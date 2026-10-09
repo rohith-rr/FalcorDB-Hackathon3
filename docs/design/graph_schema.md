@@ -1,6 +1,6 @@
 # Canonical graph schema
 
-Status: proposed core schema version 1, with the proposed [SRE extension](sre_graph_schema.md). Use application-owned IDs, not FalkorDB internal numeric node IDs. Application validators enforce edge endpoints, required fields and uniqueness; confirm database constraint/index support against the pinned release during implementation.
+Status: proposed core schema version 1, with the proposed [SRE extension](sre_graph_schema.md) and [Codex conversation extension](codex_conversations.md). Use application-owned IDs, not FalkorDB internal numeric node IDs. Application validators enforce edge endpoints, required fields and uniqueness; confirm database constraint/index support against the pinned release during implementation.
 
 ## Identity, provenance and source ownership
 
@@ -27,6 +27,9 @@ Canonical authority: the configured task provider (Plane or Jira/export) owns ta
 | `RevisionEffect` | `repository_id`, `delivery_id`, `effect_kind` (`REVERT`, `REAPPLICATION`), `effect_commit_sha`, nonempty `affected_revision_shas`, `coverage` (`COMPLETE`, `PARTIAL`, `UNKNOWN`), `authority`, `mapping_version`; common provenance fields |
 | `Document` plus `DesignDoc` or `ProcessDoc` | title, version, content hash, content path/reference, document status (`CURRENT`, `SUPERSEDED`, `DRAFT`), access scope |
 | `CheckRun` | provider ID, repository ID, SHA, name, status, nullable conclusion and completed time |
+| `Conversation` | Codex source instance, native session ID or retained import key, explicitly bound project/repository IDs, nullable title/source timestamps, active capture reference, parser dialect/version, coverage and access scope |
+| `Message` | `conversation_id`, native ID or retained source locator, `role` (`USER`, `ASSISTANT`), verified origin, sequence, nullable source timestamp/principal, sanitized content reference/hash, capture reference and source locator |
+| `DesignDecision` | exact decision revision, `status` (`PROPOSED`, `ACCEPTED`, `REJECTED`, `SUPERSEDED`), title, bounded rationale/alternatives, supporting message IDs, applicable entity IDs, review manifest/version and nullable reviewer/review time |
 
 Missing values remain unknown. Normalize task statuses to `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `CANCELLED`, `UNKNOWN`, preserving provider values. GitHub `CLOSED` is not synonymous with merged; derive merged presentation from authoritative merge fields. `IMPLEMENTED_IN` is descriptive association, not proof of completion.
 
@@ -65,6 +68,13 @@ Discovery first returns request-local candidates and retains association audit r
 | `Document:DesignDoc` | `SPECIFIES` | `Task` | Architectural requirements |
 | `Document:ProcessDoc` | `GOVERNS_PROCESS` | `Task` | Operational instructions |
 | `CheckRun` | `CHECKS_COMMIT` | `Commit` | Result for a specific revision |
+| `Conversation` | `HAS_MESSAGE` | `Message` | Normalized eligible messages from a versioned sanitized capture |
+| `Conversation` | `IN_REPOSITORY` | `Repository` | Explicit import-manifest binding; no inferred branch/code ownership |
+| `Message` | `NEXT_MESSAGE` | `Message` | Optional verified order within one conversation; gaps retain coverage limitations |
+| `Message` | `MENTIONS` | Structural entity | Scoped explicit reference or a separately labeled semantic candidate |
+| `DesignDecision` | `SUPPORTED_BY` | `Message` | Exact message evidence for the recorded rationale and intent |
+| `DesignDecision` | `APPLIES_TO` | Structural entity | Reviewed scoped applicability; proposed links remain candidates |
+| `DesignDecision` | `SUPERSEDES` | `DesignDecision` | Reviewed replacement of an exact prior revision; acyclic, same tenant |
 
 Code-ready dependency traversal follows `DEPENDS_ON` with kind `CODE`; operational dependencies use kind `PROCESS` and remain visible in blockers. Unknown kinds prevent assuming a complete code plan. Inferred hierarchy/dependency cycles are rejected at promotion; imported confirmed cycles are surfaced rather than hidden.
 
@@ -128,3 +138,11 @@ Execute every domain template through the [Phase 1 projection gates](phase_01_gr
 ## Incident schema integration
 
 The [SRE graph extension](sre_graph_schema.md) is canonical for additional entities, temporal fields and source authority. It reuses these task/code/document IDs and adds verified authorship/assignment/reviewer edges, deployment/artifact history, service-instance dependencies, effective on-call assignments and customer-feature observations. New runtime relations must preserve environment, region and validity intervals. Incident explanations remain authored records with evidence; storing a model hypothesis does not promote it to a confirmed fact.
+
+## Codex conversation authority
+
+Conversation nodes and their relationships belong to STRUCTURAL. Immutable sanitized captures, import cursors and operator review manifests are retained outside graph rebuild deletion. Logical message IDs remain stable across append; content/capture hashes and decision revision hashes are separate version fields. Do not merge distinct same-text utterances or count echoed/forked records as independent support. See [shared conversation contracts](contracts.md#codex-conversation-extension).
+
+`CONFIRMED` on `MENTIONS` confirms an exact reference resolved within authorized manifest scope, not the truth of a message claim. `SUPPORTED_BY` confirms the cited message exists; a model's extracted decision remains `PROPOSED`. An authorized review manifest alone changes a decision to `ACCEPTED`, `REJECTED` or `SUPERSEDED`, with actor/time and exact supporting revisions. Acceptance records intent, not delivery or approval to execute. Preserve conflicting reviews; reject dangling references and supersession cycles. `APPLIES_TO`/`MENTIONS` allow existing structural task, repository, branch, PR, commit, document and service-catalog targets; they cannot synthesize task dependencies, delivery mappings or incident facts.
+
+Conversation retrieval uses approved bounded templates for scoped exact lookup, incoming mentions, messages, decision evidence and supersession. Index application conversation/message/decision IDs and their authorized scope fields. All routes declare STRUCTURAL and fingerprint capture/message versions, membership, review state, negative lookups and coverage. Captures remain subject to the source-access registry independently of graph generation.

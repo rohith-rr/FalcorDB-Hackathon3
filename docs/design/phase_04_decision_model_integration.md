@@ -29,7 +29,7 @@ Keep provider differences in adapters. Pin/check actual SDK and checkpoint versi
 
 1. Wrap the Phase 3 rules router in the common interface and retain its output as a comparison baseline.
 2. Implement Jev, Clef and/or Laya adapter according to available access. Verify endpoint/SDK request and response fields with a small smoke request. Record missing access as unevaluated.
-3. Create intent `choice`: `BRANCH_BASE`, `TASK_CONTEXT`, `BLOCKERS`, `EPIC_PROGRESS`, `INCIDENT_BRIEF`, `INCIDENT_HISTORY`, `OTHER`. Exact identifiers bypass semantic entity selection but not intent resolution when needed.
+3. Create intent `choice`: `BRANCH_BASE`, `TASK_CONTEXT`, `BLOCKERS`, `EPIC_PROGRESS`, `CONVERSATION_CONTEXT`, `INCIDENT_BRIEF`, `INCIDENT_HISTORY`, `OTHER`. Exact identifiers bypass semantic entity selection but not intent resolution when needed.
 4. Retrieve authorized candidates before semantic selection. Initial cap is 10 entities/documents per call, with a configured token budget for the chosen provider. Include descriptive option text, types, task purpose and short versioned excerpts. Map selected labels back to known logical IDs.
 5. Add `NONE`/`AMBIGUOUS` options and request clarification when choices are incomplete or tied. Selection can narrow narrative context but cannot drop required delivery/verification evidence. If candidate retrieval exceeds budgets, refine scope or perform a measured hierarchical shortlist; do not silently omit the correct candidate.
 6. Add optional `noul` judgments for narrative blockers and `score` over `routine`, `blocking current work`, `urgent production impact`. Use multiple independent questions for multiple comments/documents rather than pretending `choice` is multi-select. Ticket priority and policy remain primary.
@@ -53,6 +53,12 @@ Use the sample counts and gate in the decision record: at least 60 total example
 Every branch regression from Phase 3 must pass with each adapter enabled and disabled. An adapter meeting the demo gate can be enabled for supervised semantic routing. A failed/unavailable adapter remains disabled; the completion report explains that outcome and the rules mode. This phase is complete when there is an honest evaluation and a working fallback, not when a model has merely returned valid JSON.
 
 The discovery feature has an additional [association evaluation gate](task_branch_association.md#acceptance-and-evaluation), separate from the 60 routing examples: at least 20 association cases with 10 held-out, rules/Clef comparison, and an actual Clef smoke result before claiming live identification. Include ID-free positive cases and same-person concurrent-task negatives; verify high-scoring inferred-only prerequisite coverage never produces a branch command. Report unavailable inference as an incomplete feature, without disabling known explicit task/Git workflows.
+
+## Codex conversation extension
+
+Evaluate rationale/discussion paraphrases under `CONVERSATION_CONTEXT` and permitted conversation/decision candidate selection. Exact IDs remain deterministic. Models may rank accessible messages or propose structured decisions/semantic mentions, with model/prompt/input hashes; they cannot set accepted/rejected/superseded status, grant permission or confirm operational facts. Operator-reviewed manifests remain sufficient for the POC; automatic extraction is an evaluated aid.
+
+Gate: measure ambiguous/no-match routing and unsupported-state failures alongside existing intent checks, including a transcript that contains instructions to alter the answer or accept a decision. Preserve origin/coverage qualifiers and original evidence. Exclude evaluator instructions/ground truth and generated repetitions from discovery inputs. Disclose an explicit chat task/branch link; do not report that case as ID-free Clef inference. A rules/manual-review fallback remains labeled and cannot claim an extraction model passed.
 
 ## SRE extension
 

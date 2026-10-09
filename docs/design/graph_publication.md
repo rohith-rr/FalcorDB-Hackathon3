@@ -6,7 +6,7 @@ Status: proposed, 2026-10-09. This specification fixes the reviewed ingestion, a
 
 Keep one shared FalkorDB graph and canonical entity IDs so incident paths still join directly to tasks, commits and runbooks. Partition its managed records into two logical projections with separate durable `ImportState` records and read/write gates:
 
-- `STRUCTURAL`: tasks, epics, repositories, branches, commits, reviews, document references, verified mappings and the service/directory/customer catalog.
+- `STRUCTURAL`: tasks, epics, repositories, branches, commits, reviews, document references, Codex conversations/messages/reviewed design decisions, verified mappings and the service/directory/customer catalog.
 - `INCIDENT`: alerts, incident lifecycle projections, deployments, artifacts, runtime changes, observations, effective on-call assignments and projected action records. These are derived from the retained incident event log.
 
 Every managed node/edge has immutable `projection_owner`. A relationship belongs to INCIDENT when it originates in an incident-owned record, including its links to structural entities; other relationships belong to STRUCTURAL. Versioned catalog dependencies and customer routing remain structural; runtime observations do not overwrite catalog fields. Current runtime state comes from incident evidence rather than mutating the catalog's `ServiceInstance` identity. Validate ownership before writes. A template declares all projections it reads, including cross-projection joins, and reads only their READY snapshots.
@@ -16,6 +16,10 @@ Retain canonical structural endpoints referenced by incident records, tombstonin
 An active owner bundle describes the complete logical projection, including unchanged records. Record `snapshot_id` denotes its last materialization and can predate that bundle after a delta; do not filter current records by equality with the active snapshot ID. READY plus validated bundle membership/coverage establishes the current view. Fingerprints exclude this materialization metadata while evidence preserves its originating read tokens and observation times.
 
 One application worker serializes publication. Acquire gates in STRUCTURAL, INCIDENT order, then the access-registry gate if needed; no reverse acquisition. Incident publication holds the structural shared gate to validate endpoints and its own exclusive gate. Structural rebuild/recovery holds both exclusive gates to protect cross-projection links, but changes only its owned records/state unless explicitly performing a coordinated import. A multi-projection publication marks every affected projection DIRTY before mutation and admits readers only after all required projections are durably READY. A failed incident update blocks incident-backed reads; structural-only queries remain available. Structural recovery blocks both kinds of read. Direct, MCP, picker, cache and trace routes use these same declarations/gates.
+
+## Conversation imports
+
+Codex imports follow [the conversation capture protocol](codex_conversations.md#capture-identity-and-publication): stage immutable sanitized captures and a pending append cursor, reconcile the complete STRUCTURAL bundle, and publish through this writer. Persist the acknowledged cursor only after READY; restart reconciles a published bundle before replay. Manual batches do not create a third projection, mutate INCIDENT or rebuild after every JSONL line. Retained content/reviews/cursors are outside projection deletion. An unrelated chat batch preserves equivalent branch/incident answer inputs; relevant changed mentions/rationale/status/access invalidate the affected read set.
 
 ## Durable incident batching
 
@@ -39,6 +43,7 @@ An incident answer states the published log position/time it covers. Attach curr
 - Every approved template ID/version, exact scoped parameters and fixed query-time reference timestamps; canonical semantic result hash and coverage/completeness hash.
 - Entity and relationship IDs, source versions, values/qualifiers, adjacency membership, document hashes/anchors, mapping/effect/policy/identity versions and original freshness deadlines.
 - Exact relevant candidate/stable Git heads and source-resource/enclosing-scope access versions.
+- For conversation reads: capture/message hashes, eligible origin/lineage, scoped mention/candidate membership, decision revision/review/status/supersession, negative searches and capture coverage. Extracted summaries cannot stand in for missing original evidence.
 
 A template fingerprint includes all rows and relationship evidence within its declared bound, not just nodes cited by the LLM. Hash empty results with the full lookup scope and authoritative coverage; hash aggregate membership/counts and eligibility rules. A newly added prerequisite, epic child, delivery effect, deployment or matching candidate must change the relevant read result even if every previously cited node is unchanged. Include observation times that support a claim, but exclude transport-only metadata such as projection generation, snapshot ID and ingestion time. Use canonical ordering and application IDs, never internal numeric IDs or incidental row order. Overflow, restricted/incomplete critical coverage, unsupported templates or missing fingerprints cannot establish equivalence.
 

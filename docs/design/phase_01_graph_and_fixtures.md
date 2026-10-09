@@ -14,6 +14,7 @@ backend/app/graph/import_state.py
 backend/app/graph/{projection_ownership,read_sets}.py
 backend/app/graph/templates/*.cypher
 backend/app/storage/documents.py
+backend/app/storage/conversation_captures.py
 scripts/seed_graph.py
 tests/integration/test_graph_queries.py
 tests/integration/test_graph_loader.py
@@ -71,6 +72,12 @@ Retain seed commands, expected counts and a browser screenshot/path export for t
 Verify direct/MCP reads, the picker and stored evidence routes use the same projection admission rules. Seed/reset scripts cannot bypass them. During a provider call, unrelated publication may finish and an equivalent read set may publish; changed dependencies, aggregates, absence results, effects or permitted content must invalidate it. Include INCIDENT DIRTY with structural queries still working, cross-owner recovery preserving links, and unrelated/relevant generation changes during traversal and inference. Retained records survive rebuild/restart. Run the [publication acceptance cases](graph_publication.md#required-implementation-evidence); startup instructions declare ownership, single writer, cadence/caps and gate order.
 
 The [FalkorDB resource plan](falkordb_resources_and_hackathon_plan.md) supplies the incident query inventory and an illustrative deployment read. Keep actual tested `.cypher` templates and evidence outputs in the implementation repository. SDK extraction/deduplication must not modify canonical operational identities without a reviewed compatibility implementation.
+
+## Codex conversation extension
+
+Add canonical `Conversation`, `Message` and `DesignDecision` nodes and the [schema relationships](graph_schema.md#codex-conversation-authority) to STRUCTURAL. Validate scoped mentions, message membership/order, review revision bindings and acyclic supersession. Keep sanitized captures/cursors/reviews outside projection deletion. Add bounded templates/indexes for scoped conversation lookup, incoming mentions, eligible messages and decision evidence/replacements; include empty results, candidate membership, hashes/status/coverage in read sets. A confirmed mention establishes only a reference.
+
+Gate: load the synthetic conversation graph, retrieve cited messages and proposed/accepted/superseded decisions, reject cross-tenant/dangling/cyclic links, and prove reimports preserve IDs and distinct repeated utterances. Interrupted chat publication must recover from the retained full STRUCTURAL bundle while preserving other structural sources and incident links. Transcript picker/view and direct/MCP routes use the same readiness/access gates. Document actual database/query behavior with the pinned release.
 
 ## SRE extension
 

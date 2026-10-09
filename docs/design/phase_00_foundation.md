@@ -16,6 +16,9 @@ backend/pyproject.toml
 backend/app/main.py
 backend/app/config.py
 backend/app/contracts/{query,evidence,decision,answer}.py
+backend/app/contracts/conversations.py
+fixtures/conversations/{local_session,cli_events}.jsonl
+fixtures/conversations/{expected,review_manifest}.json
 fixtures/payments/{tasks,pulls,reviews,documents,links}.json
 fixtures/tls/{tasks,documents,links}.json
 fixtures/scenarios.json
@@ -89,6 +92,12 @@ Include the approved POC core decisions in foundation contracts/fixtures: `Sourc
 Record tested versions, startup commands and fixture inventory. Phase 1 starts when the runtime is ready and shared contract choices are settled.
 
 Apply the [FalkorDB resource plan](falkordb_resources_and_hackathon_plan.md): verify the pinned image's actual persistence directory, prove that the graph survives a container restart, and record the server/client/MCP compatibility matrix. A hosted demo is optional and retains working local instructions.
+
+## Codex conversation extension
+
+Implement the configuration and typed [conversation contracts](contracts.md#codex-conversation-extension) from [the source specification](codex_conversations.md). Register allowlisted sources and explicit tenant/project/repository bindings, dialect/producer/parser/redaction versions, caps, capture storage and cursor policy. Add `CONVERSATION_CONTEXT`, optional exact IDs, message/review evidence and nullable `conversation_context` without changing existing clarification tokens or BRANCH/INCIDENT decision types.
+
+Create sanitized synthetic JSONL fixtures alongside the expected normalization/review manifest. Cover visible user/assistant messages, injected user-role context, echoes, distinct repeated utterances, null IDs/times, partial tails, unsupported records, compaction/forks and missing attachments. Keep real personal session logs, hidden reasoning and credentials out of committed fixtures. Gate: configuration/contract checks reject arbitrary file paths and conflicting scope; fixture expectations distinguish proposed, accepted and superseded intent from verified operational facts. This gate prepares inputs; it does not claim a working importer.
 
 ## SRE extension
 

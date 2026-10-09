@@ -12,6 +12,7 @@ The Company Brain can be demonstrated from a natural-language question to a cite
 frontend/package.json
 frontend/src/{App,api,types}.tsx
 frontend/src/components/{QueryForm,AnswerPanel,DecisionCard,SourceList,TracePanel}.tsx
+frontend/src/components/{ConversationContext,TranscriptView}.tsx
 tests/end_to_end/test_company_brain.py
 scripts/run_scenario_suite.py
 reports/demo_acceptance.md
@@ -83,6 +84,14 @@ Test authorization using configured allowed/denied demo scopes, ensure traces ca
 9. Retrieve actual live Plane task context and an allowlisted Google Doc, including multiple tabs and a table. Show source-backed citations and source-specific modes using the [adapter smoke gate](source_adapters.md#acceptance-and-completion-record).
 
 Completion requires the scenario report, tested startup/seed/recovery instructions, successful real API answer evidence from Phase 5, both live Plane/Google Docs adapter smoke results, a replayable demo, and an explicit list of unfinished production capabilities. Export-only fallback or unavailable live credentials leaves this full gate incomplete. Do not call the system production-ready at this gate. These are future implementation checks, not results of the design revision.
+
+## Codex conversation extension
+
+Add discussion/rationale prompts, optional exact conversation/decision IDs, accessible candidates and an authorized bounded transcript view. Candidates submit a fresh exact-ID request, separate from existing task/repository/branch token continuation. Render role/source time, capture time/mode/coverage, source excerpts and decision status/review/replacement from engine fields. Explain proposed versus accepted versus superseded intent in plain language. An accepted decision is not an execution approval or delivery result.
+
+Add a demo segment: import an explicitly selected real Codex JSONL file, ask why an approach was chosen, follow a message citation, show a reviewed replacement, then repeat/append the import. Include an assistant's incorrect merge claim to show authoritative code facts still govern branch decisions. Show ambiguity, partial-tail/overflow and inaccessible-source behavior without leaking private content.
+
+Gate: the conversation acceptance cases in [the source specification](codex_conversations.md#required-implementation-evidence) pass alongside existing branch/incident/live-source gates, with actual parser/capture/review versions and results in the demo report. Conversation completion is additional; it cannot turn an unevaluated live adapter or action test into a passing result. This design update imports no transcript and implements no UI.
 
 ## SRE extension
 

@@ -12,13 +12,15 @@ Live Plane task data, Google Docs content, GitHub change/review metadata and sup
 backend/app/ingestion/{normalize,reconcile,manifest,snapshots}.py
 backend/app/ingestion/{event_log,event_batches,incident_projection}.py
 backend/app/associations/{periods,candidates}.py
-backend/app/connectors/{github,plane,google_docs,jira_export,markdown}.py
+backend/app/connectors/{github,plane,google_docs,codex_jsonl,jira_export,markdown}.py
+backend/app/ingestion/{conversation_normalize,conversation_mentions,decision_reviews}.py
 scripts/import_sources.py
 schemas/relationship_manifest.json
 tests/ingestion/test_normalization.py
 tests/ingestion/test_reconciliation.py
 tests/connectors/test_github_reads.py
 tests/connectors/{test_plane_reads,test_google_docs_reads}.py
+tests/connectors/test_codex_jsonl.py
 ```
 
 The demo connector scope requires live read-only Plane, Google Docs and GitHub adapters; Jira JSON/CSV import and Markdown/document manifests remain supported. The [source-adapter specification](source_adapters.md) defines authentication, mappings, interfaces, failure behavior and the live gate. Live Jira OAuth, arbitrary PDF extraction, comment NER, native Plane dependency enumeration and inferred dependencies are deferred. A labeled export fallback does not satisfy the live integration gate.
@@ -82,6 +84,14 @@ Verify repeated imports, updated refs, closed-unmerged PRs, dismissed reviews, d
 Verify work periods across reassignment, status changes/reopening, multiple assignees and time zones; a lone current snapshot or generic update timestamp must not fabricate history. Author/time candidates retain exact head/commit evidence, and unrelated inherited commits or missing identities cannot create confirmed links. Repeated imports of the same evidence are idempotent; changed periods/heads invalidate discovery caches.
 
 Completion requires valid Payments/TLS imported snapshots with confirmed delivery/dependency scope and provenance, plus actual live Plane and Google Docs smoke results and source-backed task/document citations as specified in [source adapters](source_adapters.md#acceptance-and-completion-record). Missing credentials/provider availability leave the live gate incomplete. A fixture/export-only mode remains usable but labeled as a partial deliverable.
+
+## Codex conversation extension
+
+Implement [the JSONL adapter](codex_conversations.md) through `SourceAdapter.read_scope`. Pin a complete-line prefix, classify origin, sanitize eligible content, canonicalize dialect echoes and retain stable IDs/immutable captures. Real sessions are IMPORT. Append checks validate prefix continuity; unfinished tails are deferred, malformed complete/unknown content-bearing records block checkpoint advancement, and rewritten/truncated sources require reconciliation. Missing files do not imply deletion. Resolve exact permitted mentions against existing endpoints; extraction/manual entries propose decisions, and reviewed manifests change exact revisions' intent status.
+
+Stage capture and cursor metadata in a complete reconciled STRUCTURAL bundle and publish through the single writer. Acknowledge the cursor after READY; reconcile crashes between publication and acknowledgment. Queries never trigger ingestion. Automatic watching is optional after manual repeatable imports pass.
+
+Gate: import a synthetic fixture and one explicitly selected real project transcript; reimport/append without duplication or timestamp fabrication. Exercise malformed/partial/unsupported records, origin filtering, echoes/repeated text, replacement/parser changes and denied access. Retain sanitized results/capture metadata only. Show exact task/document mentions and reviewed supersession with source citations; crash/restart neither loses records nor erases incident evidence. These checks supplement required live Plane/Google Docs/GitHub gates.
 
 ## SRE extension
 

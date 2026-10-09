@@ -10,6 +10,7 @@ The API returns a typed branch recommendation or an explicit inability to select
 
 ```text
 backend/app/traversal/{controller,resolver,dependencies,documents,progress}.py
+backend/app/traversal/conversations.py
 backend/app/decisions/{branch_policy,review_policy,commands}.py
 backend/app/verification/{git,provider,coverage}.py
 scripts/build_git_fixtures.py
@@ -81,6 +82,12 @@ Create actual temporary Git repositories for conventional merges, unmerged featu
 Pass all Phase 0 branch scenarios. Include diamond DAG versus cycle, configured stable ref other than main, multiple repositories sharing a branch name, partial task delivery, PR merged into a different target, later unmerged branch additions, deleted feature with stable coverage, and review dismissal/current-head differences. Confirm no denied/incomplete/stale case yields a command. Payments selects the backend feature with review warnings; a verified complete stable delivery selects stable. Retain typed output and trace for Phase 4 comparisons.
 
 Add real Git histories where stable conventionally merges then reverts a delivery while feature is unchanged: stable must be `REVERTED` and feature `INCLUDED`. Verify complete restoration and later reversions, squash/rebase alternatives that cannot bypass same-group effects, unrelated reversions, partial/incomparable restoration, missing objects and conflicts. Ambiguity returns `UNKNOWN` with no command. Changed mapping/effect inputs invalidate caches with unchanged heads; unrelated publications preserve equivalent accumulated inputs. Include 201 rows concentrated on one frontier task: overflow must remain explicit and cannot yield a complete recommendation or silently omit other tasks.
+
+## Codex conversation extension
+
+Route `CONVERSATION_CONTEXT` through scoped lookup and bounded conversation/message/decision templates, with no mandatory task when authorized project/repository scope is resolved. Respect exact conversation/decision IDs and retrieve original supporting messages, corrections, alternatives and review/supersession state together. Defaults: 20 conversations, 50 messages, 10 decisions plus byte/token/depth limits and explicit overflow. Task context may include linked discussions but branch coverage and incident checks never consume them as source truth.
+
+Conversation/decision ambiguity returns permitted candidates in `ConversationContext` with no selected rationale; the client narrows scope or submits a fresh exact-ID request. Existing task/repository/branch continuation tokens are unchanged. Gate: exact, scoped-title, task-mention and reviewed-replacement retrieval all preserve provenance; ambiguous/restricted/incomplete cases do not guess or prove absence. Relevant message/mention/review changes invalidate output, unrelated publications preserve equivalent read sets, and denied captures suppress both messages and derived rationale.
 
 ## SRE extension
 

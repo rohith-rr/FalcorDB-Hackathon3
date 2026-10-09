@@ -4,7 +4,7 @@ Status: proposed design; application implementation has not started. Revised 202
 
 ## Product intent
 
-Create a Company Brain that connects epics, stories, tasks, repositories, branches, commits, PRs, code reviews, design documents and operational documents. An engineer asks a short question and receives context, a practical recommendation and the evidence behind it.
+Create a Company Brain that connects epics, stories, tasks, repositories, branches, commits, PRs, code reviews, design documents, operational documents and Codex conversations. An engineer asks a short question and receives context, a practical recommendation and the evidence behind it.
 
 The first complete use case is: **Which branch should I branch from to implement the Public API when its backend dependency has not reached the stable branch?** The same graph should explain task blockers, find design/process documents, and summarize initiative progress.
 
@@ -30,7 +30,7 @@ Explicit graph paths support relationship queries, but there is no universal fiv
 
 ```mermaid
 flowchart TD
-    Sources[Code, tasks, documents, monitoring and deployment records] --> Ingest[Normalize, reconcile and preserve provenance]
+    Sources[Code, tasks, documents, Codex chats, monitoring and deployment records] --> Ingest[Normalize, reconcile and preserve provenance]
     Ingest --> Graph[FalkorDB]
     Question[Engineer question] --> Scope[Authenticate and establish scope]
     Scope --> Resolve[Exact lookup and candidate retrieval]
@@ -55,6 +55,12 @@ Imports use the [Phase 1 durable protocol](docs/design/phase_01_graph_and_fixtur
 
 The hackathon POC uses one application writer and completes initial scenario publication before investigation; subsequent event batches follow the configured cadence. Curated manifests are valid inputs; automated mapping maintenance remains future work. Shared contracts preserve request-local suggestions/audits, explicit incident scope, required checks, typed answer facts and independent source-access invalidation. Clarification selections survive unrelated imports and recompute current evidence. Approved sandbox execution returns 202 with a durable job receipt; the worker restores the target and measures recovery while the UI polls plan status. [Core decision index](docs/design/README.md#poc-core-decisions).
 
+### Codex conversation integration
+
+Import explicitly selected Codex chat `.jsonl` files through a versioned local adapter, retaining sanitized message content, source locators, capture hashes and coverage. Connect `Conversation`, `Message` and reviewed `DesignDecision` records to existing graph entities in STRUCTURAL. Support questions such as “Why did we choose this approach?” and “What did we discuss about this task?” with citations to the original messages and the review that accepted or superseded a design decision. Chat content records discussion and intent; task state, delivery, incident cause and action approval still require their authoritative sources.
+
+The [Codex conversation specification](docs/design/codex_conversations.md) defines supported transcript dialects, origin filtering, deduplication, append checkpoints, scoped mentions, review authority, access and acceptance checks. Local real transcripts are labeled `IMPORT`; fixtures are `FIXTURE`. A file watcher is optional and does not make a transcript an authenticated live operational source. No raw personal transcript is committed to the repository. This is a requested POC feature with completion gates in Phases 0–6; ingestion and query implementation remain future work.
+
 ## Canonical graph
 
 See [graph schema](docs/design/graph_schema.md) for properties, identity and provenance.
@@ -72,6 +78,9 @@ See [graph schema](docs/design/graph_schema.md) for properties, identity and pro
 | `Document:DesignDoc` | `SPECIFIES -> Task` |
 | `Document:ProcessDoc` | `GOVERNS_PROCESS -> Task` |
 | `CheckRun` (optional in the demo) | `CHECKS_COMMIT -> Commit` |
+| `Conversation` | `HAS_MESSAGE -> Message`, manifest-bound `IN_REPOSITORY -> Repository` |
+| `Message` | Scoped `MENTIONS ->` existing structural entities; optional `NEXT_MESSAGE -> Message` |
+| `DesignDecision` | `SUPPORTED_BY -> Message`, reviewed `APPLIES_TO ->` structural entities, `SUPERSEDES -> DesignDecision` |
 
 All nodes and relationships carry tenant identity, source references, observation times and snapshot identity. Relationships distinguish explicit/confirmed links from inferred candidates. Inferred links cannot justify a branch command. Store document content/version and individual reviews, not just titles and an aggregate review string.
 
@@ -118,6 +127,8 @@ Ancestry proves historical inclusion, not that later code preserves every behavi
 
 **TLS.** Resolve Task-404, follow incoming `GOVERNS_PROCESS` edges, retrieve the current accessible runbook content, and explain only supported steps with its source link. Keep the task's observed state unchanged. If four of five eligible leaf tasks are completed, display `4/5 = 80%` with counts and observation time. Report incomplete status coverage explicitly.
 
+**Design rationale.** Resolve a scoped task/repository or an exact conversation, retrieve accessible messages and reviewed decisions, and explain the recorded rationale with message citations, decision status and capture coverage. A superseded decision includes its reviewed replacement. “The assistant said it was implemented” is cited as a chat statement and cannot establish delivery. An incomplete import cannot establish that an idea was never discussed.
+
 ## Coding phases
 
 Start at the [implementation index](docs/design/README.md). Each document defines coding tasks, proposed files, validation and a completion gate.
@@ -126,8 +137,8 @@ Start at the [implementation index](docs/design/README.md). Each document define
 | --- | --- |
 | [0: Foundation](docs/design/phase_00_foundation.md) | Runtime, contracts and scenario fixtures |
 | [1: Graph](docs/design/phase_01_graph_and_fixtures.md) | Schema, durable import/recovery and query templates |
-| [2: Ingestion](docs/design/phase_02_ingestion_and_sync.md) | Plane/Google Docs/GitHub reads, exports and explicit links |
-| [3: Traversal](docs/design/phase_03_traversal_and_branch_decisions.md) | Verified branch and blocker decisions |
+| [2: Ingestion](docs/design/phase_02_ingestion_and_sync.md) | Plane/Google Docs/GitHub reads, Codex JSONL imports, exports and explicit links |
+| [3: Traversal](docs/design/phase_03_traversal_and_branch_decisions.md) | Verified branch/blocker decisions and scoped conversation context |
 | [4: Decision models](docs/design/phase_04_decision_model_integration.md) | Adapters, evaluation and routing gate |
 | [5: Answers](docs/design/phase_05_context_and_llm_answers.md) | Evidence bundle, real LLM API call and fallback |
 | [6: Demo](docs/design/phase_06_ui_evaluation_and_demo.md) | Query UI, graph explanation and regression checks |
@@ -140,6 +151,7 @@ Phase completion is defined by each phase's completion gate, not by elapsed time
 - Payments returns the verified backend base with review warnings and source citations; complete stable delivery selects stable instead.
 - Independent dependency branches, stale data, missing mappings, cycles and inaccessible prerequisites withhold a single-base command and explain the limitation.
 - Task context includes available design/process documents, implementation and individual reviews with source versions.
+- Codex imports expose source-backed messages and reviewed design rationale, with stable IDs, idempotent reimports/append, explicit partial coverage and accepted/superseded status. Chats cannot confirm implementation, incident cause or action approval.
 - LLM prose cannot change branch/revision selections, task states, progress, commands or source links.
 - The UI exposes the actual traversal and verification evidence and distinguishes fixtures from live results.
 - Interrupted imports remain blocked across application/database restart until a validated full rebuild; no mixed-snapshot answer or command appears.

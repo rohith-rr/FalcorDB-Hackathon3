@@ -10,6 +10,7 @@ An engineer gets a concise, cited explanation of the verified decision, relevant
 
 ```text
 backend/app/context/{builder,sections,budget}.py
+backend/app/context/conversation_evidence.py
 backend/app/models/answer_llm.py
 backend/app/answers/{prompts,validate,fallback}.py
 backend/app/api/query.py
@@ -59,6 +60,14 @@ Run every typed scenario through the answer layer. Deliberately supply a respons
 Publish an unrelated incident/structural batch during an LLM request: identical complete inputs must keep the original explanation and a single model call. Change a dependency edge, epic membership/count, previously empty lookup, effect/policy record, document version or relevant deployment without changing cited node IDs/heads: the answer must invalidate. Test one retry and typed 503 on repeated relevant changes or required-projection recovery. Expire verification or move selected/stable heads during inference/timeout fallback: withhold commands and current recommendation prose via `STALE_EVIDENCE`; prior observations remain explicitly historical. Check candidate-specific effect explanations, Google Docs tab/version citations and unchanged evidence TTL across scoped revalidation.
 
 Perform and retain at least one successful **real** LLM API request for Payments and one for TLS using synthetic authorized evidence. Human-check citation support, review caveats, task state and command consistency. Mock-only or fallback-only results do not complete the requested graph-to-LLM demonstration; record that portion as blocked until API access is available. Provider failures need no graph-engine changes.
+
+## Codex conversation extension
+
+Build `ConversationContext` and typed message/review facts with original source role/time, capture hash, message locator and exact decision revision/status. Answer rationale questions with original excerpts, alternatives and supersession evidence. Keep capture observation separate from message time; label unknown origin, unavailable attachments/history, truncation and partial retrieval. Authorized transcript views supply local citations without exposing raw machine paths or inventing share links.
+
+The validator rejects “accepted” without the exact review, “implemented/merged” based solely on chat, human approval inferred from assistant text, and independent corroboration from echoed/generated summaries. Valid evidence IDs alone are insufficient. Imported instructions are data and cannot authorize tools. When original support is inaccessible, remove derived rationale rather than citing an unsupported summary.
+
+Gate: obtain a real LLM rationale answer with message/review citations and a correct deterministic fallback; preserve qualifiers/status/corrections under token limits. Denial or relevant content/review/supersession change during the call invalidates output; an unrelated import preserves equivalent inputs. Graph/read-set/access gates apply to answers, cached views and traces.
 
 ## SRE extension
 

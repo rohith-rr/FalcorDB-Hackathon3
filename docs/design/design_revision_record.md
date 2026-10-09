@@ -1,6 +1,16 @@
 # Design revision record
 
-Date: 2026-10-09. Scope: approved design corrections, live adapter planning, requested Clef task-branch discovery and embedded POC core fixes. Application implementation has not started. The workspace is now a Git repository; earlier validation notes below retain their historical context.
+Date: 2026-10-09. Scope: approved design corrections, live adapter planning, requested Clef task-branch discovery, embedded POC core fixes and Codex conversation integration. Application implementation has not started. The workspace is now a Git repository; earlier validation notes below retain their historical context.
+
+## Requested Codex conversation integration
+
+Date: 2026-10-09. The user requested embedding local Codex chat JSONL ingestion in the design. [Codex conversations](codex_conversations.md) now owns the source-registration, versioned dialect/origin parser, sanitized capture/identity, deduplication, complete-line cursor/recovery, scoped mention, reviewed decision, retrieval/citation and access rules. The master/index, canonical schema/contracts, source adapters/publication, Phases 0–7, model/association policy and SRE/demo instructions consume this specification.
+
+The extension adds STRUCTURAL `Conversation`, `Message` and `DesignDecision` records, `CONVERSATION_CONTEXT`, message/review evidence and authorized transcript views. Models propose decisions; versioned operator reviews record accepted/rejected/superseded intent. Chat statements never confirm task/delivery/incident facts, approve actions or supply independent corroboration of their own generated claims. Local sessions remain IMPORT, synthetic inputs FIXTURE; no third projection or per-line rebuild is introduced. Manual repeatable import is the POC path, automated watching/extraction optional. The existing live-source, branch, incident and action gates remain; the eighteen-task seed catalog, receipts and archived draft are preserved.
+
+This revision edits specifications only. No runtime importer/model/UI, source imports, external task writes or chat copying were performed. Runtime acceptance checks remain future work.
+
+Documentation validation passed across 29 Markdown files: 306 local links, 88 heading anchors, balanced code fences, one parsed JSON example and three parsed JSON files. The archived original SHA-256 is unchanged, existing demo JSON/receipts were not edited, and `git diff --check` passed. These results include the existing untracked POC review and the new conversation specification; they verify documents, not runtime ingestion or retrieval.
 
 ## Review findings resolved in the specifications
 

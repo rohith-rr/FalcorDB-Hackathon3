@@ -6,6 +6,8 @@ This is a creation recipe, not a record that tasks or PRs already exist. Local k
 
 ## Copy-paste prompt
 
+The [requested Codex conversation extension](../design/codex_conversations.md) is implemented through the existing phase tasks and their updated design gates. Keep the eighteen stable task keys/dependency catalog and existing seed payload/receipts unchanged unless a separate backlog update is requested. Import only explicitly selected project chats and reviewed rationale; this seed recipe, evaluator prompts and ground-truth associations are not discovery evidence. A chat-reported implementation or approval cannot populate delivery mappings or execution receipts. Record real conversation import evidence in the phase completion report after implementation.
+
 > Read `docs/demo/plane_project_seed_instructions.md`. Execute the initial Plane seeding workflow in the existing Plane project named **Falcor DB hackathon**. Resolve its actual workspace and project ID through the connected tools; if multiple projects match that name, ask which workspace to use. Do not create a new project. Create or reuse the four parent epics and eighteen implementation tasks in that project, including the specified task dependencies, and write the local receipts and relationship manifest. Use the supplied descriptions and acceptance criteria without expanding the scope. Do not implement code, create placeholder PRs, or manufacture completed work. Reuse existing records on reruns. Ask only for required scope or access information that cannot be resolved from the supplied configuration or connected tools. Report the resolved workspace/project, actual created/reused IDs, and any incomplete items.
 
 ## Inputs to resolve once

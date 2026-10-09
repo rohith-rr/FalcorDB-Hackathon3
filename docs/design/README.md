@@ -8,6 +8,7 @@ Read the [master design](../../requirement_doc.md) first. This folder divides co
 - [Application contracts](contracts.md): typed requests, branch decisions, evidence and API responses.
 - [Graph publication](graph_publication.md): projection ownership, durable incident batching, scoped read-set validation and generation-independent clarification.
 - [Source adapters](source_adapters.md): required live Plane/Google Docs reads, provider mappings, labeled export fallback and smoke gates.
+- [Codex conversations](codex_conversations.md): selected JSONL imports, message provenance, scoped mentions, reviewed design decisions and conversation queries.
 - [Task-branch association](task_branch_association.md): assignment/in-progress windows, author/commit evidence and Clef inference when explicit task references are absent.
 - [Decision model evaluation](decision_models.md): Jev/Clef/Laya evaluation, alternatives and selection policy.
 - [POC core logic review](../reviews/poc_core_logic_review.md): assessment under the hackathon POC scope and the concrete decisions needed for the demo.
@@ -42,8 +43,8 @@ To use the project's own implementation work as demo data, follow the [Plane bac
 | --- | --- | --- | --- |
 | 0 | [Foundation](phase_00_foundation.md) | Shared specifications | Running API/database and deterministic scenarios |
 | 1 | [Graph and fixtures](phase_01_graph_and_fixtures.md) | 0 | Durable interrupted-import recovery and scoped query results |
-| 2 | [Ingestion and sync](phase_02_ingestion_and_sync.md) | 1 | Normalized snapshots, confirmed links and live Plane/Google Docs smoke evidence |
-| 3 | [Traversal and branch decisions](phase_03_traversal_and_branch_decisions.md) | 2 | Correct typed recommendations and trace evidence |
+| 2 | [Ingestion and sync](phase_02_ingestion_and_sync.md) | 1 | Normalized snapshots, confirmed links, live Plane/Google Docs smoke evidence and repeatable Codex imports |
+| 3 | [Traversal and branch decisions](phase_03_traversal_and_branch_decisions.md) | 2 | Correct typed recommendations, scoped conversation retrieval and trace evidence |
 | 4 | [Decision model integration](phase_04_decision_model_integration.md) | 3 | Measured routing choice or documented rules fallback |
 | 5 | [Context and LLM answers](phase_05_context_and_llm_answers.md) | 3, 4 | A cited explanation from a real LLM API call |
 | 6 | [UI, evaluation and demo](phase_06_ui_evaluation_and_demo.md) | 5 | Reproducible demo and scenario regression report |
@@ -59,9 +60,11 @@ The recommended hackathon demonstration leads with incident investigation and ap
 
 Phase completion is defined by each phase's completion gate, not by elapsed time. Effort is re-estimated after the recovery/persistence and live-adapter compatibility checks rather than committed to hour figures in advance.
 
-The demo covers one organization, one project and one repository. If scope must shrink, cut extra connectors beyond Plane/Google Docs/GitHub, sophisticated visuals, optional checks ingestion and model fine-tuning. Preserve durable recovery, candidate-specific revision effects, the verified branch workflow, review warnings, TLS content, citations, traversal trace and a real retrieval-to-LLM explanation. Live Plane and Google Docs are required completion gates; export fallback is labeled as a partial deliverable. Keep fixtures clearly labeled. A rules-only demo does not establish the value of Jev, Clef or Laya. For the SRE-focused demo, use the alternative scope and cuts in the [SRE integration plan](sre_integration_plan.md).
+The demo covers one organization, one project and one repository. If scope must shrink, cut extra connectors beyond Plane/Google Docs/GitHub and the requested Codex import, sophisticated visuals, optional checks ingestion and model fine-tuning. Preserve durable recovery, candidate-specific revision effects, the verified branch workflow, review warnings, TLS content, conversation provenance/review gates, citations, traversal trace and a real retrieval-to-LLM explanation. Live Plane and Google Docs are required completion gates; export fallback is labeled as a partial deliverable. Keep fixtures clearly labeled. A rules-only demo does not establish the value of Jev, Clef or Laya. For the SRE-focused demo, use the alternative scope and cuts in the [SRE integration plan](sre_integration_plan.md).
 
 ## Questions settled by default
+
+The requested Codex extension uses allowlisted local JSONL imports, separate sanitized captures and a versioned parser; manual import precedes optional watching. Conversation/message/decision records belong to STRUCTURAL. Extracted decisions start `PROPOSED`; authorized operator review records accepted intent. No chat statement grants source truth or execution approval. The Phase 0–6 conversation gates are additional POC requirements and do not replace the live Plane/Google Docs or branch/incident gates.
 
 Python backend; React frontend; fixtures/exports first, then required live Plane/Google Docs/GitHub reads; Markdown and verified manifests supported; durable per-projection recovery, fixed incident batching and scoped answer validation; candidate-specific revision effects; one process/demo tenant/repository; configured stable ref; advisory production actions; model-guided exploration; asynchronous approved sandbox execution with polling; no NER pipeline. Update canonical contracts before changing consumers.
 

@@ -4,6 +4,8 @@ Status: planned, 2026-10-09. This is a coding plan and documentation integration
 
 ## 1. Architecture decision
 
+The requested [Codex conversation integration](codex_conversations.md) reuses STRUCTURAL and the shared phases. Accessible messages and reviewed design intent can explain historical rationale or alternatives when linked to an existing service/runbook/task. Cite them as discussion evidence; they cannot establish incident cause, deployed artifact, current responder, recovery success or action approval. Operational observations and the exact current action protocol retain their authority. Conversation imports preserve INCIDENT records and use the same read-set/access checks; they do not enter the incident event log as new operational facts.
+
 One Company Brain supports development questions and incident questions through the same entity identities, source adapters, permissions, decision-model interface, evidence store, traversal trace and answer LLM.
 
 For incidents, use **model-guided graph exploration**. The decision model selects a next node or evidence request from application-provided choices. Application code fetches those choices, tracks several pending paths, enforces mandatory checks and records evidence. Known factual joins remain ordinary queries; there is no need to ask a model which commit a deployment record identifies.

@@ -4,6 +4,8 @@ Status: proposed; incident exploration and Clef documentation added 2026-10-09. 
 
 ## Decision
 
+The [Codex conversation extension](codex_conversations.md) adds `CONVERSATION_CONTEXT` routing and optional permitted message/decision selection. Evaluate these against exact/rules retrieval. Automated decision extraction is optional: models produce PROPOSED records with source evidence and versioned inputs, while an authorized operator review manifest records accepted/rejected/superseded intent. Models cannot use a chat statement to establish operational truth or action permission. Repeated generated summaries are not independent evidence; original accessible messages and review status remain required.
+
 Use model-guided graph exploration within application-controlled reads and state verification. Evaluate specialized decision models for next-node/evidence selection, intent/entity/document routing and optional narrative judgments. Maintain several pending paths and required-check coverage. Use a separate LLM API after evidence retrieval to explain results. Ship labeled rules routing if a model fails evaluation; do not replace source facts with probabilistic judgments.
 
 Add the requested [Clef task-branch association](task_branch_association.md): assignment/in-progress windows and mapped author activity retrieve candidates; Clef compares task purpose, commit messages and changed paths when explicit identifiers are absent. Evaluate this separately from routing, with competing simultaneous tasks and multiple possible branches. Model output establishes a candidate association, never verified delivery or unique branch ownership. The feature requires its own actual Clef smoke/evaluation result; using Jev/Laya for other routing does not demonstrate it.

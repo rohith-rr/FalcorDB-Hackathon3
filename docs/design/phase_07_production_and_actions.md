@@ -43,6 +43,12 @@ Gate: each new question family has a contract, authoritative sources, permission
 
 Publish measured service SLOs, access controls, data coverage limits, restore procedures, provider dependencies and action failure behavior. Review operational readiness using actual evidence. The Company Brain is ready for a wider rollout only when its source freshness, authorization and decision correctness can be maintained outside curated demo fixtures.
 
+## Codex conversation extension
+
+Extend source ACLs, retention/redaction/deletion, backups and audit policy to sanitized captures, message excerpts, embeddings, reviewed decisions, traces and model inputs. Removing supporting content must invalidate derived rationale while preserving a permitted minimal audit marker; never revive denied content through a graph rebuild. Measure per-user access propagation before using real company chats. A public repository does not make its conversations public.
+
+Optional watchers/hooks use a versioned dialect registry, bounded batching, durable cursors and explicit selected-source access. Detect prefix replacement/parser changes, reconcile periodically and support operator review conflicts and supersession. These conveniences must preserve the manual-import recovery/read-set protocol. Chats and accepted intent never bypass the exact current action approval, target/evidence validation or executor authorization. Gate: restore/deletion/revocation and multiworker publication exercises cover conversation-derived output as well as documents.
+
 ## SRE extension
 
 Promote the [incident requirements](../../SRE%20event%20handling.md) through actual monitoring/deployment/on-call/customer connectors, coverage reconciliation and per-user access controls. Treat draft notification, approved send, approved production action and incident closure as separate permissions. Production execution requires an exact expiring plan, current-state revalidation, scoped credentials, per-target serialization, idempotency, audit/outcome records and service-specific recovery checks. Verify provider receipts/actual state before retrying ambiguous outcomes. Store human-reviewed incident explanations and owned follow-up tasks without promoting generated text to trusted facts. See the [SRE integration plan](sre_integration_plan.md).

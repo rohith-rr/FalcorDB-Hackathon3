@@ -4,6 +4,8 @@ Status: proposed implementation addition. The workspace contains design document
 
 ## Intended behavior and time evidence
 
+For [imported Codex conversations](codex_conversations.md), exact scoped task/branch mentions remain discussion references, not confirmed implementation mappings. If discovery receives such a reference, disclose it as an explicit-reference aid and exclude that case from the ID-free evaluation subset. Keep seeding instructions, evaluator ground truth, imported evaluation chats and repeated model predictions out of association inputs; they cannot corroborate their own inferred link. Conversation speaker identity is not Git author identity, and chat-reported work times do not replace tracker transition evidence.
+
 When an assigned task is currently `IN_PROGRESS` and no confirmed branch association or precise task reference in available branch/commit/PR records identifies its implementation, discover likely branches using the assignee's commits during task work periods. Clef compares task purpose with branch activity to suggest associations even when task IDs are absent. Existing explicit mappings take precedence; conflicting explicit records remain conflicts rather than being overwritten by inference.
 
 A work period is the intersection of an assignment interval for one person and a task `IN_PROGRESS` interval. Use half-open UTC intervals `[valid_from, valid_to)`; open periods end at the recorded observation time for inference. Reassignment, removal, completion, blocking and reopening split periods. Multiple assignees have separate person/work periods. Planned dates, task creation and generic `updated_at` are not transition timestamps.
