@@ -1,0 +1,32 @@
+{
+  "tenant_id": "demo",
+  "source_system": "markdown-export",
+  "label": "SYNTHETIC FIXTURE - not live provider data",
+  "observed_at": "2026-10-10T00:00:00Z",
+  "documents": [
+    {
+      "id": "demo:markdown:tls:runbook-edge-gateway-rotation",
+      "title": "Edge gateway TLS rotation runbook (synthetic)",
+      "document_type": "ProcessDoc",
+      "doc_status": "CURRENT",
+      "version": "3",
+      "source_url": null,
+      "source_record_ref": "export:tls:runbook:edge-gateway-rotation",
+      "governs": ["demo:jira:tls:TASK-404"],
+      "sections": [
+        { "anchor": "prerequisites", "tab_id": null,
+          "text": "Prerequisites: staging certificates exist in the vault (TASK-403 done) and maintenance window is confirmed. Rotating without a window drops long-lived connections." },
+        { "anchor": "step-1-stage", "tab_id": null,
+          "text": "Step 1: Stage the new certificates on each edge gateway host with `gwctl certs stage --profile edge` and confirm the checksum output matches the vault record." },
+        { "anchor": "step-2-rotate", "tab_id": null,
+          "text": "Step 2: Rotate with `gwctl certs rotate --gateway <instance> --window maintenance`. Wait for the gateway to report state=ROTATED before continuing." },
+        { "anchor": "step-3-verify", "tab_id": null,
+          "text": "Step 3: Verify each gateway handshake with `openssl s_client -connect <gateway>:443 -servername <fqdn>`; the presented certificate must be the new serial." },
+        { "anchor": "step-4-monitor", "tab_id": null,
+          "text": "Step 4: Monitor handshake error dashboards for 30 minutes. A rise above 0.5% triggers rollback: `gwctl certs rollback --gateway <instance>`." },
+        { "anchor": "caveats", "tab_id": null,
+          "text": "Caveat: gateways behind the legacy load balancer pool require the compatibility flag `--legacy-pool`; omitting it produces handshake failures only for that pool." }
+      ]
+    }
+  ]
+}

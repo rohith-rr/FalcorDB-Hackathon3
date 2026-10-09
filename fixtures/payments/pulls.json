@@ -1,0 +1,51 @@
+{
+  "tenant_id": "demo",
+  "source_system": "github-snapshot",
+  "label": "SYNTHETIC FIXTURE - not live provider data",
+  "observed_at": "2026-10-10T00:00:00Z",
+  "repositories": [
+    {
+      "id": "demo:github:payments:repository:901",
+      "provider_id": "901",
+      "owner_name": "demo-org/payments-service",
+      "clone_url": "file://__GIT_ROOT__/payments-service",
+      "stable_ref": "refs/heads/main",
+      "default_ref": "refs/heads/main"
+    }
+  ],
+  "branches": [
+    {
+      "id": "demo:github:payments:901:branch:main",
+      "repository_id": "demo:github:payments:repository:901",
+      "ref": "refs/heads/main",
+      "head_sha": "SYMBOLIC:main_head",
+      "exists": true,
+      "is_protected": true
+    },
+    {
+      "id": "demo:github:payments:901:branch:feature/backend-service",
+      "repository_id": "demo:github:payments:repository:901",
+      "ref": "refs/heads/feature/backend-service",
+      "head_sha": "SYMBOLIC:backend_delivery_head",
+      "exists": true,
+      "is_protected": false
+    }
+  ],
+  "pull_requests": [
+    {
+      "id": "demo:github:payments:901:pr:17",
+      "repository_id": "demo:github:payments:repository:901",
+      "head_repository_id": "demo:github:payments:repository:901",
+      "number": 17,
+      "title": "PAY-101 Implement backend service",
+      "state": "OPEN",
+      "draft": false,
+      "merged_at": null,
+      "merge_commit_sha": null,
+      "base_ref": "refs/heads/main",
+      "head_ref": "refs/heads/feature/backend-service",
+      "head_sha": "SYMBOLIC:backend_delivery_head",
+      "base_sha": "SYMBOLIC:main_head"
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "tenant_id": "demo",
+  "source_system": "jira-export",
+  "label": "SYNTHETIC FIXTURE - not live provider data",
+  "observed_at": "2026-10-10T00:00:00Z",
+  "ingested_at": "2026-10-10T00:00:00Z",
+  "snapshot_id": "snap-tls-001",
+  "epics": [
+    {
+      "id": "demo:jira:tls:Epic-TLS-rotation",
+      "external_key": "Epic-TLS-rotation",
+      "project_id": "demo:jira:tls",
+      "title": "TLS certificate rotation",
+      "status": "IN_PROGRESS",
+      "raw_status": "In Progress"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "demo:jira:tls:TASK-404",
+      "external_key": "TASK-404",
+      "project_id": "demo:jira:tls",
+      "title": "Rotate edge-gateway TLS certificate",
+      "work_item_type": "TASK",
+      "status": "BLOCKED",
+      "raw_status": "Blocked",
+      "priority": "critical",
+      "assignee_ids": ["demo:jira:tls:user:sre-lead"],
+      "repository_ids": []
+    },
+    {
+      "id": "demo:jira:tls:TASK-401",
+      "external_key": "TASK-401",
+      "project_id": "demo:jira:tls",
+      "title": "Inventory certificates and expiry dates",
+      "work_item_type": "SUBTASK",
+      "status": "DONE",
+      "raw_status": "Done",
+      "priority": "medium",
+      "assignee_ids": [],
+      "repository_ids": []
+    },
+    {
+      "id": "demo:jira:tls:TASK-402",
+      "external_key": "TASK-402",
+      "project_id": "demo:jira:tls",
+      "title": "Generate replacement certificates",
+      "work_item_type": "SUBTASK",
+      "status": "DONE",
+      "raw_status": "Done",
+      "priority": "medium",
+      "assignee_ids": [],
+      "repository_ids": []
+    },
+    {
+      "id": "demo:jira:tls:TASK-403",
+      "external_key": "TASK-403",
+      "project_id": "demo:jira:tls",
+      "title": "Stage certificates in the secrets vault",
+      "work_item_type": "SUBTASK",
+      "status": "DONE",
+      "raw_status": "Done",
+      "priority": "medium",
+      "assignee_ids": [],
+      "repository_ids": []
+    },
+    {
+      "id": "demo:jira:tls:TASK-405",
+      "external_key": "TASK-405",
+      "project_id": "demo:jira:tls",
+      "title": "Deploy certificates to edge gateways",
+      "work_item_type": "SUBTASK",
+      "status": "DONE",
+      "raw_status": "Done",
+      "priority": "medium",
+      "assignee_ids": [],
+      "repository_ids": []
+    },
+    {
+      "id": "demo:jira:tls:TASK-406",
+      "external_key": "TASK-406",
+      "project_id": "demo:jira:tls",
+      "title": "Verify gateway handshakes and dashboards",
+      "work_item_type": "SUBTASK",
+      "status": "TODO",
+      "raw_status": "Backlog",
+      "priority": "high",
+      "assignee_ids": [],
+      "repository_ids": []
+    }
+  ],
+  "hierarchy": [
+    { "id": "demo:jira:tls:edge:has_task:epic-404",
+      "source_record_ref": "jira-export:tls:hierarchy:1",
+      "start_id": "demo:jira:tls:Epic-TLS-rotation",
+      "end_id": "demo:jira:tls:TASK-404" },
+    { "id": "demo:jira:tls:edge:has_task:404-401",
+      "source_record_ref": "jira-export:tls:hierarchy:2",
+      "start_id": "demo:jira:tls:TASK-404",
+      "end_id": "demo:jira:tls:TASK-401" },
+    { "id": "demo:jira:tls:edge:has_task:404-402",
+      "source_record_ref": "jira-export:tls:hierarchy:3",
+      "start_id": "demo:jira:tls:TASK-404",
+      "end_id": "demo:jira:tls:TASK-402" },
+    { "id": "demo:jira:tls:edge:has_task:404-403",
+      "source_record_ref": "jira-export:tls:hierarchy:4",
+      "start_id": "demo:jira:tls:TASK-404",
+      "end_id": "demo:jira:tls:TASK-403" },
+    { "id": "demo:jira:tls:edge:has_task:404-405",
+      "source_record_ref": "jira-export:tls:hierarchy:5",
+      "start_id": "demo:jira:tls:TASK-404",
+      "end_id": "demo:jira:tls:TASK-405" },
+    { "id": "demo:jira:tls:edge:has_task:404-406",
+      "source_record_ref": "jira-export:tls:hierarchy:6",
+      "start_id": "demo:jira:tls:TASK-404",
+      "end_id": "demo:jira:tls:TASK-406" }
+  ],
+  "dependencies": [
+    { "id": "demo:jira:tls:edge:depends_on:404-405",
+      "source_record_ref": "manifest:tls:dependency:1",
+      "start_id": "demo:jira:tls:TASK-404",
+      "end_id": "demo:jira:tls:TASK-405",
+      "dependency_kind": "PROCESS" }
+  ]
+}

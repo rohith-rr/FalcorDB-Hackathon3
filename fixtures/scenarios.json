@@ -1,0 +1,143 @@
+{
+  "tenant_id": "demo",
+  "label": "SYNTHETIC FIXTURE scenarios - expected typed outcomes, not live results",
+  "scenarios": [
+    {
+      "id": "scenario:payments:open-feature-with-changes-requested",
+      "question": "Which branch should I branch from to implement the Public API?",
+      "task_key": "PAY-103",
+      "project_id": "demo:jira:payments",
+      "expected": {
+        "resolution": "RESOLVED",
+        "decision_status": "RECOMMENDED",
+        "selected_ref": "refs/heads/feature/backend-service",
+        "review_readiness": "CHANGES_REQUESTED",
+        "warnings_include": "changes requested",
+        "development_use_allowed": true,
+        "commands_proposed": true
+      }
+    },
+    {
+      "id": "scenario:payments:delivered-to-stable",
+      "question": "Which branch should I branch from to implement the Public API after backend delivery reaches stable?",
+      "task_key": "PAY-103",
+      "project_id": "demo:jira:payments",
+      "variation": "backend_delivery integrated into main",
+      "expected": {
+        "resolution": "RESOLVED",
+        "decision_status": "RECOMMENDED",
+        "selected_ref": "refs/heads/main",
+        "review_readiness": "UNKNOWN",
+        "commands_proposed": true
+      }
+    },
+    {
+      "id": "scenario:payments:pr-closed-without-merge",
+      "question": "Is the backend implementation available on stable after PR 17 closed without merging?",
+      "task_key": "PAY-101",
+      "project_id": "demo:jira:payments",
+      "expected": {
+        "resolution": "RESOLVED",
+        "decision_status": "INSUFFICIENT_EVIDENCE",
+        "notes": "GitHub CLOSED is not merged; closure must not be treated as delivery"
+      }
+    },
+    {
+      "id": "scenario:payments:transitive-dependencies",
+      "question": "What prerequisites must be covered before PAY-103 work starts?",
+      "task_key": "PAY-103",
+      "project_id": "demo:jira:payments",
+      "expected": {
+        "resolution": "RESOLVED",
+        "required_task_ids_include": ["demo:jira:payments:PAY-101"],
+        "notes": "dependency closure must cover the entire prerequisite set"
+      }
+    },
+    {
+      "id": "scenario:payments:dependency-cycle",
+      "question": "Plan the branch base when confirmed dependencies form a cycle",
+      "task_key": "PAY-103",
+      "project_id": "demo:jira:payments",
+      "variation": "cycle edges present in a separate scenario import",
+      "expected": {
+        "resolution": "RESOLVED",
+        "decision_status": "DEPENDENCY_CYCLE",
+        "commands_proposed": false
+      }
+    },
+    {
+      "id": "scenario:tls:runbook-and-progress",
+      "question": "How do I rotate the edge gateway certificate and how far along is the TLS epic?",
+      "task_key": "TASK-404",
+      "project_id": "demo:jira:tls",
+      "expected": {
+        "resolution": "RESOLVED",
+        "decision": null,
+        "document_id": "demo:markdown:tls:runbook-edge-gateway-rotation",
+        "document_version": "3",
+        "sections_include": ["prerequisites", "step-1-stage", "step-2-rotate", "step-3-verify", "step-4-monitor"],
+        "epic_progress": { "completed": 4, "eligible": 5, "percent": 80 },
+        "task_state_retained": "BLOCKED"
+      }
+    },
+    {
+      "id": "scenario:payments:model-provider-down",
+      "question": "Which branch should I branch from to implement the Public API (answer provider unreachable)?",
+      "task_key": "PAY-103",
+      "project_id": "demo:jira:payments",
+      "expected": {
+        "resolution": "RESOLVED",
+        "answer_mode": "DETERMINISTIC",
+        "notes": "provider failure falls back to engine facts, not silence"
+      }
+    },
+    {
+      "id": "scenario:payments:stale-inaccessible-evidence",
+      "question": "Which branch should I branch from when the implementation ref was force-pushed away?",
+      "task_key": "PAY-103",
+      "project_id": "demo:jira:payments",
+      "expected": {
+        "resolution": "RESOLVED",
+        "decision_status": "STALE_EVIDENCE",
+        "notes": "refresh heads; withhold unsupported recommendation"
+      }
+    },
+    {
+      "id": "scenario:payments:ambiguous-task",
+      "question": "Rotate the certificate",
+      "task_key": null,
+      "project_id": "demo:jira:tls",
+      "expected": {
+        "resolution": "NEEDS_CLARIFICATION",
+        "clarification_kind": "TASK",
+        "commands_proposed": false
+      }
+    },
+    {
+      "id": "scenario:runtime:import-interrupted",
+      "question": "Query issued while a structural import was interrupted mid-mutation",
+      "expected": {
+        "http_status": 503,
+        "error_code": "GRAPH_RECOVERY_REQUIRED",
+        "notes": "reads blocked until complete durable recovery; prior snapshot is audit metadata only"
+      }
+    },
+    {
+      "id": "scenario:runtime:preparation-failure",
+      "question": "Import preparation fails before mutation",
+      "expected": {
+        "outcome": "PREPARATION_FAILED",
+        "notes": "previous snapshot remains readable at its original observation age"
+      }
+    },
+    {
+      "id": "scenario:runtime:read-set-changed",
+      "question": "Query inputs change across a publication",
+      "expected": {
+        "http_status": 503,
+        "error_code": "GRAPH_SNAPSHOT_CHANGED",
+        "notes": "one whole-request retry; repeated relevant change returns the typed error; no invalid command"
+      }
+    }
+  ]
+}

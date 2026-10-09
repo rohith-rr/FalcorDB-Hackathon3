@@ -1,0 +1,95 @@
+{
+  "tenant_id": "demo",
+  "source_instance": "demo:codex:local:fixture",
+  "parser_version": "1.0.0",
+  "redaction_version": "1.0.0",
+  "dialect": "codex-fixture-dialect",
+  "dialect_version": "1.0",
+  "label": "SYNTHETIC FIXTURE expectations - normalization/coverage assertions",
+  "bindings": {
+    "project_ids": ["demo:jira:payments"],
+    "repository_ids": ["demo:github:payments:repository:901"]
+  },
+  "sources": [
+    {
+      "source_key": "local_session",
+      "file": "local_session.jsonl",
+      "coverage": "PARTIAL",
+      "pending_tail": true,
+      "notes": "fixture ends with a byte-level partial final record (no closing brace, no newline) to exercise the pending-tail rule; the parser defers it and must not advance the cursor past it"
+    },
+    {
+      "source_key": "cli_events",
+      "file": "cli_events.jsonl",
+      "coverage": "COMPLETE",
+      "pending_tail": false
+    }
+  ],
+  "expected_messages": [
+    { "source_key": "local_session", "ordinal": 0, "origin": "HUMAN_INPUT", "role": "USER",
+      "content_contains": "publish through the durable batching window" },
+    { "source_key": "local_session", "ordinal": 1, "origin": "ASSISTANT_VISIBLE", "role": "ASSISTANT",
+      "content_contains": "fixed 30-second batches" },
+    { "source_key": "local_session", "ordinal": 2, "origin": "HUMAN_INPUT", "role": "USER",
+      "content_contains": "Documented tradeoff in demo:jira:payments:PAY-101",
+      "expected_mentions": ["demo:jira:payments:PAY-101"] },
+    { "source_key": "local_session", "ordinal": 3, "origin": "UNKNOWN", "role": "ASSISTANT",
+      "notes": "null-id assistant echo of m3 content: distinct record, not merged with the user utterance" },
+    { "source_key": "local_session", "ordinal": 4, "origin": "HUMAN_INPUT", "role": "USER",
+      "content_contains": "Which branch should I branch from" },
+    { "source_key": "local_session", "ordinal": 5, "origin": "ASSISTANT_VISIBLE", "role": "ASSISTANT",
+      "content_contains": "verified implementation head" },
+    { "source_key": "local_session", "ordinal": 6, "origin": "INJECTED_CONTEXT", "role": "USER",
+      "excluded_from_retrieval": true },
+    { "source_key": "local_session", "ordinal": 7, "origin": "ASSISTANT_VISIBLE", "role": "ASSISTANT",
+      "record_kind": "compaction_summary",
+      "not_original_utterance": true,
+      "excluded_from_decision_support": true },
+    { "source_key": "local_session", "ordinal": 8, "origin": "HUMAN_INPUT", "role": "USER",
+      "record_kind": "fork", "fork_parent": "m5",
+      "lineage_required": true },
+    { "source_key": "local_session", "ordinal": 9, "origin": "ASSISTANT_VISIBLE", "role": "ASSISTANT",
+      "content_contains": "event_batch_window_seconds" },
+    { "source_key": "local_session", "ordinal": 10, "origin": "HUMAN_INPUT", "role": "USER",
+      "notes": "m11 arrived in the same captured prefix" },
+    { "source_key": "cli_events", "ordinal": 0, "origin": "ASSISTANT_VISIBLE", "role": "ASSISTANT",
+      "content_contains": "incident-owned records" },
+    { "source_key": "cli_events", "ordinal": 1, "origin": "HUMAN_INPUT", "role": "USER",
+      "content_contains": "design decision with the message as support" }
+  ],
+  "expected_exclusions": [
+    "injected environment context (m7) is not retrievable content",
+    "hidden reasoning event (e3) is not retrievable content",
+    "event echo (turn.completed for m2) creates no duplicate message",
+    "attachment att-1 has no available bytes and is metadata only",
+    "unsupported runtime record is skipped with a coverage limitation"
+  ],
+  "expected_decisions": [
+    { "decision_key": "incident-batching-window",
+      "title": "Durable 30-second incident batching for graph publication",
+      "supporting_messages": ["local_session:1"],
+      "review": "ACCEPTED",
+      "reviewer": "demo-operator",
+      "reviewed_at": "2026-10-10T08:00:00Z" },
+    { "decision_key": "read-interval",
+      "title": "Keep a 15-second READY read interval between incident batches",
+      "supporting_messages": ["local_session:9"],
+      "review": "ACCEPTED",
+      "reviewer": "demo-operator",
+      "reviewed_at": "2026-10-10T08:05:00Z" },
+    { "decision_key": "branch-base-advice",
+      "title": "Branch dependent work from the verified implementation head",
+      "supporting_messages": ["local_session:5"],
+      "review": "SUPERSEDED",
+      "reviewer": "demo-operator",
+      "reviewed_at": "2026-10-10T08:10:00Z",
+      "replacement_decision_key": "incident-batching-window",
+      "notes": "recorded to exercise supersession review semantics in fixtures" }
+  ],
+  "invariants": [
+    "distinct repeated utterances remain distinct records",
+    "echoes of event records are not counted as independent support",
+    "fixture expectations distinguish proposed/accepted/superseded intent from verified operational facts",
+    "no real personal session content is committed"
+  ]
+}

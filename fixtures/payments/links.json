@@ -1,0 +1,36 @@
+{
+  "tenant_id": "demo",
+  "source_system": "relationship-manifest",
+  "label": "SYNTHETIC FIXTURE - confirmed mapping manifest",
+  "observed_at": "2026-10-10T00:00:00Z",
+  "implementation_links": [
+    {
+      "id": "demo:jira:payments:edge:implemented_in:pay-101-feature",
+      "source_record_ref": "manifest:payments:implementation:1",
+      "start_id": "demo:jira:payments:PAY-101",
+      "end_id": "demo:github:payments:901:branch:feature/backend-service",
+      "link_method": "MANIFEST",
+      "authority": "CONFIRMED"
+    },
+    {
+      "id": "demo:github:payments:edge:implemented_by:pay-101-pr-17",
+      "source_record_ref": "manifest:payments:implementation:2",
+      "start_id": "demo:jira:payments:PAY-101",
+      "end_id": "demo:github:payments:901:pr:17",
+      "link_method": "MANIFEST",
+      "authority": "CONFIRMED"
+    }
+  ],
+  "deliveries": [
+    {
+      "delivery_id": "demo:payments:delivery:pay-101:d1",
+      "task_id": "demo:jira:payments:PAY-101",
+      "repository_id": "demo:github:payments:repository:901",
+      "implementation_revision": "SYMBOLIC:backend_delivery_commit",
+      "role": "IMPLEMENTATION",
+      "coverage": "COMPLETE",
+      "pr_id": "demo:github:payments:901:pr:17"
+    }
+  ],
+  "revision_effects": []
+}

@@ -1,0 +1,20 @@
+{
+  "tenant_id": "demo",
+  "source_system": "github-snapshot",
+  "label": "SYNTHETIC FIXTURE - not live provider data",
+  "observed_at": "2026-10-10T00:00:00Z",
+  "reviews": [
+    {
+      "id": "demo:github:payments:review:441",
+      "provider_review_id": "441",
+      "pull_request_id": "demo:github:payments:901:pr:17",
+      "reviewer_id": "demo:github:payments:user:dev-b",
+      "state": "CHANGES_REQUESTED",
+      "submitted_at": "2026-10-09T15:30:00Z",
+      "commit_sha": "SYMBOLIC:backend_delivery_head",
+      "body": "Please split the settlement module out of the core service commit.",
+      "dismissal_type": null,
+      "dismissal_reason": null
+    }
+  ]
+}

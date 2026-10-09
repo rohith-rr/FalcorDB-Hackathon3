@@ -1,0 +1,22 @@
+{
+  "tenant_id": "demo",
+  "source_system": "markdown-export",
+  "label": "SYNTHETIC FIXTURE - not live provider data",
+  "observed_at": "2026-10-10T00:00:00Z",
+  "documents": [
+    {
+      "id": "demo:markdown:payments:design-backend-service",
+      "title": "Backend Service design (synthetic)",
+      "document_type": "DesignDoc",
+      "doc_status": "CURRENT",
+      "version": "1",
+      "source_url": null,
+      "source_record_ref": "export:payments:design:backend-service",
+      "specifies": ["demo:jira:payments:PAY-101"],
+      "sections": [
+        { "anchor": "overview", "tab_id": null, "text": "The backend service settles payment intents and exposes the internal ledger API. The Public API task (PAY-103) consumes this service." },
+        { "anchor": "branch-policy", "tab_id": null, "text": "Backend work integrates through feature branches and PR review; dependent tasks branch from the verified implementation head." }
+      ]
+    }
+  ]
+}

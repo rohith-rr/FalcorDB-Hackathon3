@@ -1,0 +1,10 @@
+{
+  "tenant_id": "demo",
+  "source_system": "github-snapshot",
+  "label": "SYNTHETIC FIXTURE - TLS has no code repository in the demo scope",
+  "observed_at": "2026-10-10T00:00:00Z",
+  "repositories": [],
+  "branches": [],
+  "pull_requests": [],
+  "reviews": []
+}

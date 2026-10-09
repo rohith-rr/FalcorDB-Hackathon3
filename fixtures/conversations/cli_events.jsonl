@@ -1,0 +1,5 @@
+{"type": "session_meta", "session_id": "synthetic-cli-events-001", "dialect": "codex-cli-json-events", "producer": "codex-fixture-dialect", "producer_version": "1.0", "label": "SYNTHETIC FIXTURE - sanitized `codex exec --json` style event stream"}
+{"type": "event", "id": "e1", "event": "session.started", "timestamp": "2026-10-09T10:00:00Z"}
+{"type": "event", "id": "e2", "event": "agent.message.completed", "role": "assistant", "timestamp": "2026-10-09T10:00:30Z", "content": "The read gate must admit structural reads during incident batching; only incident-owned records change."}
+{"type": "event", "id": "e3", "event": "item.completed", "item": {"type": "reasoning"}, "note": "hidden reasoning is excluded from retrievable content"}
+{"type": "event", "id": "e4", "event": "agent.message.completed", "role": "user", "timestamp": "2026-10-09T10:01:00Z", "content": "Agreed. Record that as a design decision with the message as support."}

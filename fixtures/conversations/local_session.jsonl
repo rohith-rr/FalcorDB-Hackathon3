@@ -1,0 +1,15 @@
+{"type": "session_meta", "session_id": "synthetic-session-001", "producer": "codex-fixture-dialect", "producer_version": "1.0", "timestamp": "2026-10-09T09:00:00Z", "cwd": "synthetic://demo/project", "label": "SYNTHETIC FIXTURE - sanitized sample, no real transcript content"}
+{"type": "message", "id": "m1", "role": "user", "timestamp": "2026-10-09T09:01:00Z", "content": "Should the incident exporter publish through the durable batching window instead of writing alerts directly to the graph?"}
+{"type": "message", "id": "m2", "role": "assistant", "timestamp": "2026-10-09T09:01:20Z", "content": "Yes - accept alerts durably first, then coalesce them into fixed 30-second batches that update only incident-owned records. The structural graph and event cadence stay separate."}
+{"type": "event", "event": "turn.completed", "echo_of": "m2", "timestamp": "2026-10-09T09:01:21Z"}
+{"type": "message", "id": "m3", "role": "user", "timestamp": "2026-10-09T09:03:00Z", "content": "Documented tradeoff in demo:jira:payments:PAY-101 - the batch delay is the price for keeping structural reads available."}
+{"type": "message", "id": null, "role": "assistant", "timestamp": null, "content": "Noted: the batch delay is the price for keeping structural reads available."}
+{"type": "message", "id": "m5", "role": "user", "timestamp": "2026-10-09T09:05:00Z", "content": "Which branch should I branch from for the Public API work?"}
+{"type": "message", "id": "m6", "role": "assistant", "timestamp": "2026-10-09T09:05:10Z", "content": "Use the verified implementation head on feature/backend-service; stable does not include the backend delivery yet. Verify review state before starting."}
+{"type": "message", "id": "m7", "role": "user", "timestamp": "2026-10-09T09:06:00Z", "content": "<environment_context>cwd: synthetic://demo/project; branch: synthetic; token accounting omitted</environment_context>", "origin_hint": "injected"}
+{"type": "message", "id": "m8", "role": "assistant", "timestamp": "2026-10-09T09:08:00Z", "content": "Compacted summary: earlier discussion established durable alert batching and the branch recommendation context. (compaction summary - derived context, not an original utterance)", "record_kind": "compaction_summary"}
+{"type": "message", "id": "m9", "role": "user", "timestamp": "2026-10-09T09:09:00Z", "content": "Forked from m5: revisit the branch question after the review. Fork lineage: parent message m5.", "record_kind": "fork", "fork_parent": "m5"}
+{"type": "attachment", "id": "att-1", "message_id": "m6", "filename": "review-notes.png", "bytes_available": false}
+{"type": "unsupported", "record": "unknown-runtime-record", "note": "runtime bookkeeping the parser skips with a coverage limitation"}
+{"type": "message", "id": "m10", "role": "assistant", "timestamp": "2026-10-09T09:10:00Z", "content": "Proposal: name the batching window constant `event_batch_window_seconds` and keep the read interval at 15 seconds so structural queries see a READY interval between batches."}
+{"type": "message", "id": "m11", "role": "user", "timestamp": "2026-10-09T09:

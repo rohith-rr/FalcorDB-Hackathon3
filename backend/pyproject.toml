@@ -1,0 +1,36 @@
+[project]
+name = "company-brain-backend"
+version = "0.1.0"
+description = "Company Brain backend (FalkorDB hackathon) - Phase 0/1 foundation and graph layer"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi==0.115.14",
+    "uvicorn==0.35.0",
+    "pydantic==2.11.7",
+    "pydantic-settings==2.10.1",
+    "falkordb==1.7.1",
+    "python-dotenv==1.1.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.4.1",
+    "httpx==0.28.1",
+]
+
+[tool.uv]
+# The venv lives at backend/.venv (UV_PROJECT_ENVIRONMENT, workspace policy).
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: tests that require the pinned FalkorDB database",
+]
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = { find = { include = ["app*", "scripts*"] } }

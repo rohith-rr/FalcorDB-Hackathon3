@@ -1,1 +1,25 @@
+# Local secret material (never commit)
 secret-key-1791555741477.csv
+
+# Project downloads, runtimes, Docker disks, caches, state and secrets
+# (docs/design/workspace_setup.md)
+.local/
+.venv/
+**/.venv/
+.env
+.env.*
+!.env.example
+**/node_modules/
+frontend/dist/
+__pycache__/
+*.py[cod]
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Generated runtime artifacts
+reports/*.log
+*.uv.lock.bak
+uv-cache/

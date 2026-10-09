@@ -1,0 +1,41 @@
+{
+  "tenant_id": "demo",
+  "manifest_version": "1.0.0",
+  "label": "SYNTHETIC FIXTURE - operator review manifest for extracted design decisions",
+  "authority": "OPERATOR_REVIEW",
+  "reviews": [
+    {
+      "decision_key": "incident-batching-window",
+      "revision_hash": "REPLACED_AT_IMPORT:sha256:decision-revision-1",
+      "status": "ACCEPTED",
+      "reviewer": "demo-operator",
+      "reviewed_at": "2026-10-10T08:00:00Z",
+      "supporting_messages": ["local_session:1"],
+      "applicable_entities": ["demo:jira:payments:PAY-101"]
+    },
+    {
+      "decision_key": "read-interval",
+      "revision_hash": "REPLACED_AT_IMPORT:sha256:decision-revision-2",
+      "status": "ACCEPTED",
+      "reviewer": "demo-operator",
+      "reviewed_at": "2026-10-10T08:05:00Z",
+      "supporting_messages": ["local_session:9"],
+      "applicable_entities": ["demo:jira:payments:PAY-101"]
+    },
+    {
+      "decision_key": "branch-base-advice",
+      "revision_hash": "REPLACED_AT_IMPORT:sha256:decision-revision-3",
+      "status": "SUPERSEDED",
+      "reviewer": "demo-operator",
+      "reviewed_at": "2026-10-10T08:10:00Z",
+      "supporting_messages": ["local_session:5"],
+      "replacement_decision_key": "incident-batching-window",
+      "applicable_entities": ["demo:github:payments:repository:901"]
+    }
+  ],
+  "invariants": [
+    "acceptance establishes reviewed intent only, not delivery or execution approval",
+    "supersession is acyclic and references an exact replacement revision",
+    "conflicting reviews would be preserved as unresolved coverage"
+  ]
+}

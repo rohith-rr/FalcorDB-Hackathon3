@@ -1,0 +1,41 @@
+# Compose project storage is explicit: name, bind-mounted database data and
+# bounded logs all resolve under the workspace (docs/design/workspace_setup.md).
+# Ports bind to 127.0.0.1 only. Database data must NOT live in an anonymous
+# volume: the bind mount keeps FalkorDB durable state inspectable under
+# .local/state/falkordb.
+name: company-brain
+
+services:
+  falkordb:
+    image: falkordb/falkordb:v4.20.7
+    container_name: company-brain-falkordb
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"   # local-only
+      - "127.0.0.1:3000:3000"   # FalkorDB Browser (inspection aid)
+    environment:
+      # Write durability for the Phase 1 import fence: AOF with synchronous
+      # fsync; each acknowledged write is durable before the reply.
+      REDIS_ARGS: >-
+        --appendonly yes
+        --appendfsync always
+        --auto-aof-rewrite-percentage 100
+        --auto-aof-rewrite-min-size 64mb
+        --maxmemory 512mb
+        --maxmemory-policy noeviction
+    volumes:
+      - ./.local/state/falkordb:/var/lib/falkordb/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+
+# The API itself runs on the host through the project Python environment
+# (backend/.venv) so browser inspection, seeding and tests share one runtime.
