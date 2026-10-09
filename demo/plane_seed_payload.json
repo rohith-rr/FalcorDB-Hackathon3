@@ -1,0 +1,539 @@
+{
+  "schema_version": "company-brain-seed-payload/v1",
+  "seed_namespace": "company-brain-poc-v1",
+  "project_name": "Falcor DB hackathon",
+  "scope_resolution": "pending Plane connection; do not create a project",
+  "state_policy": "resolve project backlog/unstarted state mapped to TODO",
+  "type_policy": "inspect and use configured epic/task types",
+  "epics": [
+    {
+      "key": "E01",
+      "title": "Build the Company Brain runtime and graph foundation",
+      "description": "Provide the local runtime, shared contracts, durable graph publication and bounded reads required by all workflows. Complete when its four child tasks meet their acceptance criteria.",
+      "children": [
+        "T01",
+        "T02",
+        "T03",
+        "T04"
+      ]
+    },
+    {
+      "key": "E02",
+      "title": "Connect project evidence and verify development decisions",
+      "description": "Read real tracker/document/Git evidence, import explicit relationships, verify branch bases and evaluate inferred task-to-branch associations.",
+      "children": [
+        "T05",
+        "T06",
+        "T07",
+        "T08",
+        "T09",
+        "T10"
+      ]
+    },
+    {
+      "key": "E03",
+      "title": "Deliver cited answers and a reproducible demo",
+      "description": "Explain engine facts, present evidence and decisions, document the demo procedure and retain measured acceptance results.",
+      "children": [
+        "T11",
+        "T12",
+        "T17",
+        "T18"
+      ]
+    },
+    {
+      "key": "E04",
+      "title": "Investigate incidents and restore a disposable sandbox",
+      "description": "Resolve exact runtime scope, investigate with bounded checks, and demonstrate one approved restoration with measured recovery.",
+      "children": [
+        "T13",
+        "T14",
+        "T15",
+        "T16"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "key": "T01",
+      "title": "Bootstrap the local API and FalkorDB runtime",
+      "description": "Create the Python API, pinned dependencies, local Compose configuration, environment example and startup instructions. This task establishes startup, not graph-backed question answering.",
+      "acceptance_criteria": [
+        "The documented PowerShell startup works; `/health` exposes liveness and `/ready` distinguishes an unavailable/uninitialized graph.",
+        "Database storage survives restart using the tested image configuration; secrets are absent from responses and committed examples.",
+        "Record tested versions and actual startup checks."
+      ],
+      "specifications": [
+        "docs/design/phase_00_foundation.md"
+      ],
+      "parent": "E01",
+      "dependencies": [],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T01"
+    },
+    {
+      "key": "T02",
+      "title": "Define shared query, evidence and incident contracts",
+      "description": "Implement the canonical typed request/response records and validation, including source access, association audits, answer facts, graph availability, investigation checks and sandbox action states.",
+      "acceptance_criteria": [
+        "Invalid IDs/enums and unscoped requests are rejected; clarification and uncertainty have typed outcomes.",
+        "`UNAVAILABLE`, `MISSING` and `NOT_CHECKED` remain distinct; inferred associations cannot masquerade as delivery.",
+        "Schema examples and focused contract validation agree with the canonical specification."
+      ],
+      "specifications": [
+        "docs/design/contracts.md",
+        "docs/design/phase_00_foundation.md"
+      ],
+      "parent": "E01",
+      "dependencies": [],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T02"
+    },
+    {
+      "key": "T03",
+      "title": "Publish graph snapshots with durable import recovery",
+      "description": "Implement one writer, validated batch imports, the durable import fence and generation/readiness checks. Keep control records and retained content outside disposable graph projection storage.",
+      "acceptance_criteria": [
+        "Interrupted mutation and restart block reads until a complete validated rebuild succeeds.",
+        "Preparation failure preserves the prior snapshot at its original age; publication increments generation consistently.",
+        "Direct and MCP-backed reads use the same gate; graph rebuild does not erase access records, association audits or action receipts."
+      ],
+      "specifications": [
+        "docs/design/phase_01_graph_and_fixtures.md"
+      ],
+      "parent": "E01",
+      "dependencies": [
+        {
+          "prerequisite": "T01",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T02",
+          "kind": "CODE"
+        }
+      ],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T03"
+    },
+    {
+      "key": "T04",
+      "title": "Add bounded graph queries and traversal evidence",
+      "description": "Implement parameterized, scoped templates for task context, dependencies, documents, progress and runtime neighbors, with evidence and coverage metadata.",
+      "acceptance_criteria": [
+        "Queries obey tenant/project/repository scope and configured row/depth limits; overflow is visible.",
+        "A diamond dependency graph is not a cycle; real task cycles are reported; runtime cycles use visited tracking.",
+        "Return stable evidence IDs and graph paths; no generated unrestricted Cypher or model writes."
+      ],
+      "specifications": [
+        "docs/design/graph_schema.md",
+        "docs/design/phase_01_graph_and_fixtures.md",
+        "docs/design/phase_03_traversal_and_branch_decisions.md"
+      ],
+      "parent": "E01",
+      "dependencies": [
+        {
+          "prerequisite": "T03",
+          "kind": "CODE"
+        }
+      ],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T04"
+    },
+    {
+      "key": "T05",
+      "title": "Read Plane tasks, assignees and activity history",
+      "description": "Build the read-only Plane adapter for this project's actual tasks, metadata, parents, statuses, assignees and activity pages. Reconstruct usable assignment/in-progress intervals without invented start times.",
+      "acceptance_criteria": [
+        "Preserve native IDs, all assignees, source timestamps and pagination coverage; unknown types/states stay explicit.",
+        "Read back at least one seeded task through the live adapter and retain sanitized evidence.",
+        "Incomplete activity history prevents unsupported temporal association; source access handling uses T08's shared registry when integrated."
+      ],
+      "specifications": [
+        "docs/design/source_adapters.md",
+        "docs/design/task_branch_association.md"
+      ],
+      "parent": "E02",
+      "dependencies": [
+        {
+          "prerequisite": "T01",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T02",
+          "kind": "CODE"
+        }
+      ],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T05"
+    },
+    {
+      "key": "T06",
+      "title": "Read versioned Google Docs content and anchors",
+      "description": "Build the allowlisted read-only document adapter, preserving tabs, headings, lists and tables with immutable normalized content and versioned citations.",
+      "acceptance_criteria": [
+        "A document changed during retrieval is retried once or rejected as incomplete; unsupported content is reported.",
+        "A live document with multiple tabs and a table produces verifiable sections/citations.",
+        "Source access handling uses T08's shared registry when integrated; unavailable live access never silently becomes fixture success."
+      ],
+      "specifications": [
+        "docs/design/source_adapters.md",
+        "docs/design/phase_02_ingestion_and_sync.md"
+      ],
+      "parent": "E02",
+      "dependencies": [
+        {
+          "prerequisite": "T01",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T02",
+          "kind": "CODE"
+        }
+      ],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T06"
+    },
+    {
+      "key": "T07",
+      "title": "Collect Git and GitHub implementation evidence",
+      "description": "Read allowed repository refs, full commit identities, PR state, individual reviews and bounded changed-file evidence. Support actual Git verification separately from provider metadata.",
+      "acceptance_criteria": [
+        "Preserve author versus committer identity/time, exact heads and PR targets; `closed` is not automatically `merged`.",
+        "Missing objects, incomplete history or failed fetches produce uncertainty, not absence.",
+        "Retain real implementation and integration SHAs only when observed; never use placeholder hashes."
+      ],
+      "specifications": [
+        "docs/design/graph_schema.md",
+        "docs/design/phase_02_ingestion_and_sync.md",
+        "docs/design/phase_03_traversal_and_branch_decisions.md"
+      ],
+      "parent": "E02",
+      "dependencies": [
+        {
+          "prerequisite": "T01",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T02",
+          "kind": "CODE"
+        }
+      ],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T07"
+    },
+    {
+      "key": "T08",
+      "title": "Import verified relationships and retain source access state",
+      "description": "Normalize adapter snapshots and the operator-reviewed manifest into graph batches. Implement the durable source access registry independently of successful imports and graph generations.",
+      "acceptance_criteria": [
+        "Validate explicit task/repository/document/dependency mappings, endpoint scope and source-specific `LIVE`/`IMPORT`/`FIXTURE` modes.",
+        "Denied content stays suppressed after failed import/restart, including traces and audits; transient transport failure is not automatically revocation.",
+        "Later candidate projection preserves inference observation/expiry and never confirms delivery or triggers a query-owned rebuild."
+      ],
+      "specifications": [
+        "docs/design/phase_02_ingestion_and_sync.md",
+        "docs/design/contracts.md#source-access-registry"
+      ],
+      "parent": "E02",
+      "dependencies": [
+        {
+          "prerequisite": "T03",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T05",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T06",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T07",
+          "kind": "CODE"
+        }
+      ],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T08"
+    },
+    {
+      "key": "T09",
+      "title": "Verify prerequisite coverage and recommend a branch base",
+      "description": "Implement the deterministic branch policy over the full confirmed prerequisite closure and exact Git heads, including delivery groups, squash mappings, candidate-specific reverts and final freshness checks.",
+      "acceptance_criteria": [
+        "Prefer verified stable coverage; otherwise select an eligible covering feature or request clarification.",
+        "Independent branches, unknown/partial mappings, cycles and stale evidence yield the appropriate outcome without unsupported commands.",
+        "Review warnings remain separate from delivery; real generated Git histories cover merge, squash, revert and reapplication cases."
+      ],
+      "specifications": [
+        "docs/design/phase_03_traversal_and_branch_decisions.md"
+      ],
+      "parent": "E02",
+      "dependencies": [
+        {
+          "prerequisite": "T04",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T07",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T08",
+          "kind": "CODE"
+        }
+      ],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T09"
+    },
+    {
+      "key": "T10",
+      "title": "Discover likely implementation branches from work activity",
+      "description": "Use mapped assignee identities, observed work periods and bounded commit/content evidence to evaluate likely branches when explicit task references are absent. Integrate Clef with deterministic validation and visible abstention.",
+      "acceptance_criteria": [
+        "Concurrent similar work can remain ambiguous; missing identity/history or provider availability is disclosed.",
+        "Suggestions carry exact observed heads, evidence, model metadata and expiry; they never establish code delivery.",
+        "Return request-local suggestions, retain audits outside the graph and evaluate actual model results against a held-out set as specified."
+      ],
+      "specifications": [
+        "docs/design/task_branch_association.md",
+        "docs/design/phase_04_decision_model_integration.md"
+      ],
+      "parent": "E02",
+      "dependencies": [
+        {
+          "prerequisite": "T04",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T05",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T07",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T08",
+          "kind": "CODE"
+        }
+      ],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T10"
+    },
+    {
+      "key": "T11",
+      "title": "Generate cited answers from engine-owned facts",
+      "description": "Build bounded context and typed facts, call an answer LLM, validate referenced facts and qualifications, and fall back to deterministic output when needed.",
+      "acceptance_criteria": [
+        "Critical values/commands/statuses are engine-rendered; possible impact is never promoted to observed impact by prose.",
+        "Keep runbook prerequisites and warnings with steps; source-access and graph/head freshness gates run after inference.",
+        "Retain one real retrieval-to-LLM result; invalid citations, changed access or provider failure produce the specified safe fallback/error."
+      ],
+      "specifications": [
+        "docs/design/phase_05_context_and_llm_answers.md"
+      ],
+      "parent": "E03",
+      "dependencies": [
+        {
+          "prerequisite": "T04",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T08",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T09",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T14",
+          "kind": "CODE"
+        }
+      ],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T11"
+    },
+    {
+      "key": "T12",
+      "title": "Present scoped questions, decisions and evidence in the UI",
+      "description": "Create the query UI with task/repository clarification, exact service-instance selection, cited answers, evidence paths, source modes and decision validity.",
+      "acceptance_criteria": [
+        "Display branch coverage/review warnings and distinguish inferred associations from verified bases.",
+        "Handle partial incident checks, unavailable sources, graph recovery and expired decisions; copying commands requires current eligibility.",
+        "Render action state and recovery state separately when T16 is integrated; show unknown outcomes without offering a blind retry."
+      ],
+      "specifications": [
+        "docs/design/phase_06_ui_evaluation_and_demo.md"
+      ],
+      "parent": "E03",
+      "dependencies": [
+        {
+          "prerequisite": "T09",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T10",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T11",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T14",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T16",
+          "kind": "CODE"
+        }
+      ],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T12"
+    },
+    {
+      "key": "T13",
+      "title": "Retain incident events and resolve exact service scope",
+      "description": "Accept and deduplicate permitted incident events durably, retain incident timelines, and resolve an exact environment/region/service instance before investigation.",
+      "acceptance_criteria": [
+        "Two same-named regional services require exact authorized identity or picker selection; the model cannot guess.",
+        "Unresolved accepted alerts remain pending; operator selections are recorded without overwriting contradictory source identity.",
+        "Preserve event/provider status separately from investigation results and action outcomes."
+      ],
+      "specifications": [
+        "docs/design/contracts.md#incident-and-exploration-extension",
+        "docs/design/sre_integration_plan.md"
+      ],
+      "parent": "E04",
+      "dependencies": [
+        {
+          "prerequisite": "T02",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T03",
+          "kind": "CODE"
+        }
+      ],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T13"
+    },
+    {
+      "key": "T14",
+      "title": "Investigate incidents with a controller-owned checklist",
+      "description": "Implement bounded exploration of current/historical deployment, owner/on-call, runtime dependencies, customer observations and runbook context. Models may order reads; the controller owns required checks and STOP eligibility.",
+      "acceptance_criteria": [
+        "Premature STOP causes a required read while budget remains; budget exhaustion returns an explicitly partial brief.",
+        "Timeout is `UNAVAILABLE`, authoritative absence is `MISSING`, and unattempted work is `NOT_CHECKED`.",
+        "Distinguish authors/owners/current responders and observed/possible impact; incomplete action prerequisites block execution plans."
+      ],
+      "specifications": [
+        "docs/design/sre_integration_plan.md",
+        "docs/design/phase_03_traversal_and_branch_decisions.md"
+      ],
+      "parent": "E04",
+      "dependencies": [
+        {
+          "prerequisite": "T04",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T08",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T13",
+          "kind": "CODE"
+        }
+      ],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T14"
+    },
+    {
+      "key": "T15",
+      "title": "Build the disposable payments sandbox and recovery probe",
+      "description": "Create the local sandbox with immutable healthy/failing artifact versions, explicit instance identity, deployment/config/schema compatibility records and a measurable health probe.",
+      "acceptance_criteria": [
+        "Every artifact/deployment identifier is real for this sandbox; synthetic customers, routes and alerts are labeled fixtures.",
+        "A failing version and a compatible healthy target can be observed without affecting real services.",
+        "Probe results include served artifact identity and the canonical 30-second, one-request-per-second recovery window; incomplete sampling is not recovery."
+      ],
+      "specifications": [
+        "docs/design/sre_integration_plan.md#poc-sandbox-recipe"
+      ],
+      "parent": "E04",
+      "dependencies": [
+        {
+          "prerequisite": "T01",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T02",
+          "kind": "CODE"
+        }
+      ],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T15"
+    },
+    {
+      "key": "T16",
+      "title": "Execute one approved sandbox restoration durably",
+      "description": "Implement only `RESTORE_SANDBOX_ARTIFACT`, with exact plan approval, durable execution claim, per-target serialization, retained receipts and outcome reconciliation.",
+      "acceptance_criteria": [
+        "Validate exact target/current state, compatibility, access and expiry before the atomic claim; duplicates return existing operation state.",
+        "Crashes before/after mutation and receipt failures leave explicit outcomes; unknown outcome retains the target reservation and is reconciled without blind retry.",
+        "Report execution and measured recovery separately; matching artifact identity alone does not fabricate an execution receipt or close an incident."
+      ],
+      "specifications": [
+        "docs/design/contracts.md#poc-sandbox-execution-protocol",
+        "docs/design/sre_integration_plan.md"
+      ],
+      "parent": "E04",
+      "dependencies": [
+        {
+          "prerequisite": "T14",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T15",
+          "kind": "CODE"
+        }
+      ],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T16"
+    },
+    {
+      "key": "T17",
+      "title": "Document the live-data demo and sandbox rehearsal procedure",
+      "description": "Write the actual setup/rehearsal procedure, curate permitted source mappings and prepare the allowlisted demo Google Doc. Record the repository/Plane identity bindings and label synthetic runtime facts explicitly.",
+      "acceptance_criteria": [
+        "Instructions cover prerequisites, source refresh, task/PR evidence, sandbox applicability, failure handling and reset ownership.",
+        "The Google Doc is manually created or created through a separately authorized document workflow, and its real ID/version is recorded; missing access is reported.",
+        "Keep expected answers and discovery ground truth out of the app's retrieval sources; document limitations without claiming passed checks."
+      ],
+      "specifications": [
+        "docs/design/phase_06_ui_evaluation_and_demo.md",
+        "docs/design/source_adapters.md"
+      ],
+      "parent": "E03",
+      "dependencies": [],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T17"
+    },
+    {
+      "key": "T18",
+      "title": "Run acceptance checks and record the hackathon demonstration",
+      "description": "Exercise the implemented workflows against real project evidence and isolated synthetic edge cases. Record actual outcomes, source modes, provider availability, timings and limitations.",
+      "acceptance_criteria": [
+        "Live Plane and Google Docs smoke checks have actual receipts, or remain explicitly incomplete.",
+        "Rehearse task context, branch coverage, ID-free discovery when eligible, incident investigation and approved sandbox recovery; absent features are reported as not implemented.",
+        "Keep regression reports, demo procedure and evaluation counts reproducible; do not mark the task complete because tickets or fixtures were created."
+      ],
+      "specifications": [
+        "docs/design/phase_06_ui_evaluation_and_demo.md",
+        "docs/design/README.md#poc-core-decisions"
+      ],
+      "parent": "E03",
+      "dependencies": [
+        {
+          "prerequisite": "T12",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T16",
+          "kind": "CODE"
+        },
+        {
+          "prerequisite": "T17",
+          "kind": "PROCESS"
+        }
+      ],
+      "seed_marker": "Seed-Key: company-brain-poc-v1:T18"
+    }
+  ]
+}

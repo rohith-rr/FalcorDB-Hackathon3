@@ -33,6 +33,8 @@ The user approved these fixes for the hackathon POC on 2026-10-09. They are now 
 
 ## Execution order
 
+To use the project's own implementation work as demo data, follow the [Plane backlog and PR evidence instructions](../demo/plane_project_seed_instructions.md). They provide a reusable eighteen-task catalog, explicit dependencies, idempotent seeding rules and a later real-work PR workflow.
+
 | Order | Design document | Depends on | Completion artifact |
 | --- | --- | --- | --- |
 | 0 | [Foundation](phase_00_foundation.md) | Shared specifications | Running API/database and deterministic scenarios |

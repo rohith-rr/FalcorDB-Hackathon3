@@ -1,0 +1,1576 @@
+{
+  "schema_version": "company-brain-relationships/v1",
+  "seed_namespace": "company-brain-poc-v1",
+  "generated_at": "2026-10-09T15:04:37.440397Z",
+  "scope": {
+    "plane_instance": null,
+    "workspace_slug": null,
+    "workspace_id": null,
+    "project_name": "Falcor DB hackathon",
+    "project_id": null,
+    "project_resolution": "unresolved: Plane access unavailable",
+    "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+    "repository_id": null,
+    "stable_ref": "master",
+    "stable_ref_evidence": "Verified from checkout origin/HEAD -> refs/remotes/origin/master."
+  },
+  "mapping": {
+    "E01": null,
+    "E02": null,
+    "E03": null,
+    "E04": null,
+    "T01": null,
+    "T02": null,
+    "T03": null,
+    "T04": null,
+    "T05": null,
+    "T06": null,
+    "T07": null,
+    "T08": null,
+    "T09": null,
+    "T10": null,
+    "T11": null,
+    "T12": null,
+    "T13": null,
+    "T14": null,
+    "T15": null,
+    "T16": null,
+    "T17": null,
+    "T18": null
+  },
+  "hierarchy": [
+    {
+      "parent": "E01",
+      "child": "T01",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E01",
+      "child": "T02",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E01",
+      "child": "T03",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E01",
+      "child": "T04",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E02",
+      "child": "T05",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E02",
+      "child": "T06",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E02",
+      "child": "T07",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E02",
+      "child": "T08",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E02",
+      "child": "T09",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E02",
+      "child": "T10",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E03",
+      "child": "T11",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E03",
+      "child": "T12",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E03",
+      "child": "T17",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E03",
+      "child": "T18",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E04",
+      "child": "T13",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E04",
+      "child": "T14",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E04",
+      "child": "T15",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "parent": "E04",
+      "child": "T16",
+      "kind": "PARENT_OF",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "user-directed reviewed seed catalog",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependent": "T03",
+      "prerequisite": "T01",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T03",
+      "prerequisite": "T02",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T04",
+      "prerequisite": "T03",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T05",
+      "prerequisite": "T01",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T05",
+      "prerequisite": "T02",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T06",
+      "prerequisite": "T01",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T06",
+      "prerequisite": "T02",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T07",
+      "prerequisite": "T01",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T07",
+      "prerequisite": "T02",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T08",
+      "prerequisite": "T03",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T08",
+      "prerequisite": "T05",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T08",
+      "prerequisite": "T06",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T08",
+      "prerequisite": "T07",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T09",
+      "prerequisite": "T04",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T09",
+      "prerequisite": "T07",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T09",
+      "prerequisite": "T08",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T10",
+      "prerequisite": "T04",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T10",
+      "prerequisite": "T05",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T10",
+      "prerequisite": "T07",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T10",
+      "prerequisite": "T08",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T11",
+      "prerequisite": "T04",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T11",
+      "prerequisite": "T08",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T11",
+      "prerequisite": "T09",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T11",
+      "prerequisite": "T14",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T12",
+      "prerequisite": "T09",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T12",
+      "prerequisite": "T10",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T12",
+      "prerequisite": "T11",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T12",
+      "prerequisite": "T14",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T12",
+      "prerequisite": "T16",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T13",
+      "prerequisite": "T02",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T13",
+      "prerequisite": "T03",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T14",
+      "prerequisite": "T04",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T14",
+      "prerequisite": "T08",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T14",
+      "prerequisite": "T13",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T15",
+      "prerequisite": "T01",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T15",
+      "prerequisite": "T02",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T16",
+      "prerequisite": "T14",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T16",
+      "prerequisite": "T15",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T18",
+      "prerequisite": "T12",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T18",
+      "prerequisite": "T16",
+      "kind": "CODE",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    },
+    {
+      "dependent": "T18",
+      "prerequisite": "T17",
+      "kind": "PROCESS",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "docs/demo/plane_project_seed_instructions.md",
+        "basis": "explicit dependency table",
+        "operator_id": null,
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      },
+      "resolution": "native endpoint IDs pending"
+    }
+  ],
+  "dependency_coverage": {
+    "T01": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T02": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T03": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T04": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T05": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T06": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T07": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T08": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T09": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T10": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T11": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T12": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T13": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T14": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T15": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T16": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T17": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    },
+    "T18": {
+      "declared_in_seed_catalog": true,
+      "complete_and_verified": false,
+      "reason": "Plane project and native work-item IDs unresolved."
+    }
+  },
+  "repository_bindings": [
+    {
+      "task": "T01",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T02",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T03",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T04",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T05",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T06",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T07",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T08",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T09",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T10",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T11",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T12",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T13",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T14",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T15",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T16",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T17",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T18",
+      "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
+      "repository_id": null,
+      "stable_ref": "master",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "verified checkout remote and origin/HEAD",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    }
+  ],
+  "document_links": [
+    {
+      "task": "T01",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_00_foundation.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T02",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/contracts.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T02",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_00_foundation.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T03",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_01_graph_and_fixtures.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T04",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/graph_schema.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T04",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_01_graph_and_fixtures.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T04",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_03_traversal_and_branch_decisions.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T05",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/source_adapters.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T05",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/task_branch_association.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T06",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/source_adapters.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T06",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_02_ingestion_and_sync.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T07",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/graph_schema.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T07",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_02_ingestion_and_sync.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T07",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_03_traversal_and_branch_decisions.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T08",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_02_ingestion_and_sync.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T08",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/contracts.md#source-access-registry",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T09",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_03_traversal_and_branch_decisions.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T10",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/task_branch_association.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T10",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_04_decision_model_integration.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T11",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_05_context_and_llm_answers.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T12",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_06_ui_evaluation_and_demo.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T13",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/contracts.md#incident-and-exploration-extension",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T13",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/sre_integration_plan.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T14",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/sre_integration_plan.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T14",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_03_traversal_and_branch_decisions.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T15",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/sre_integration_plan.md#poc-sandbox-recipe",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T16",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/contracts.md#poc-sandbox-execution-protocol",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T16",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/sre_integration_plan.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T17",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_06_ui_evaluation_and_demo.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T17",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/source_adapters.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T18",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/phase_06_ui_evaluation_and_demo.md",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    },
+    {
+      "task": "T18",
+      "source_type": "git_markdown",
+      "source_id": "docs/design/README.md#poc-core-decisions",
+      "source_mode": "IMPORT",
+      "authority": "CONFIRMED",
+      "link_method": "MANIFEST",
+      "provenance": {
+        "source": "task catalog specification links",
+        "recorded_at": "2026-10-09T15:04:37.440397Z"
+      }
+    }
+  ],
+  "google_docs_links": [],
+  "implementation_mappings": [],
+  "delivery_mappings": [],
+  "effect_mappings": [],
+  "limitations": [
+    "Plane instance/workspace/project IDs and provider work-item IDs unresolved.",
+    "Logical edges are captured but native endpoint resolution/read-back is incomplete.",
+    "No Google Doc identity/source available; none fabricated."
+  ]
+}
