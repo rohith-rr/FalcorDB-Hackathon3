@@ -77,11 +77,15 @@ Prefer stable provider/service IDs and environment/region tags. If these are abs
 
 Resolve the service's current on-call assignment for the relevant time and escalation level. Account for overrides, several responders, schedule gaps and shift handovers. Refresh before any notification. Code authors/reviewers are useful contacts, but they are not automatically the people to page. PagerDuty connects services to schedules through escalation policies. [Schedules and escalation policies](https://support.pagerduty.com/main/docs/escalation-policies-and-schedules), [shift overrides](https://support.pagerduty.com/main/docs/my-on-call-shifts).
 
+POC scope choice: synthetic alerts carry an exact service-instance ID. Interactive queries use an authorized service/environment/region picker and submit a fresh request. Missing/ambiguous or contradictory instance scope produces the typed selection/conflict response in [contracts](docs/design/contracts.md#poc-incident-scope-selection); no model guess starts an investigation. Accepted unresolved alerts remain pending until authorized explicit selection. Semantic identity resolution can be evaluated later without overriding source identity.
+
 ### REQ-SRE-03: explore the graph with decision models
 
 The application retrieves authorized neighboring nodes, with relation direction, names, short summaries, source times and scope. The decision model chooses a next node or action from those candidates. Record the choice, question version, available choices and visited path.
 
 Maintain several pending paths. Required checks include current deployment, ownership, relevant measurements, service dependencies and runbook availability. A model chooses exploration order and optional context; it cannot remove mandatory checks or claim complete customer coverage after exploring only one path. Include `ASK_FOR_HELP` and `STOP` choices, with application checks before stopping.
+
+Initialize required check records in the controller. Normal STOP requires an attempted outcome for every required check; premature STOP falls back to a required read while budget remains. Timeout/provider failure is UNAVAILABLE, authoritative complete absence is MISSING, and unattempted work is NOT_CHECKED. Budget exhaustion returns a partial brief with unresolved checks. Action prerequisites must have complete, current, permitted evidence irrespective of whether the model stopped. Follow the scheduler in the [SRE plan](docs/design/sre_integration_plan.md#3-node-exploration-and-stop-conditions).
 
 Fetch full relevant node facts and document sections into an evidence store. Send compact summaries to navigation calls and the collected relevant facts/paths to the final LLM. On a limit, model failure or unresolved candidate, return a useful partial brief and mark missing coverage. The final LLM does not need to rediscover the graph to answer.
 
@@ -128,6 +132,8 @@ Production sending is a separate authorized operation. In this planning task, no
 First-release production behavior is read-only and advisory. Sandbox action execution requires a reviewable plan and explicit operator approval. A future production executor requires a configured allowlist, scoped short-lived credentials, target/version checks, expiry, permissions, per-target serialization, audit history, and recovery checks. Use vetted adapter operations and argument arrays, not an LLM-written shell script.
 
 Duplicate approval/execution requests must not duplicate changes. A changed deployment, expired plan or changed permission invalidates the plan. Partial completion is reported and does not trigger a broad retry or compensating rollback automatically. An approved notification is not authorization to modify a deployment.
+
+The POC implements only RESTORE_SANDBOX_ARTIFACT on the disposable payments workload. Use the [canonical execution protocol](docs/design/contracts.md#poc-sandbox-execution-protocol): durable exact-version approval, per-target serialization, atomic execution claim and pre-mutation operation record. Unknown outcomes remain reserved for reconciliation and cannot be blindly retried. The [sandbox recipe](docs/design/sre_integration_plan.md#poc-sandbox-recipe) defines the healthy/failing artifacts, compatibility manifest, blocked-schema variant and 30-sample recovery criterion. Production adapters and enterprise action policy remain later work.
 
 ### REQ-SRE-10: verify recovery and learn
 

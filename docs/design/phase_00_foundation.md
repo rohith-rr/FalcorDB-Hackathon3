@@ -79,6 +79,8 @@ Fixtures are synthetic and labeled as such. No external provider account access 
 - The minimal Git fixture builder produces actual commit objects and resolves symbolic delivery labels for the Phase 1 seed.
 - A settings example contains names/defaults without tokens; provider settings remain optional at this stage.
 
+Include the approved POC core decisions in foundation contracts/fixtures: `SourceAccessRecord` and its independent versions/errors, retained `AssociationAuditRecord`, `AnswerFact` references, exact incident-instance scope errors/picker, `InvestigationCheck` with UNAVAILABLE distinct from MISSING/NOT_CHECKED, and the durable sandbox execution state machine. Configure one application writer plus retained transactional local storage outside graph projection deletion. Add scenarios for discovery without generation mutation, denied content after failed import/restart, two same-named regional instances, premature STOP, a timed-out required check, false impact prose with a valid citation, and action crashes before/after mutation. Runtime behavior is checked in the owning phases, not by contract validation alone.
+
 Record tested versions, startup commands and fixture inventory. Phase 1 starts when the runtime is ready and shared contract choices are settled.
 
 Apply the [FalkorDB resource plan](falkordb_resources_and_hackathon_plan.md): verify the pinned image's actual persistence directory, prove that the graph survives a container restart, and record the server/client/MCP compatibility matrix. A hosted demo is optional and retains working local instructions.

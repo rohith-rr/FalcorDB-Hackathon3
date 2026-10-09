@@ -44,7 +44,7 @@ Implement the [association specification](task_branch_association.md) using Phas
 
 Call Clef through the verified `state`/`questions` interface with branch `choice` plus `NONE`/`AMBIGUOUS`/`MULTIPLE` and independent per-pair `noul` judgments. Validate the configurable suggestion gates and evidence completeness, preserve probabilities/model hashes, and return typed `BranchAssociationResult`. Recheck task/heads/graph after the call. Suggested `IMPLEMENTED_IN` edges use `INFERRED`/`CANDIDATE`; the model cannot promote links, infer dependencies or fill `DELIVERED_BY`.
 
-Clef is the requested provider for this feature even if another provider handles intent/incident routing. Missing access, failed evaluation or malformed/timeout responses yields explicit discovery abstention; do not silently relabel rules output as Clef inference. Persist any candidate links only through authorized ingestion using the Phase 1 import protocol.
+Clef is the requested provider for this feature even if another provider handles intent/incident routing. Missing access, failed evaluation or malformed/timeout responses yields explicit discovery abstention; do not silently relabel rules output as Clef inference. Return request-local suggestions and persist `AssociationAuditRecord` outside the graph. Candidate edges can be projected only by an explicit later ingestion batch through Phase 1, preserving original inference time/generation/expiry and revalidating access and inputs. Never trigger an import from the producing query or automatically rebuild after every answer. Test unchanged generation on successful discovery, audit-write failure, and expired/denied suggestions during later projection.
 
 ## Evaluation and completion gate
 
@@ -57,3 +57,5 @@ The discovery feature has an additional [association evaluation gate](task_branc
 ## SRE extension
 
 Add next-node/evidence selection with actual permitted neighbors plus `ASK_FOR_HELP`/`STOP`. Repeated choices use newly retrieved context, while full records remain in the evidence store. Test multiple pending paths, premature stop, absent candidates, source/model disagreement and several operating locations. A failed adapter uses a labeled deterministic/partial investigation. Compare rules, general-LLM navigation and specialized decision models with the same tools, snapshots, budgets and final answer provider. Measure cost per correctly grounded incident brief and missed evidence, not only decision-call price. See the [SRE integration plan](sre_integration_plan.md).
+
+The controller owns `InvestigationCheck` states from [contracts](contracts.md). A premature model STOP yields the next required read while budget remains. Record timeout/provider failure as UNAVAILABLE, complete authoritative absence as MISSING, and unattempted work as NOT_CHECKED. Budget termination returns partial coverage; it cannot create missing-fact evidence or an executable plan.

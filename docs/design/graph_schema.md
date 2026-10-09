@@ -38,6 +38,8 @@ For [task-branch discovery](task_branch_association.md), retain separate authore
 
 Inferred `IMPLEMENTED_IN` edges reference `association_id`, candidate/stable head SHAs, work-period/evidence IDs and model/identity/mapping versions, with `link_method=INFERRED` and `authority=CANDIDATE`. A scoped candidate read may retrieve them as task-context suggestions; confirmed traversal/delivery decisions still exclude them. Promotion requires source/operator evidence, and a promoted branch association alone is not complete delivery proof.
 
+Discovery first returns request-local candidates and retains association audit records outside the graph. An explicit subsequent import can project these edges, with original inference observation time/generation/expiry preserved separately from the projection snapshot. Projection never refreshes an expired inference or confirms delivery. Source-access records, action receipts and audit storage remain outside projection rebuild deletion; their canonical contracts are in [contracts](contracts.md).
+
 ## Relationships and direction
 
 | From | Edge | To | Meaning |

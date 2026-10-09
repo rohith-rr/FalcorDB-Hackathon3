@@ -38,13 +38,17 @@ An MCP timeout returns partial investigation status; it does not trigger broader
 
 ## 3. Node exploration and stop conditions
 
+For the POC, alerts identify an exact service instance. Interactive questions use the authorized `GET /service-instances` picker with labels such as `Payments / Demo / Region A`; selecting an instance submits a fresh query with existing scope fields. Validate all supplied IDs/environment/region together. An ambiguous or conflicting subject returns the typed 422 scope error in [contracts](contracts.md#poc-incident-scope-selection), without investigation conclusions. An accepted unresolved alert remains durably pending; an authorized explicit selection through the incident investigation endpoint is recorded before enrichment starts. Task/repository/branch continuation tokens remain unchanged.
+
 Store `InvestigationState` with question/alert, operating scope, current node, pending candidate/check queue, visited node/edge IDs, retrieved evidence IDs, source snapshot, required-check status, token/call/time budget and stop reason.
 
 Allow `EXPLORE_NODE`, `FETCH_EVIDENCE`, `ASK_FOR_HELP`, `STOP`. An option maps to an accessible actual neighbor or a supported evidence adapter. Candidate descriptions include relation direction, type, name, relevance summary and observation age. Model selection is validated against the exact current choice set.
 
 Start with up to 10 choices per call, six navigation calls, 200 visited entities and eight relationship levels as configurable demo budgets. Related independent questions can be batched against the same state. A selected node may expose new choices requiring another request. Avoid repeatedly sending full documents; the evidence store retains their relevant sections for the final answer.
 
-Mandatory checks: service/environment resolution, current and incident-time deployment coverage, ownership/current on-call, runtime dependencies within declared scope, customer evidence coverage and current runbook lookup. A lookup can legitimately be missing/unknown; record that result. `STOP` means the brief can be assembled with those limitations, not that the incident is solved. Optional PR discussion, similar incidents and design context can be prioritized by the model.
+Mandatory checks: service/environment resolution, current and incident-time deployment coverage, ownership/current on-call, runtime dependencies within declared scope, customer evidence coverage and current runbook lookup. Initialize application-owned `InvestigationCheck` records before exploration. The model selects among eligible reads or optional context; it cannot remove a required check or set its outcome. Known joins execute in bounded templates. Record status, coverage, attempted time, evidence and sanitized failure for each check.
+
+Use KNOWN for retrieved facts, MISSING only for an adequately complete authoritative lookup establishing absence, STALE for expired evidence, RESTRICTED for access denial, UNAVAILABLE for a failed/timed-out lookup, and NOT_CHECKED for unattempted work. Normal model STOP is accepted only when every required check has an attempted outcome; premature STOP selects the next required read deterministically while budget remains. Repeated STOP cannot create an unbounded model loop. On budget/deadline exhaustion, end with a partial stop reason and expose remaining NOT_CHECKED checks. A partial brief is useful; an action requires complete, current, permitted evidence for every action prerequisite. A recorded KNOWN status alone is insufficient. Optional PR discussion, similar incidents and design context remain model-prioritized.
 
 When budget, access or a source fails, produce a partial brief with unresolved checks. Do not report full impact or an executable recovery plan from incomplete prerequisite data. Service-call cycles use visited tracking and can still be explored; they are not confused with an invalid task/action dependency ordering.
 
@@ -96,6 +100,18 @@ Gate: real answer API output supports every factual claim with supplied evidence
 Create `backend/app/actions/sandbox.py`, `frontend/src/components/{IncidentPage,IncidentTimeline,ImpactList,ActionReview}.tsx`, `scripts/replay_incident.py` and `tests/end_to_end/test_sre_incident.py`. The sandbox adapter accepts only a vetted deployment restoration in a disposable local environment. Display an explicit confirmation and record approval separately from execution.
 
 Gate: approved operation changes the intended disposable target once; repeated requests do not repeat it; changed state/expired approval refuses execution; recovery checks show actual sandbox results; no production credentials or outbound messaging tools are used. Verify cancellation, partial failure and actual-state re-read before retries.
+
+### POC sandbox recipe
+
+Implement one `RESTORE_SANDBOX_ARTIFACT` adapter for a disposable local payments workload. Build two immutable artifact versions: one healthy and one with a controlled request failure. Retain their digests and actual served version identity. The fixture manifest supplies a versioned compatibility record for current/target artifact, configuration and schema. Unknown/incompatible combinations cannot produce a review-ready plan. A second scenario changes schema compatibility and must block the same proposed restoration.
+
+Use the [canonical execution protocol](contracts.md#poc-sandbox-execution-protocol). Store exact plan version, approval actor/time, target state, expiry, compatibility record and unique operation ID in retained transactional local storage. The sandbox adapter is the only target writer; route reset through it as a separately controlled demo operation when no execution/reconciliation is active. The per-target gate serializes recheck and execution; no model-written scripts or mutable target substitutions are accepted.
+
+After permission, evidence, target-state and expiry checks, atomically claim APPROVED to RUNNING and persist the operation before mutation. Repeated requests return existing status/receipts. Persist terminal outcome and actual artifact identity afterward. On process restart or ambiguous acknowledgment, retain UNKNOWN_OUTCOME and reserve the target until actual-state/receipt reconciliation succeeds. Do not infer successful execution solely from a matching target digest or automatically retry an unobserved operation. An unresolved case requires operator reconciliation. Pre-claim cancellation prevents changes; post-claim cancellation cannot claim the operation was undone.
+
+Verify recovery with one synthetic request per second for 30 seconds. All 30 must succeed and the expected artifact identity must be confirmed for the demo criterion; retain timestamped samples. Interrupted sampling is incomplete, and failed checks do not erase an otherwise known execution outcome. Display operation outcome and recovery result separately; neither closes the incident automatically.
+
+Required cases: approved restoration, missing approval, duplicate/concurrent execution, expired plan, moved target, incompatible/unknown schema, cancellation before claim, crash after RUNNING but before mutation, crash after mutation before receipt, receipt persistence failure and interrupted/failed recovery sampling. Resume from durable records rather than repeating a side effect. These are future implementation gates, not passed tests.
 
 ## 6. Practical sprint allocation
 

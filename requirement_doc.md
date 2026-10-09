@@ -53,6 +53,8 @@ The development sprint covers one organization, one project and one repository. 
 
 Imports use the [Phase 1 durable read-blocking protocol](docs/design/phase_01_graph_and_fixtures.md#snapshot-consistency): prepare and retain a complete rebuild bundle, persist dirty state/generation before mutation, rebuild and validate, then publish ready state and the snapshot together. Interrupted imports remain unreadable across restart until full recovery succeeds. Every graph-backed answer revalidates the ready generation; a marker check alone cannot recover overwritten records.
 
+The hackathon POC uses one application writer and completes scenario imports before investigation. Curated manifests are valid inputs; automated mapping maintenance remains future work. Approved core decisions are embedded in the shared contracts and phases: request-local branch suggestions with separately retained audits and later batch projection; explicit incident-instance selection; controller-owned required checks with UNAVAILABLE distinct from missing evidence; typed answer facts and qualifier validation; durable source-access invalidation independent of graph imports; and one approved, version-bound sandbox restoration with outcome reconciliation. [Core decision index](docs/design/README.md#poc-core-decisions).
+
 ## Canonical graph
 
 See [graph schema](docs/design/graph_schema.md) for properties, identity and provenance.

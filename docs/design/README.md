@@ -9,11 +9,27 @@ Read the [master design](../../requirement_doc.md) first. This folder divides co
 - [Source adapters](source_adapters.md): required live Plane/Google Docs reads, provider mappings, labeled export fallback and smoke gates.
 - [Task-branch association](task_branch_association.md): assignment/in-progress windows, author/commit evidence and Clef inference when explicit task references are absent.
 - [Decision model evaluation](decision_models.md): Jev/Clef/Laya evaluation, alternatives and selection policy.
+- [POC core logic review](../reviews/poc_core_logic_review.md): assessment under the hackathon POC scope and the concrete decisions needed for the demo.
+- [Open questions and probable solutions](open_questions_and_probable_solutions.md): deferred non-core gaps, proposed solutions and conditions for revisiting them.
 - [SRE event handling](../../SRE%20event%20handling.md): incident-assistant requirements and grounded interpretation of the supplied PDF.
 - [SRE graph extension](sre_graph_schema.md): runtime, deployment, ownership, on-call and customer evidence.
 - [SRE integration plan](sre_integration_plan.md): model-guided exploration, shared-phase changes, MCP access and sandbox demonstration.
 - [FalkorDB resources and hackathon plan](falkordb_resources_and_hackathon_plan.md): verified event guidance, client/MCP/GraphRAG SDK choices, focused demo and submission evidence.
 - [Original draft](archive/original_requirement_doc.md): preserved source document; superseded by the master design.
+
+## POC core decisions
+
+The user approved these fixes for the hackathon POC on 2026-10-09. They are now design requirements in the owning specifications; application implementation and runtime checks remain future work. Curated manifests are sufficient POC inputs. Deferred production questions remain in [open questions and probable solutions](open_questions_and_probable_solutions.md).
+
+| Review ID | Embedded decision | Authoritative specification / coding phase |
+| --- | --- | --- |
+| C-01 | Request-local suggestions, retained audit records, explicit later candidate projection | [Association lifecycle](task_branch_association.md#representation-and-use), [Phase 4](phase_04_decision_model_integration.md#clef-task-branch-discovery) |
+| C-02 | Exact instance IDs / authorized picker; fresh scoped requests and pending unresolved alerts | [Scope contract](contracts.md#poc-incident-scope-selection), [SRE plan](sre_integration_plan.md#3-node-exploration-and-stop-conditions) |
+| C-03 | Controller-owned required checks, guarded STOP and explicit unavailable/partial outcomes | [Investigation contracts](contracts.md#incident-and-exploration-extension), [SRE scheduler](sre_integration_plan.md#3-node-exploration-and-stop-conditions) |
+| C-04 | Engine fact registry, constrained explanations and final validity checks | [Answer contracts](contracts.md#context-and-answer-response), [Phase 5](phase_05_context_and_llm_answers.md#fact-registry-and-final-publication) |
+| C-05 | Durable access registry independent of graph import success | [Access contract](contracts.md#source-access-registry), [Source adapters](source_adapters.md#persistent-source-access-handling) |
+| C-06 | One restore operation with durable approval/claim/receipt, reconciliation and measured recovery | [Action protocol](contracts.md#poc-sandbox-execution-protocol), [Sandbox recipe](sre_integration_plan.md#poc-sandbox-recipe) |
+| C-07 | One writer, scenario-batch publication and shared direct/MCP read gates | [Phase 1](phase_01_graph_and_fixtures.md#snapshot-consistency) |
 
 ## Execution order
 
