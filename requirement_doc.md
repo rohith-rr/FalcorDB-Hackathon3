@@ -22,7 +22,7 @@ For the hackathon, lead the demonstration with the incident workflow and a recov
 | Linking a task to a branch proves its code exists there | Confirmed task-to-PR and task-to-delivery-revision links identify implementation; branch pointers can move. |
 | Finding a TLS runbook means the task is unblocked | Instructions offer a resolution path. Task state stays as recorded by its source. |
 | Retrieval is the final answer | Build an evidence bundle, then call an LLM API to explain it with citations. |
-| A 48-hour prototype is production-ready | Deliver a reproducible single-tenant prototype; production has a separate phase. |
+| An early prototype is production-ready | Deliver a reproducible single-tenant prototype; production has a separate phase. |
 
 Explicit graph paths support relationship queries, but there is no universal five-hop failure threshold for vector retrieval. The goal is to reduce unsupported answers and expose their provenance, without promising zero hallucinations.
 
@@ -49,11 +49,11 @@ flowchart TD
 
 Recommended initial stack: Python 3.11+, FastAPI, Pydantic, FalkorDB Python client, Docker Compose, and React/TypeScript. These are defaults for a new implementation, not existing code. Pin tested versions in Phase 0 and use Docker Desktop/WSL2 where appropriate on Windows. The answer LLM and decision provider use independent adapters.
 
-The development sprint covers one organization, one project and one repository. Start with fixtures and structured exports, then require read-only live Plane, Google Docs and GitHub adapters for demo completion. Jira exports and Markdown remain supported and visibly labeled alternatives. The [source-adapter specification](docs/design/source_adapters.md) defines identity, authentication, normalization, coverage and live smoke checks. The SRE-focused demo adds a small synthetic service/deployment/on-call/customer dataset; its scope and alternate sprint allocation are defined in the SRE plan. Additional live operational sources and enterprise permissions follow after the demo.
+The development scope covers one organization, one project and one repository. Start with fixtures and structured exports, then require read-only live Plane, Google Docs and GitHub adapters for demo completion. Jira exports and Markdown remain supported and visibly labeled alternatives. The [source-adapter specification](docs/design/source_adapters.md) defines identity, authentication, normalization, coverage and live smoke checks. The SRE-focused demo adds a small synthetic service/deployment/on-call/customer dataset; its scope and alternative demo path are defined in the SRE plan. Additional live operational sources and enterprise permissions follow after the demo.
 
-Imports use the [Phase 1 durable read-blocking protocol](docs/design/phase_01_graph_and_fixtures.md#snapshot-consistency): prepare and retain a complete rebuild bundle, persist dirty state/generation before mutation, rebuild and validate, then publish ready state and the snapshot together. Interrupted imports remain unreadable across restart until full recovery succeeds. Every graph-backed answer revalidates the ready generation; a marker check alone cannot recover overwritten records.
+Imports use the [Phase 1 durable protocol](docs/design/phase_01_graph_and_fixtures.md#snapshot-consistency) with separate STRUCTURAL and INCIDENT ownership/state in one FalkorDB graph. Retain complete per-projection recovery bundles and persist DIRTY before mutation. Incident events are durably logged and coalesced into fixed 30-second windows, with bounded batches and a READY read interval; update incident-owned records without rebuilding the structural graph. Recovery blocks reads requiring the affected projection. Every answer validates its complete semantic read set, access and freshness; unrelated generation changes do not discard valid LLM output. See [graph publication](docs/design/graph_publication.md).
 
-The hackathon POC uses one application writer and completes scenario imports before investigation. Curated manifests are valid inputs; automated mapping maintenance remains future work. Approved core decisions are embedded in the shared contracts and phases: request-local branch suggestions with separately retained audits and later batch projection; explicit incident-instance selection; controller-owned required checks with UNAVAILABLE distinct from missing evidence; typed answer facts and qualifier validation; durable source-access invalidation independent of graph imports; and one approved, version-bound sandbox restoration with outcome reconciliation. [Core decision index](docs/design/README.md#poc-core-decisions).
+The hackathon POC uses one application writer and completes initial scenario publication before investigation; subsequent event batches follow the configured cadence. Curated manifests are valid inputs; automated mapping maintenance remains future work. Shared contracts preserve request-local suggestions/audits, explicit incident scope, required checks, typed answer facts and independent source-access invalidation. Clarification selections survive unrelated imports and recompute current evidence. Approved sandbox execution returns 202 with a durable job receipt; the worker restores the target and measures recovery while the UI polls plan status. [Core decision index](docs/design/README.md#poc-core-decisions).
 
 ## Canonical graph
 
@@ -71,11 +71,9 @@ See [graph schema](docs/design/graph_schema.md) for properties, identity and pro
 | `RevisionEffect` | `EFFECT_AT -> Commit`, `AFFECTS_REVISION -> Commit`, reapplication `RESOLVES_REVERT -> RevisionEffect` |
 | `Document:DesignDoc` | `SPECIFIES -> Task` |
 | `Document:ProcessDoc` | `GOVERNS_PROCESS -> Task` |
-| `CheckRun` (optional in sprint) | `CHECKS_COMMIT -> Commit` |
+| `CheckRun` (optional in the demo) | `CHECKS_COMMIT -> Commit` |
 
 All nodes and relationships carry tenant identity, source references, observation times and snapshot identity. Relationships distinguish explicit/confirmed links from inferred candidates. Inferred links cannot justify a branch command. Store document content/version and individual reviews, not just titles and an aggregate review string.
-
-When task IDs are missing from branch names and commit messages, use the [Clef task-branch fallback](docs/design/task_branch_association.md). Intersect assignment history with in-progress periods, map the assignee to Git author identities, and retrieve their branch activity in that window. Clef compares task purpose with messages, changed files and competing simultaneous tasks, returning likely, multiple, ambiguous or no-match associations. Preserve period/author/commit evidence and model scores as inferred candidate links; temporal correlation is not confirmed implementation or delivery. Explicit provider/manifest mappings take precedence.
 
 When task IDs are missing from branch names and commit messages, use the [Clef task-branch fallback](docs/design/task_branch_association.md). Intersect assignment history with in-progress periods, map the assignee to Git author identities, and retrieve their branch activity in that window. Clef compares task purpose with messages, changed files and competing simultaneous tasks, returning likely, multiple, ambiguous or no-match associations. Preserve period/author/commit evidence and model scores as inferred candidate links; temporal correlation is not confirmed implementation or delivery. Explicit provider/manifest mappings take precedence.
 
@@ -94,7 +92,6 @@ Use model-guided exploration to select useful neighboring nodes or evidence requ
 | Does review text describe a deployment blocker? | Optional `noul`, with cited input and uncertainty handling |
 | Rank narrative urgency | Optional `score` with a defined rubric; explicit ticket priority takes precedence |
 | Is a PR merged? Does a branch contain a required revision? | Source fields and Git checks |
-| Which ID-free branch likely implements an assigned in-progress task? | Work-period/author retrieval, then Clef association judgment with ambiguity and no-match options |
 | Which ID-free branch likely implements an assigned in-progress task? | Work-period/author retrieval, then Clef association judgment with ambiguity and no-match options |
 | Which incident node or evidence should be explored next? | Model `choice` over scoped neighbors and pending checks; preserve several paths |
 | Who is on-call now? What was deployed? Are customers failing? | Current assignment, deployment and measurement records; model choices do not establish these facts |
@@ -125,18 +122,18 @@ Ancestry proves historical inclusion, not that later code preserves every behavi
 
 Start at the [implementation index](docs/design/README.md). Each document defines coding tasks, proposed files, validation and a completion gate.
 
-| Phase | Deliverable | Original estimate (provisional) |
-| --- | --- | --- |
-| [0: Foundation](docs/design/phase_00_foundation.md) | Runtime, contracts and scenario fixtures | 2 hours |
-| [1: Graph](docs/design/phase_01_graph_and_fixtures.md) | Schema, durable import/recovery and query templates | 4 hours |
-| [2: Ingestion](docs/design/phase_02_ingestion_and_sync.md) | Plane/Google Docs/GitHub reads, exports and explicit links | 6 hours |
-| [3: Traversal](docs/design/phase_03_traversal_and_branch_decisions.md) | Verified branch and blocker decisions | 8 hours |
-| [4: Decision models](docs/design/phase_04_decision_model_integration.md) | Adapters, evaluation and routing gate | 5 hours |
-| [5: Answers](docs/design/phase_05_context_and_llm_answers.md) | Evidence bundle, real LLM API call and fallback | 4 hours |
-| [6: Demo](docs/design/phase_06_ui_evaluation_and_demo.md) | Query UI, graph explanation and regression checks | 7 hours |
-| [7: Production](docs/design/phase_07_production_and_actions.md) | Permissions, reliable sync, actions and broader context | After sprint |
+| Phase | Deliverable |
+| --- | --- |
+| [0: Foundation](docs/design/phase_00_foundation.md) | Runtime, contracts and scenario fixtures |
+| [1: Graph](docs/design/phase_01_graph_and_fixtures.md) | Schema, durable import/recovery and query templates |
+| [2: Ingestion](docs/design/phase_02_ingestion_and_sync.md) | Plane/Google Docs/GitHub reads, exports and explicit links |
+| [3: Traversal](docs/design/phase_03_traversal_and_branch_decisions.md) | Verified branch and blocker decisions |
+| [4: Decision models](docs/design/phase_04_decision_model_integration.md) | Adapters, evaluation and routing gate |
+| [5: Answers](docs/design/phase_05_context_and_llm_answers.md) | Evidence bundle, real LLM API call and fallback |
+| [6: Demo](docs/design/phase_06_ui_evaluation_and_demo.md) | Query UI, graph explanation and regression checks |
+| [7: Production](docs/design/phase_07_production_and_actions.md) | Permissions, reliable sync, actions and broader context |
 
-The original Phases 0-6 estimate totaled 36 hours plus 12 recovery hours within a 48-hour internal budget. All estimates are provisional under the revised recovery and required live-adapter scope; re-estimate after actual setup/compatibility checks. Export ingestion and rules routing remain labeled fallbacks if integrations/model setup exceed the budget, but export-only results do not complete the live Plane/Google Docs gate. At least one real LLM API call is required to demonstrate the requested retrieval-to-explanation workflow; fallback-only operation is a partial deliverable.
+Phase completion is defined by each phase's completion gate, not by elapsed time. Re-estimate effort after the actual recovery/persistence and live-adapter compatibility checks rather than committing to hour figures in advance. Export ingestion and rules routing remain labeled fallbacks if integrations/model setup cannot be completed, but export-only results do not complete the live Plane/Google Docs gate. At least one real LLM API call is required to demonstrate the requested retrieval-to-explanation workflow; fallback-only operation is a partial deliverable.
 
 ## Success criteria
 
@@ -146,9 +143,11 @@ The original Phases 0-6 estimate totaled 36 hours plus 12 recovery hours within 
 - LLM prose cannot change branch/revision selections, task states, progress, commands or source links.
 - The UI exposes the actual traversal and verification evidence and distinguishes fixtures from live results.
 - Interrupted imports remain blocked across application/database restart until a validated full rebuild; no mixed-snapshot answer or command appears.
+- Incident ingestion uses durable bounded windows and affects only its projection; structural-only reads remain available during incident recovery.
+- Unrelated imports preserve equivalent answer inputs; changed relationships, counts, absence results, access or heads invalidate affected answers without silently reusing prose.
+- Clarification tokens survive unrelated imports while revalidating selected candidates; sandbox execution returns a durable 202 receipt and exposes operation/recovery progress through polling.
 - Stable merge/revert does not exclude an unchanged valid feature; complete confirmed reapplication restores only applicable candidate histories.
 - Live Plane tasks and Google Docs content produce actual source-backed context/citations; unavailable adapters keep the full demo gate incomplete.
-- ID-free task/branch discovery uses assignment/in-progress history and author/content evidence; Clef suggestions and ambiguities remain visible without becoming confirmed delivery coverage.
 - ID-free task/branch discovery uses assignment/in-progress history and author/content evidence; Clef suggestions and ambiguities remain visible without becoming confirmed delivery coverage.
 - Model accuracy, abstention, latency and cost are measured separately from graph/branch correctness.
 

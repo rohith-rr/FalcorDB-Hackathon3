@@ -1,6 +1,6 @@
 # Phase 7: production Company Brain and controlled actions
 
-Status: planned after the hackathon. Depends on Phase 6. No fixed sprint timebox. Split this phase into separate releases; completion of earlier phases does not authorize or implement these operations.
+Status: planned after the hackathon. Depends on Phase 6. No fixed timebox. Split this phase into separate releases; completion of earlier phases does not authorize or implement these operations.
 
 ## Outcome
 
@@ -13,7 +13,7 @@ Proposed files: `backend/app/auth/`, `backend/app/permissions/`, `backend/app/jo
 1. Add company identity/SSO and repository/project/document permissions. Enforce authorization before retrieval, during expansion, before answer construction and before trace access. Inaccessible prerequisites produce a scoped incomplete result without leaking titles, counts or URLs.
 2. Implement source-specific ACL synchronization and revocation invalidation, including affected caches, content stores and traces. Decide approved hosted-model data handling per organization; local decision inference does not automatically make answer-LLM egress acceptable.
 3. Extend the existing live Plane/Google Docs/GitHub adapters with live Jira and additional document providers, source-specific mappings, pagination and incremental cursors. Verify webhook signatures, deduplicate deliveries and reconcile periodically so missed events do not leave permanent stale facts. Per-user ACL synchronization builds on the demo's configured identity/scope.
-4. Introduce a durable job queue and retry/dead-letter handling. Preserve the Phase 1 durable dirty-state/rebuild invariant until coherent versioned publication or transactional updates are validated across workers. Multiworker reads cannot rely on the prototype's process-local gate; add distributed admission/fencing before enabling them. Interrupted-import recovery is a Phase 1 requirement, not deferred production work.
+4. Extend the existing durable event/action job stores with production retry/dead-letter handling. Preserve per-projection DIRTY recovery, ownership, bounded incident cadence and complete scoped validation. Multiworker reads need distributed admission/publication fencing and equivalent read-set checks; process-local gates are insufficient. Validate any transactional/immutable-publication replacement across workers before enabling it. Recovery remains a Phase 1 requirement.
 5. Track mapping health: unknown deliveries, ambiguous task links, stale source scopes and conflicts. Offer an operator review workflow for inferred relationships; retain confirming evidence and source authority.
 6. Add backup/restore drills, versioned schema migrations, retention/deletion policy, provider quota management, bounded resource use and monitoring for stale/incorrect recommendations.
 

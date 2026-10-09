@@ -6,6 +6,7 @@ Read the [master design](../../requirement_doc.md) first. This folder divides co
 
 - [Graph schema](graph_schema.md): identities, source properties, relationship direction and delivery evidence.
 - [Application contracts](contracts.md): typed requests, branch decisions, evidence and API responses.
+- [Graph publication](graph_publication.md): projection ownership, durable incident batching, scoped read-set validation and generation-independent clarification.
 - [Source adapters](source_adapters.md): required live Plane/Google Docs reads, provider mappings, labeled export fallback and smoke gates.
 - [Task-branch association](task_branch_association.md): assignment/in-progress windows, author/commit evidence and Clef inference when explicit task references are absent.
 - [Decision model evaluation](decision_models.md): Jev/Clef/Laya evaluation, alternatives and selection policy.
@@ -29,7 +30,9 @@ The user approved these fixes for the hackathon POC on 2026-10-09. They are now 
 | C-04 | Engine fact registry, constrained explanations and final validity checks | [Answer contracts](contracts.md#context-and-answer-response), [Phase 5](phase_05_context_and_llm_answers.md#fact-registry-and-final-publication) |
 | C-05 | Durable access registry independent of graph import success | [Access contract](contracts.md#source-access-registry), [Source adapters](source_adapters.md#persistent-source-access-handling) |
 | C-06 | One restore operation with durable approval/claim/receipt, reconciliation and measured recovery | [Action protocol](contracts.md#poc-sandbox-execution-protocol), [Sandbox recipe](sre_integration_plan.md#poc-sandbox-recipe) |
-| C-07 | One writer, scenario-batch publication and shared direct/MCP read gates | [Phase 1](phase_01_graph_and_fixtures.md#snapshot-consistency) |
+| C-07 | One writer, per-projection publication and shared direct/MCP read gates | [Phase 1](phase_01_graph_and_fixtures.md#snapshot-consistency), [Publication policy](graph_publication.md) |
+
+The subsequent design-risk review adds fixed incident windows and independent projection recovery, complete read-set equivalence after model calls, generation-independent clarification with current candidate checks, and asynchronous sandbox execution/status polling. These supersede global-generation-only invalidation and unspecified per-event publication cadence. See [publication acceptance cases](graph_publication.md#required-implementation-evidence) and the [sandbox protocol](contracts.md#poc-sandbox-execution-protocol). Runtime checks remain future implementation work.
 
 ## Execution order
 
@@ -48,19 +51,19 @@ To use the project's own implementation work as demo data, follow the [Plane bac
 
 Use each completion gate before moving on. A failing semantic adapter can be disabled without preventing graph decisions or the answer LLM. Record provider unavailability as an unevaluated result, not a passing evaluation.
 
-For the incident demo, follow the SRE integration plan's additions to these phases. Its original 36-hour estimate replaces the demo allocation rather than adding another 36-hour workload; both estimates are provisional under the revised recovery/live-adapter scope. The existing development scenarios remain part of the product requirements and regressions when implemented; completing all development and incident features in one sprint is not assumed. The shared live Plane/Google Docs gate applies to either demo path.
+For the incident demo, follow the SRE integration plan's additions to these phases; it is an alternative demo path over the same phases, not an additional workload. The existing development scenarios remain part of the product requirements and regressions when implemented; completing all development and incident features together is not assumed. The shared live Plane/Google Docs gate applies to either demo path.
 
-The recommended hackathon demonstration leads with incident investigation and approved sandbox recovery. The FalkorDB resource plan maps sponsor tools to that workflow and treats document SDK retrieval, native algorithm projections and Canvas as optional additions. Event dates and the user's reported organizer permission for early coding are recorded there; the 48-hour budget below remains an internal planning assumption.
+The recommended hackathon demonstration leads with incident investigation and approved sandbox recovery. The FalkorDB resource plan maps sponsor tools to that workflow and treats document SDK retrieval, native algorithm projections and Canvas as optional additions. Event dates and the user's reported organizer permission for early coding are recorded there.
 
-## 48-hour sprint boundary
+## Scope boundary
 
-The original allocation was 36 engineering hours to Phases 0-6 and 12 for setup failures, integration and rehearsal. Treat every phase timebox as provisional and re-estimate after recovery/persistence and live-adapter compatibility checks. These are internal engineering estimates, not a delivery guarantee or calendar estimate for a single inexperienced developer.
+Phase completion is defined by each phase's completion gate, not by elapsed time. Effort is re-estimated after the recovery/persistence and live-adapter compatibility checks rather than committed to hour figures in advance.
 
-If time runs short in the development-focused demo, cut extra connectors beyond Plane/Google Docs/GitHub, sophisticated visuals, optional checks ingestion and model fine-tuning. Preserve durable recovery, candidate-specific revision effects, the verified branch workflow, review warnings, TLS content, citations, traversal trace and a real retrieval-to-LLM explanation. Live Plane and Google Docs are required completion gates; export fallback is labeled as a partial deliverable. Keep fixtures clearly labeled. A rules-only demo does not establish the value of Jev, Clef or Laya. For the SRE-focused demo, use the alternative scope and cuts in the [SRE integration plan](sre_integration_plan.md).
+The demo covers one organization, one project and one repository. If scope must shrink, cut extra connectors beyond Plane/Google Docs/GitHub, sophisticated visuals, optional checks ingestion and model fine-tuning. Preserve durable recovery, candidate-specific revision effects, the verified branch workflow, review warnings, TLS content, citations, traversal trace and a real retrieval-to-LLM explanation. Live Plane and Google Docs are required completion gates; export fallback is labeled as a partial deliverable. Keep fixtures clearly labeled. A rules-only demo does not establish the value of Jev, Clef or Laya. For the SRE-focused demo, use the alternative scope and cuts in the [SRE integration plan](sre_integration_plan.md).
 
 ## Questions settled by default
 
-Python backend; React frontend; structured fixtures/exports first, then required live Plane/Google Docs/GitHub reads; Markdown and verified manifests remain supported; durable read blocking during import/recovery; candidate-specific revert/reapplication evidence; one process/demo tenant/repository; stable ref configured per repository; advisory production actions; model-guided incident exploration; approved action execution only in a disposable sandbox during the incident demo; no NER pipeline in the sprint. Revisit defaults only when implementation evidence requires it, and update the canonical contracts before changing consumers.
+Python backend; React frontend; fixtures/exports first, then required live Plane/Google Docs/GitHub reads; Markdown and verified manifests supported; durable per-projection recovery, fixed incident batching and scoped answer validation; candidate-specific revision effects; one process/demo tenant/repository; configured stable ref; advisory production actions; model-guided exploration; asynchronous approved sandbox execution with polling; no NER pipeline. Update canonical contracts before changing consumers.
 
 ## Design revision gate
 

@@ -2,7 +2,7 @@
   "schema_version": "company-brain-seed-payload/v1",
   "seed_namespace": "company-brain-poc-v1",
   "project_name": "Falcor DB hackathon",
-  "scope_resolution": "pending Plane connection; do not create a project",
+  "scope_resolution": "resolved: workspace 'falkor-db-hackathon' (658cbf15-219c-4a64-8732-78dde7cfc59f), project 'Falkor DB hackathon' (baa1b2af-4399-4abb-8da2-7fd918b35544)",
   "state_policy": "resolve project backlog/unstarted state mapped to TODO",
   "type_policy": "inspect and use configured epic/task types",
   "epics": [

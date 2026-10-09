@@ -12,12 +12,14 @@ Existing task/PR direction stays `Task-[:IMPLEMENTED_BY]->PullRequest`. Source a
 
 All nodes retain the canonical source reference, tenant, snapshot and observation fields. IDs use source-native identifiers; do not merge services by display name across accounts/environments.
 
+Apply [projection ownership](graph_publication.md#projection-ownership): alerts/incidents/events, deployments/artifacts/changes, observations, on-call assignments and projected action plans are INCIDENT-owned. Service/instance identities, directory/customer/feature catalog and runbook references remain STRUCTURAL-owned. Runtime current-version observations belong to incident evidence rather than overwriting structural instance fields. Incident-origin links retain their owner even when their endpoint is a structural commit, employee, task or service. Event batches update this dynamic projection without rebuilding the catalog; retained audit records remain outside graph deletion.
+
 | Node | Required operational properties |
 | --- | --- |
 | `Alert` | provider event/issue IDs, deduplication identity, signature, occurred/received times, raw state/severity, sanitized payload reference, service-resolution status |
 | `Incident` | episode ID, lifecycle state, opened/acknowledged/mitigated/resolved times when known, source owner, assigned roles, severity policy version |
 | `Service` | catalog ID, name, service kind, repository bindings, ownership source, applicability scope |
-| `ServiceInstance` | logical workload ID, service ID, provider account/cluster/namespace or equivalent, environment, region, current state/version observation |
+| `ServiceInstance` | logical workload ID, service ID, provider account/cluster/namespace or equivalent, environment/region and catalog identity state; current runtime state/version comes from incident observations/deployments |
 | `Deployment` | provider deployment/revision ID, started/completed times, observed outcome, target instance, change reference, rollback-history availability |
 | `Artifact` | immutable deployed package/image ID or digest, build provenance reference, build revisions, provenance completeness |
 | `Change` | source change ID, kind (`CODE`, `CONFIG`, `SCHEMA`, `FEATURE_FLAG`, `INFRASTRUCTURE`), effective time, bounded before/after references, affected scope |

@@ -1,42 +1,43 @@
 {
   "schema_version": "company-brain-relationships/v1",
   "seed_namespace": "company-brain-poc-v1",
-  "generated_at": "2026-10-09T15:04:37.440397Z",
+  "generated_at": "2026-10-09T15:41:20.691639+00:00",
   "scope": {
-    "plane_instance": null,
-    "workspace_slug": null,
-    "workspace_id": null,
-    "project_name": "Falcor DB hackathon",
-    "project_id": null,
-    "project_resolution": "unresolved: Plane access unavailable",
+    "plane_instance": "https://app.plane.so",
+    "workspace_slug": "falkor-db-hackathon",
+    "workspace_id": "658cbf15-219c-4a64-8732-78dde7cfc59f",
+    "project_name": "Falkor DB hackathon",
+    "project_id": "baa1b2af-4399-4abb-8da2-7fd918b35544",
+    "project_identifier": "FALKO",
+    "project_resolution": "resolved: Plane workspace 'falkor-db-hackathon' (658cbf15-219c-4a64-8732-78dde7cfc59f), project 'Falkor DB hackathon' (baa1b2af-4399-4abb-8da2-7fd918b35544)",
     "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-    "repository_id": null,
+    "repository_id": "rohith-rr/FalcorDB-Hackathon",
     "stable_ref": "master",
     "stable_ref_evidence": "Verified from checkout origin/HEAD -> refs/remotes/origin/master."
   },
   "mapping": {
-    "E01": null,
-    "E02": null,
-    "E03": null,
-    "E04": null,
-    "T01": null,
-    "T02": null,
-    "T03": null,
-    "T04": null,
-    "T05": null,
-    "T06": null,
-    "T07": null,
-    "T08": null,
-    "T09": null,
-    "T10": null,
-    "T11": null,
-    "T12": null,
-    "T13": null,
-    "T14": null,
-    "T15": null,
-    "T16": null,
-    "T17": null,
-    "T18": null
+    "E01": "f6bf5f05-8fad-48e8-98b3-ecef41086765",
+    "E02": "5db678e1-ad10-4631-9608-fb9656cd19fc",
+    "E03": "3db6ed8f-5aa1-40c6-a971-1e1840accc67",
+    "E04": "ab7d3b4c-3654-410c-918f-0210be428204",
+    "T01": "e0030537-b31c-435a-a152-3f63e7bbbbe0",
+    "T02": "be6a8582-9c9f-4f95-b920-2a6e207f57ca",
+    "T03": "8604e63f-a531-4917-80be-bf490f5d9a55",
+    "T04": "0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10",
+    "T05": "49ad50de-a9c8-46f0-8c7d-e6ad399a6c9b",
+    "T06": "e538fab4-e03e-4568-95bd-2f1a2494fb68",
+    "T07": "d6bf2d00-b23a-418a-840d-5fdf9e3ce892",
+    "T08": "cefa3070-e3ef-4aa9-a400-ebac61b3571c",
+    "T09": "4058e363-fe55-402c-ad38-559b17b7dc4c",
+    "T10": "afe05c24-2dc8-419d-8091-2e5869a2ef5a",
+    "T11": "5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf",
+    "T12": "2b6c4dde-b094-4910-8ff5-9007382b5a6d",
+    "T13": "ed7b8170-0c31-411e-ae8f-b6f0c8d714c0",
+    "T14": "5dac2f84-761b-448c-a822-21bc69c2197d",
+    "T15": "7ded08a8-4233-4881-8c1e-f887db6ae024",
+    "T16": "abcc6f12-1fb0-4302-b91f-45e672a68159",
+    "T17": "72d3ed30-4c0b-4a7c-b995-52cf2a294e80",
+    "T18": "7daac1d2-4d86-450c-9c70-8bf7e54256e9"
   },
   "hierarchy": [
     {
@@ -48,10 +49,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T01 (e0030537-b31c-435a-a152-3f63e7bbbbe0) has parent E01 (f6bf5f05-8fad-48e8-98b3-ecef41086765)",
+      "parent_native_id": "f6bf5f05-8fad-48e8-98b3-ecef41086765",
+      "child_native_id": "e0030537-b31c-435a-a152-3f63e7bbbbe0"
     },
     {
       "parent": "E01",
@@ -62,10 +65,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T02 (be6a8582-9c9f-4f95-b920-2a6e207f57ca) has parent E01 (f6bf5f05-8fad-48e8-98b3-ecef41086765)",
+      "parent_native_id": "f6bf5f05-8fad-48e8-98b3-ecef41086765",
+      "child_native_id": "be6a8582-9c9f-4f95-b920-2a6e207f57ca"
     },
     {
       "parent": "E01",
@@ -76,10 +81,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T03 (8604e63f-a531-4917-80be-bf490f5d9a55) has parent E01 (f6bf5f05-8fad-48e8-98b3-ecef41086765)",
+      "parent_native_id": "f6bf5f05-8fad-48e8-98b3-ecef41086765",
+      "child_native_id": "8604e63f-a531-4917-80be-bf490f5d9a55"
     },
     {
       "parent": "E01",
@@ -90,10 +97,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T04 (0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10) has parent E01 (f6bf5f05-8fad-48e8-98b3-ecef41086765)",
+      "parent_native_id": "f6bf5f05-8fad-48e8-98b3-ecef41086765",
+      "child_native_id": "0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10"
     },
     {
       "parent": "E02",
@@ -104,10 +113,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T05 (49ad50de-a9c8-46f0-8c7d-e6ad399a6c9b) has parent E02 (5db678e1-ad10-4631-9608-fb9656cd19fc)",
+      "parent_native_id": "5db678e1-ad10-4631-9608-fb9656cd19fc",
+      "child_native_id": "49ad50de-a9c8-46f0-8c7d-e6ad399a6c9b"
     },
     {
       "parent": "E02",
@@ -118,10 +129,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T06 (e538fab4-e03e-4568-95bd-2f1a2494fb68) has parent E02 (5db678e1-ad10-4631-9608-fb9656cd19fc)",
+      "parent_native_id": "5db678e1-ad10-4631-9608-fb9656cd19fc",
+      "child_native_id": "e538fab4-e03e-4568-95bd-2f1a2494fb68"
     },
     {
       "parent": "E02",
@@ -132,10 +145,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T07 (d6bf2d00-b23a-418a-840d-5fdf9e3ce892) has parent E02 (5db678e1-ad10-4631-9608-fb9656cd19fc)",
+      "parent_native_id": "5db678e1-ad10-4631-9608-fb9656cd19fc",
+      "child_native_id": "d6bf2d00-b23a-418a-840d-5fdf9e3ce892"
     },
     {
       "parent": "E02",
@@ -146,10 +161,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T08 (cefa3070-e3ef-4aa9-a400-ebac61b3571c) has parent E02 (5db678e1-ad10-4631-9608-fb9656cd19fc)",
+      "parent_native_id": "5db678e1-ad10-4631-9608-fb9656cd19fc",
+      "child_native_id": "cefa3070-e3ef-4aa9-a400-ebac61b3571c"
     },
     {
       "parent": "E02",
@@ -160,10 +177,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T09 (4058e363-fe55-402c-ad38-559b17b7dc4c) has parent E02 (5db678e1-ad10-4631-9608-fb9656cd19fc)",
+      "parent_native_id": "5db678e1-ad10-4631-9608-fb9656cd19fc",
+      "child_native_id": "4058e363-fe55-402c-ad38-559b17b7dc4c"
     },
     {
       "parent": "E02",
@@ -174,10 +193,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T10 (afe05c24-2dc8-419d-8091-2e5869a2ef5a) has parent E02 (5db678e1-ad10-4631-9608-fb9656cd19fc)",
+      "parent_native_id": "5db678e1-ad10-4631-9608-fb9656cd19fc",
+      "child_native_id": "afe05c24-2dc8-419d-8091-2e5869a2ef5a"
     },
     {
       "parent": "E03",
@@ -188,10 +209,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T11 (5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf) has parent E03 (3db6ed8f-5aa1-40c6-a971-1e1840accc67)",
+      "parent_native_id": "3db6ed8f-5aa1-40c6-a971-1e1840accc67",
+      "child_native_id": "5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf"
     },
     {
       "parent": "E03",
@@ -202,10 +225,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T12 (2b6c4dde-b094-4910-8ff5-9007382b5a6d) has parent E03 (3db6ed8f-5aa1-40c6-a971-1e1840accc67)",
+      "parent_native_id": "3db6ed8f-5aa1-40c6-a971-1e1840accc67",
+      "child_native_id": "2b6c4dde-b094-4910-8ff5-9007382b5a6d"
     },
     {
       "parent": "E03",
@@ -216,10 +241,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T17 (72d3ed30-4c0b-4a7c-b995-52cf2a294e80) has parent E03 (3db6ed8f-5aa1-40c6-a971-1e1840accc67)",
+      "parent_native_id": "3db6ed8f-5aa1-40c6-a971-1e1840accc67",
+      "child_native_id": "72d3ed30-4c0b-4a7c-b995-52cf2a294e80"
     },
     {
       "parent": "E03",
@@ -230,10 +257,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T18 (7daac1d2-4d86-450c-9c70-8bf7e54256e9) has parent E03 (3db6ed8f-5aa1-40c6-a971-1e1840accc67)",
+      "parent_native_id": "3db6ed8f-5aa1-40c6-a971-1e1840accc67",
+      "child_native_id": "7daac1d2-4d86-450c-9c70-8bf7e54256e9"
     },
     {
       "parent": "E04",
@@ -244,10 +273,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T13 (ed7b8170-0c31-411e-ae8f-b6f0c8d714c0) has parent E04 (ab7d3b4c-3654-410c-918f-0210be428204)",
+      "parent_native_id": "ab7d3b4c-3654-410c-918f-0210be428204",
+      "child_native_id": "ed7b8170-0c31-411e-ae8f-b6f0c8d714c0"
     },
     {
       "parent": "E04",
@@ -258,10 +289,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T14 (5dac2f84-761b-448c-a822-21bc69c2197d) has parent E04 (ab7d3b4c-3654-410c-918f-0210be428204)",
+      "parent_native_id": "ab7d3b4c-3654-410c-918f-0210be428204",
+      "child_native_id": "5dac2f84-761b-448c-a822-21bc69c2197d"
     },
     {
       "parent": "E04",
@@ -272,10 +305,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T15 (7ded08a8-4233-4881-8c1e-f887db6ae024) has parent E04 (ab7d3b4c-3654-410c-918f-0210be428204)",
+      "parent_native_id": "ab7d3b4c-3654-410c-918f-0210be428204",
+      "child_native_id": "7ded08a8-4233-4881-8c1e-f887db6ae024"
     },
     {
       "parent": "E04",
@@ -286,10 +321,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "user-directed reviewed seed catalog",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: child T16 (abcc6f12-1fb0-4302-b91f-45e672a68159) has parent E04 (ab7d3b4c-3654-410c-918f-0210be428204)",
+      "parent_native_id": "ab7d3b4c-3654-410c-918f-0210be428204",
+      "child_native_id": "abcc6f12-1fb0-4302-b91f-45e672a68159"
     }
   ],
   "dependencies": [
@@ -302,10 +339,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T03 (8604e63f-a531-4917-80be-bf490f5d9a55) is blocked_by T01 (e0030537-b31c-435a-a152-3f63e7bbbbe0)",
+      "dependent_native_id": "8604e63f-a531-4917-80be-bf490f5d9a55",
+      "prerequisite_native_id": "e0030537-b31c-435a-a152-3f63e7bbbbe0"
     },
     {
       "dependent": "T03",
@@ -316,10 +355,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T03 (8604e63f-a531-4917-80be-bf490f5d9a55) is blocked_by T02 (be6a8582-9c9f-4f95-b920-2a6e207f57ca)",
+      "dependent_native_id": "8604e63f-a531-4917-80be-bf490f5d9a55",
+      "prerequisite_native_id": "be6a8582-9c9f-4f95-b920-2a6e207f57ca"
     },
     {
       "dependent": "T04",
@@ -330,10 +371,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T04 (0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10) is blocked_by T03 (8604e63f-a531-4917-80be-bf490f5d9a55)",
+      "dependent_native_id": "0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10",
+      "prerequisite_native_id": "8604e63f-a531-4917-80be-bf490f5d9a55"
     },
     {
       "dependent": "T05",
@@ -344,10 +387,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T05 (49ad50de-a9c8-46f0-8c7d-e6ad399a6c9b) is blocked_by T01 (e0030537-b31c-435a-a152-3f63e7bbbbe0)",
+      "dependent_native_id": "49ad50de-a9c8-46f0-8c7d-e6ad399a6c9b",
+      "prerequisite_native_id": "e0030537-b31c-435a-a152-3f63e7bbbbe0"
     },
     {
       "dependent": "T05",
@@ -358,10 +403,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T05 (49ad50de-a9c8-46f0-8c7d-e6ad399a6c9b) is blocked_by T02 (be6a8582-9c9f-4f95-b920-2a6e207f57ca)",
+      "dependent_native_id": "49ad50de-a9c8-46f0-8c7d-e6ad399a6c9b",
+      "prerequisite_native_id": "be6a8582-9c9f-4f95-b920-2a6e207f57ca"
     },
     {
       "dependent": "T06",
@@ -372,10 +419,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T06 (e538fab4-e03e-4568-95bd-2f1a2494fb68) is blocked_by T01 (e0030537-b31c-435a-a152-3f63e7bbbbe0)",
+      "dependent_native_id": "e538fab4-e03e-4568-95bd-2f1a2494fb68",
+      "prerequisite_native_id": "e0030537-b31c-435a-a152-3f63e7bbbbe0"
     },
     {
       "dependent": "T06",
@@ -386,10 +435,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T06 (e538fab4-e03e-4568-95bd-2f1a2494fb68) is blocked_by T02 (be6a8582-9c9f-4f95-b920-2a6e207f57ca)",
+      "dependent_native_id": "e538fab4-e03e-4568-95bd-2f1a2494fb68",
+      "prerequisite_native_id": "be6a8582-9c9f-4f95-b920-2a6e207f57ca"
     },
     {
       "dependent": "T07",
@@ -400,10 +451,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T07 (d6bf2d00-b23a-418a-840d-5fdf9e3ce892) is blocked_by T01 (e0030537-b31c-435a-a152-3f63e7bbbbe0)",
+      "dependent_native_id": "d6bf2d00-b23a-418a-840d-5fdf9e3ce892",
+      "prerequisite_native_id": "e0030537-b31c-435a-a152-3f63e7bbbbe0"
     },
     {
       "dependent": "T07",
@@ -414,10 +467,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T07 (d6bf2d00-b23a-418a-840d-5fdf9e3ce892) is blocked_by T02 (be6a8582-9c9f-4f95-b920-2a6e207f57ca)",
+      "dependent_native_id": "d6bf2d00-b23a-418a-840d-5fdf9e3ce892",
+      "prerequisite_native_id": "be6a8582-9c9f-4f95-b920-2a6e207f57ca"
     },
     {
       "dependent": "T08",
@@ -428,10 +483,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T08 (cefa3070-e3ef-4aa9-a400-ebac61b3571c) is blocked_by T03 (8604e63f-a531-4917-80be-bf490f5d9a55)",
+      "dependent_native_id": "cefa3070-e3ef-4aa9-a400-ebac61b3571c",
+      "prerequisite_native_id": "8604e63f-a531-4917-80be-bf490f5d9a55"
     },
     {
       "dependent": "T08",
@@ -442,10 +499,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T08 (cefa3070-e3ef-4aa9-a400-ebac61b3571c) is blocked_by T05 (49ad50de-a9c8-46f0-8c7d-e6ad399a6c9b)",
+      "dependent_native_id": "cefa3070-e3ef-4aa9-a400-ebac61b3571c",
+      "prerequisite_native_id": "49ad50de-a9c8-46f0-8c7d-e6ad399a6c9b"
     },
     {
       "dependent": "T08",
@@ -456,10 +515,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T08 (cefa3070-e3ef-4aa9-a400-ebac61b3571c) is blocked_by T06 (e538fab4-e03e-4568-95bd-2f1a2494fb68)",
+      "dependent_native_id": "cefa3070-e3ef-4aa9-a400-ebac61b3571c",
+      "prerequisite_native_id": "e538fab4-e03e-4568-95bd-2f1a2494fb68"
     },
     {
       "dependent": "T08",
@@ -470,10 +531,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T08 (cefa3070-e3ef-4aa9-a400-ebac61b3571c) is blocked_by T07 (d6bf2d00-b23a-418a-840d-5fdf9e3ce892)",
+      "dependent_native_id": "cefa3070-e3ef-4aa9-a400-ebac61b3571c",
+      "prerequisite_native_id": "d6bf2d00-b23a-418a-840d-5fdf9e3ce892"
     },
     {
       "dependent": "T09",
@@ -484,10 +547,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T09 (4058e363-fe55-402c-ad38-559b17b7dc4c) is blocked_by T04 (0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10)",
+      "dependent_native_id": "4058e363-fe55-402c-ad38-559b17b7dc4c",
+      "prerequisite_native_id": "0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10"
     },
     {
       "dependent": "T09",
@@ -498,10 +563,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T09 (4058e363-fe55-402c-ad38-559b17b7dc4c) is blocked_by T07 (d6bf2d00-b23a-418a-840d-5fdf9e3ce892)",
+      "dependent_native_id": "4058e363-fe55-402c-ad38-559b17b7dc4c",
+      "prerequisite_native_id": "d6bf2d00-b23a-418a-840d-5fdf9e3ce892"
     },
     {
       "dependent": "T09",
@@ -512,10 +579,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T09 (4058e363-fe55-402c-ad38-559b17b7dc4c) is blocked_by T08 (cefa3070-e3ef-4aa9-a400-ebac61b3571c)",
+      "dependent_native_id": "4058e363-fe55-402c-ad38-559b17b7dc4c",
+      "prerequisite_native_id": "cefa3070-e3ef-4aa9-a400-ebac61b3571c"
     },
     {
       "dependent": "T10",
@@ -526,10 +595,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T10 (afe05c24-2dc8-419d-8091-2e5869a2ef5a) is blocked_by T04 (0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10)",
+      "dependent_native_id": "afe05c24-2dc8-419d-8091-2e5869a2ef5a",
+      "prerequisite_native_id": "0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10"
     },
     {
       "dependent": "T10",
@@ -540,10 +611,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T10 (afe05c24-2dc8-419d-8091-2e5869a2ef5a) is blocked_by T05 (49ad50de-a9c8-46f0-8c7d-e6ad399a6c9b)",
+      "dependent_native_id": "afe05c24-2dc8-419d-8091-2e5869a2ef5a",
+      "prerequisite_native_id": "49ad50de-a9c8-46f0-8c7d-e6ad399a6c9b"
     },
     {
       "dependent": "T10",
@@ -554,10 +627,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T10 (afe05c24-2dc8-419d-8091-2e5869a2ef5a) is blocked_by T07 (d6bf2d00-b23a-418a-840d-5fdf9e3ce892)",
+      "dependent_native_id": "afe05c24-2dc8-419d-8091-2e5869a2ef5a",
+      "prerequisite_native_id": "d6bf2d00-b23a-418a-840d-5fdf9e3ce892"
     },
     {
       "dependent": "T10",
@@ -568,10 +643,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T10 (afe05c24-2dc8-419d-8091-2e5869a2ef5a) is blocked_by T08 (cefa3070-e3ef-4aa9-a400-ebac61b3571c)",
+      "dependent_native_id": "afe05c24-2dc8-419d-8091-2e5869a2ef5a",
+      "prerequisite_native_id": "cefa3070-e3ef-4aa9-a400-ebac61b3571c"
     },
     {
       "dependent": "T11",
@@ -582,10 +659,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T11 (5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf) is blocked_by T04 (0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10)",
+      "dependent_native_id": "5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf",
+      "prerequisite_native_id": "0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10"
     },
     {
       "dependent": "T11",
@@ -596,10 +675,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T11 (5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf) is blocked_by T08 (cefa3070-e3ef-4aa9-a400-ebac61b3571c)",
+      "dependent_native_id": "5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf",
+      "prerequisite_native_id": "cefa3070-e3ef-4aa9-a400-ebac61b3571c"
     },
     {
       "dependent": "T11",
@@ -610,10 +691,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T11 (5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf) is blocked_by T09 (4058e363-fe55-402c-ad38-559b17b7dc4c)",
+      "dependent_native_id": "5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf",
+      "prerequisite_native_id": "4058e363-fe55-402c-ad38-559b17b7dc4c"
     },
     {
       "dependent": "T11",
@@ -624,10 +707,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T11 (5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf) is blocked_by T14 (5dac2f84-761b-448c-a822-21bc69c2197d)",
+      "dependent_native_id": "5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf",
+      "prerequisite_native_id": "5dac2f84-761b-448c-a822-21bc69c2197d"
     },
     {
       "dependent": "T12",
@@ -638,10 +723,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T12 (2b6c4dde-b094-4910-8ff5-9007382b5a6d) is blocked_by T09 (4058e363-fe55-402c-ad38-559b17b7dc4c)",
+      "dependent_native_id": "2b6c4dde-b094-4910-8ff5-9007382b5a6d",
+      "prerequisite_native_id": "4058e363-fe55-402c-ad38-559b17b7dc4c"
     },
     {
       "dependent": "T12",
@@ -652,10 +739,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T12 (2b6c4dde-b094-4910-8ff5-9007382b5a6d) is blocked_by T10 (afe05c24-2dc8-419d-8091-2e5869a2ef5a)",
+      "dependent_native_id": "2b6c4dde-b094-4910-8ff5-9007382b5a6d",
+      "prerequisite_native_id": "afe05c24-2dc8-419d-8091-2e5869a2ef5a"
     },
     {
       "dependent": "T12",
@@ -666,10 +755,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T12 (2b6c4dde-b094-4910-8ff5-9007382b5a6d) is blocked_by T11 (5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf)",
+      "dependent_native_id": "2b6c4dde-b094-4910-8ff5-9007382b5a6d",
+      "prerequisite_native_id": "5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf"
     },
     {
       "dependent": "T12",
@@ -680,10 +771,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T12 (2b6c4dde-b094-4910-8ff5-9007382b5a6d) is blocked_by T14 (5dac2f84-761b-448c-a822-21bc69c2197d)",
+      "dependent_native_id": "2b6c4dde-b094-4910-8ff5-9007382b5a6d",
+      "prerequisite_native_id": "5dac2f84-761b-448c-a822-21bc69c2197d"
     },
     {
       "dependent": "T12",
@@ -694,10 +787,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T12 (2b6c4dde-b094-4910-8ff5-9007382b5a6d) is blocked_by T16 (abcc6f12-1fb0-4302-b91f-45e672a68159)",
+      "dependent_native_id": "2b6c4dde-b094-4910-8ff5-9007382b5a6d",
+      "prerequisite_native_id": "abcc6f12-1fb0-4302-b91f-45e672a68159"
     },
     {
       "dependent": "T13",
@@ -708,10 +803,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T13 (ed7b8170-0c31-411e-ae8f-b6f0c8d714c0) is blocked_by T02 (be6a8582-9c9f-4f95-b920-2a6e207f57ca)",
+      "dependent_native_id": "ed7b8170-0c31-411e-ae8f-b6f0c8d714c0",
+      "prerequisite_native_id": "be6a8582-9c9f-4f95-b920-2a6e207f57ca"
     },
     {
       "dependent": "T13",
@@ -722,10 +819,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T13 (ed7b8170-0c31-411e-ae8f-b6f0c8d714c0) is blocked_by T03 (8604e63f-a531-4917-80be-bf490f5d9a55)",
+      "dependent_native_id": "ed7b8170-0c31-411e-ae8f-b6f0c8d714c0",
+      "prerequisite_native_id": "8604e63f-a531-4917-80be-bf490f5d9a55"
     },
     {
       "dependent": "T14",
@@ -736,10 +835,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T14 (5dac2f84-761b-448c-a822-21bc69c2197d) is blocked_by T04 (0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10)",
+      "dependent_native_id": "5dac2f84-761b-448c-a822-21bc69c2197d",
+      "prerequisite_native_id": "0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10"
     },
     {
       "dependent": "T14",
@@ -750,10 +851,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T14 (5dac2f84-761b-448c-a822-21bc69c2197d) is blocked_by T08 (cefa3070-e3ef-4aa9-a400-ebac61b3571c)",
+      "dependent_native_id": "5dac2f84-761b-448c-a822-21bc69c2197d",
+      "prerequisite_native_id": "cefa3070-e3ef-4aa9-a400-ebac61b3571c"
     },
     {
       "dependent": "T14",
@@ -764,10 +867,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T14 (5dac2f84-761b-448c-a822-21bc69c2197d) is blocked_by T13 (ed7b8170-0c31-411e-ae8f-b6f0c8d714c0)",
+      "dependent_native_id": "5dac2f84-761b-448c-a822-21bc69c2197d",
+      "prerequisite_native_id": "ed7b8170-0c31-411e-ae8f-b6f0c8d714c0"
     },
     {
       "dependent": "T15",
@@ -778,10 +883,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T15 (7ded08a8-4233-4881-8c1e-f887db6ae024) is blocked_by T01 (e0030537-b31c-435a-a152-3f63e7bbbbe0)",
+      "dependent_native_id": "7ded08a8-4233-4881-8c1e-f887db6ae024",
+      "prerequisite_native_id": "e0030537-b31c-435a-a152-3f63e7bbbbe0"
     },
     {
       "dependent": "T15",
@@ -792,10 +899,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T15 (7ded08a8-4233-4881-8c1e-f887db6ae024) is blocked_by T02 (be6a8582-9c9f-4f95-b920-2a6e207f57ca)",
+      "dependent_native_id": "7ded08a8-4233-4881-8c1e-f887db6ae024",
+      "prerequisite_native_id": "be6a8582-9c9f-4f95-b920-2a6e207f57ca"
     },
     {
       "dependent": "T16",
@@ -806,10 +915,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T16 (abcc6f12-1fb0-4302-b91f-45e672a68159) is blocked_by T14 (5dac2f84-761b-448c-a822-21bc69c2197d)",
+      "dependent_native_id": "abcc6f12-1fb0-4302-b91f-45e672a68159",
+      "prerequisite_native_id": "5dac2f84-761b-448c-a822-21bc69c2197d"
     },
     {
       "dependent": "T16",
@@ -820,10 +931,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T16 (abcc6f12-1fb0-4302-b91f-45e672a68159) is blocked_by T15 (7ded08a8-4233-4881-8c1e-f887db6ae024)",
+      "dependent_native_id": "abcc6f12-1fb0-4302-b91f-45e672a68159",
+      "prerequisite_native_id": "7ded08a8-4233-4881-8c1e-f887db6ae024"
     },
     {
       "dependent": "T18",
@@ -834,10 +947,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T18 (7daac1d2-4d86-450c-9c70-8bf7e54256e9) is blocked_by T12 (2b6c4dde-b094-4910-8ff5-9007382b5a6d)",
+      "dependent_native_id": "7daac1d2-4d86-450c-9c70-8bf7e54256e9",
+      "prerequisite_native_id": "2b6c4dde-b094-4910-8ff5-9007382b5a6d"
     },
     {
       "dependent": "T18",
@@ -848,10 +963,12 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T18 (7daac1d2-4d86-450c-9c70-8bf7e54256e9) is blocked_by T16 (abcc6f12-1fb0-4302-b91f-45e672a68159)",
+      "dependent_native_id": "7daac1d2-4d86-450c-9c70-8bf7e54256e9",
+      "prerequisite_native_id": "abcc6f12-1fb0-4302-b91f-45e672a68159"
     },
     {
       "dependent": "T18",
@@ -862,320 +979,376 @@
       "provenance": {
         "source": "docs/demo/plane_project_seed_instructions.md",
         "basis": "explicit dependency table",
-        "operator_id": null,
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
+        "operator_id": "c8b28ca2-e46a-4e6b-9937-dc92e693407d",
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
       },
-      "resolution": "native endpoint IDs pending"
+      "resolution": "resolved and verified in Plane: dependent T18 (7daac1d2-4d86-450c-9c70-8bf7e54256e9) is blocked_by T17 (72d3ed30-4c0b-4a7c-b995-52cf2a294e80)",
+      "dependent_native_id": "7daac1d2-4d86-450c-9c70-8bf7e54256e9",
+      "prerequisite_native_id": "72d3ed30-4c0b-4a7c-b995-52cf2a294e80"
     }
   ],
   "dependency_coverage": {
     "T01": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "e0030537-b31c-435a-a152-3f63e7bbbbe0",
+      "display_key": "FALKO-9",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T02": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "be6a8582-9c9f-4f95-b920-2a6e207f57ca",
+      "display_key": "FALKO-13",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T03": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "8604e63f-a531-4917-80be-bf490f5d9a55",
+      "display_key": "FALKO-14",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T04": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10",
+      "display_key": "FALKO-15",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T05": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "49ad50de-a9c8-46f0-8c7d-e6ad399a6c9b",
+      "display_key": "FALKO-16",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T06": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "e538fab4-e03e-4568-95bd-2f1a2494fb68",
+      "display_key": "FALKO-17",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T07": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "d6bf2d00-b23a-418a-840d-5fdf9e3ce892",
+      "display_key": "FALKO-18",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T08": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "cefa3070-e3ef-4aa9-a400-ebac61b3571c",
+      "display_key": "FALKO-19",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T09": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "4058e363-fe55-402c-ad38-559b17b7dc4c",
+      "display_key": "FALKO-20",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T10": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "afe05c24-2dc8-419d-8091-2e5869a2ef5a",
+      "display_key": "FALKO-21",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T11": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf",
+      "display_key": "FALKO-22",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T12": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "2b6c4dde-b094-4910-8ff5-9007382b5a6d",
+      "display_key": "FALKO-23",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T13": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "ed7b8170-0c31-411e-ae8f-b6f0c8d714c0",
+      "display_key": "FALKO-24",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T14": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "5dac2f84-761b-448c-a822-21bc69c2197d",
+      "display_key": "FALKO-25",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T15": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "7ded08a8-4233-4881-8c1e-f887db6ae024",
+      "display_key": "FALKO-26",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T16": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "abcc6f12-1fb0-4302-b91f-45e672a68159",
+      "display_key": "FALKO-27",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T17": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "72d3ed30-4c0b-4a7c-b995-52cf2a294e80",
+      "display_key": "FALKO-28",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     },
     "T18": {
       "declared_in_seed_catalog": true,
-      "complete_and_verified": false,
-      "reason": "Plane project and native work-item IDs unresolved."
+      "complete_and_verified": true,
+      "native_id": "7daac1d2-4d86-450c-9c70-8bf7e54256e9",
+      "display_key": "FALKO-29",
+      "reason": "Prerequisite endpoints resolved, verified in Plane native relation graph, and confirmed in manifest."
     }
   },
   "repository_bindings": [
     {
       "task": "T01",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "e0030537-b31c-435a-a152-3f63e7bbbbe0"
     },
     {
       "task": "T02",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "be6a8582-9c9f-4f95-b920-2a6e207f57ca"
     },
     {
       "task": "T03",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "8604e63f-a531-4917-80be-bf490f5d9a55"
     },
     {
       "task": "T04",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10"
     },
     {
       "task": "T05",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "49ad50de-a9c8-46f0-8c7d-e6ad399a6c9b"
     },
     {
       "task": "T06",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "e538fab4-e03e-4568-95bd-2f1a2494fb68"
     },
     {
       "task": "T07",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "d6bf2d00-b23a-418a-840d-5fdf9e3ce892"
     },
     {
       "task": "T08",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "cefa3070-e3ef-4aa9-a400-ebac61b3571c"
     },
     {
       "task": "T09",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "4058e363-fe55-402c-ad38-559b17b7dc4c"
     },
     {
       "task": "T10",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "afe05c24-2dc8-419d-8091-2e5869a2ef5a"
     },
     {
       "task": "T11",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf"
     },
     {
       "task": "T12",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "2b6c4dde-b094-4910-8ff5-9007382b5a6d"
     },
     {
       "task": "T13",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "ed7b8170-0c31-411e-ae8f-b6f0c8d714c0"
     },
     {
       "task": "T14",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "5dac2f84-761b-448c-a822-21bc69c2197d"
     },
     {
       "task": "T15",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "7ded08a8-4233-4881-8c1e-f887db6ae024"
     },
     {
       "task": "T16",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "abcc6f12-1fb0-4302-b91f-45e672a68159"
     },
     {
       "task": "T17",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "72d3ed30-4c0b-4a7c-b995-52cf2a294e80"
     },
     {
       "task": "T18",
       "repository_url": "https://github.com/rohith-rr/FalcorDB-Hackathon",
-      "repository_id": null,
+      "repository_id": "rohith-rr/FalcorDB-Hackathon",
       "stable_ref": "master",
       "authority": "CONFIRMED",
       "link_method": "MANIFEST",
       "provenance": {
         "source": "verified checkout remote and origin/HEAD",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "7daac1d2-4d86-450c-9c70-8bf7e54256e9"
     }
   ],
   "document_links": [
@@ -1188,8 +1361,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "e0030537-b31c-435a-a152-3f63e7bbbbe0"
     },
     {
       "task": "T02",
@@ -1200,8 +1374,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "be6a8582-9c9f-4f95-b920-2a6e207f57ca"
     },
     {
       "task": "T02",
@@ -1212,8 +1387,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "be6a8582-9c9f-4f95-b920-2a6e207f57ca"
     },
     {
       "task": "T03",
@@ -1224,8 +1400,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "8604e63f-a531-4917-80be-bf490f5d9a55"
     },
     {
       "task": "T04",
@@ -1236,8 +1413,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10"
     },
     {
       "task": "T04",
@@ -1248,8 +1426,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10"
     },
     {
       "task": "T04",
@@ -1260,8 +1439,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "0ed1a981-ab7b-4a83-a3e5-6d89eaa4dc10"
     },
     {
       "task": "T05",
@@ -1272,8 +1452,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "49ad50de-a9c8-46f0-8c7d-e6ad399a6c9b"
     },
     {
       "task": "T05",
@@ -1284,8 +1465,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "49ad50de-a9c8-46f0-8c7d-e6ad399a6c9b"
     },
     {
       "task": "T06",
@@ -1296,8 +1478,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "e538fab4-e03e-4568-95bd-2f1a2494fb68"
     },
     {
       "task": "T06",
@@ -1308,8 +1491,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "e538fab4-e03e-4568-95bd-2f1a2494fb68"
     },
     {
       "task": "T07",
@@ -1320,8 +1504,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "d6bf2d00-b23a-418a-840d-5fdf9e3ce892"
     },
     {
       "task": "T07",
@@ -1332,8 +1517,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "d6bf2d00-b23a-418a-840d-5fdf9e3ce892"
     },
     {
       "task": "T07",
@@ -1344,8 +1530,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "d6bf2d00-b23a-418a-840d-5fdf9e3ce892"
     },
     {
       "task": "T08",
@@ -1356,8 +1543,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "cefa3070-e3ef-4aa9-a400-ebac61b3571c"
     },
     {
       "task": "T08",
@@ -1368,8 +1556,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "cefa3070-e3ef-4aa9-a400-ebac61b3571c"
     },
     {
       "task": "T09",
@@ -1380,8 +1569,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "4058e363-fe55-402c-ad38-559b17b7dc4c"
     },
     {
       "task": "T10",
@@ -1392,8 +1582,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "afe05c24-2dc8-419d-8091-2e5869a2ef5a"
     },
     {
       "task": "T10",
@@ -1404,8 +1595,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "afe05c24-2dc8-419d-8091-2e5869a2ef5a"
     },
     {
       "task": "T11",
@@ -1416,8 +1608,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "5b9d516f-aeac-46fe-97e7-d8cdbdfa3dbf"
     },
     {
       "task": "T12",
@@ -1428,8 +1621,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "2b6c4dde-b094-4910-8ff5-9007382b5a6d"
     },
     {
       "task": "T13",
@@ -1440,8 +1634,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "ed7b8170-0c31-411e-ae8f-b6f0c8d714c0"
     },
     {
       "task": "T13",
@@ -1452,8 +1647,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "ed7b8170-0c31-411e-ae8f-b6f0c8d714c0"
     },
     {
       "task": "T14",
@@ -1464,8 +1660,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "5dac2f84-761b-448c-a822-21bc69c2197d"
     },
     {
       "task": "T14",
@@ -1476,8 +1673,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "5dac2f84-761b-448c-a822-21bc69c2197d"
     },
     {
       "task": "T15",
@@ -1488,8 +1686,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "7ded08a8-4233-4881-8c1e-f887db6ae024"
     },
     {
       "task": "T16",
@@ -1500,8 +1699,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "abcc6f12-1fb0-4302-b91f-45e672a68159"
     },
     {
       "task": "T16",
@@ -1512,8 +1712,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "abcc6f12-1fb0-4302-b91f-45e672a68159"
     },
     {
       "task": "T17",
@@ -1524,8 +1725,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "72d3ed30-4c0b-4a7c-b995-52cf2a294e80"
     },
     {
       "task": "T17",
@@ -1536,8 +1738,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "72d3ed30-4c0b-4a7c-b995-52cf2a294e80"
     },
     {
       "task": "T18",
@@ -1548,8 +1751,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "7daac1d2-4d86-450c-9c70-8bf7e54256e9"
     },
     {
       "task": "T18",
@@ -1560,8 +1764,9 @@
       "link_method": "MANIFEST",
       "provenance": {
         "source": "task catalog specification links",
-        "recorded_at": "2026-10-09T15:04:37.440397Z"
-      }
+        "recorded_at": "2026-10-09T15:41:20.691639+00:00"
+      },
+      "task_native_id": "7daac1d2-4d86-450c-9c70-8bf7e54256e9"
     }
   ],
   "google_docs_links": [],
@@ -1569,8 +1774,9 @@
   "delivery_mappings": [],
   "effect_mappings": [],
   "limitations": [
-    "Plane instance/workspace/project IDs and provider work-item IDs unresolved.",
-    "Logical edges are captured but native endpoint resolution/read-back is incomplete.",
+    "Initial Plane seed complete: 4 epics and 18 leaf tasks created and verified with native parent hierarchy and native blocked_by relations.",
+    "Tasks left in unstarted TODO state, unassigned.",
+    "No implementation, PRs, or completed work manufactured.",
     "No Google Doc identity/source available; none fabricated."
   ]
 }

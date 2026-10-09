@@ -29,7 +29,7 @@ Cloudflare documents [Clef](https://developers.cloudflare.com/workers-ai/models/
 | Small embedding/classifier baseline | Candidate retrieval or domain intent classifier | Useful simple comparison for a narrow ontology | Needs relevance evaluation; cannot establish graph relationships |
 | Structured-output answer LLM as router | Optional experimental comparator | Broader language interpretation | Added latency/cost and variable outputs; still needs validation |
 
-Implement the rules baseline and at least one accessible Jev, Clef or Laya provider. Compare others when available; otherwise record them as unavailable/unevaluated. Do not spend the sprint training a new model. Add a domain classifier or fine-tuning only after collecting consented labeled failures in Phase 7.
+Implement the rules baseline and at least one accessible Jev, Clef or Laya provider. Compare others when available; otherwise record them as unavailable/unevaluated. Do not train a new model for the demo. Add a domain classifier or fine-tuning only after collecting consented labeled failures in Phase 7.
 
 ## Traverse with small semantic decisions
 
@@ -46,11 +46,11 @@ For incident questions, repeat a bounded next-node/evidence-choice loop as new n
 
 ## Evaluation and release gate
 
-Create at least 60 labeled routing/selection examples with paraphrases, duplicate titles, missing candidates, unrelated intents and review-text judgments. Use a development split to tune thresholds; retain at least 20 held-out examples grouped by scenario/entity to reduce leakage. Small samples are a sprint smoke evaluation, not broad reliability evidence.
+Create at least 60 labeled routing/selection examples with paraphrases, duplicate titles, missing candidates, unrelated intents and review-text judgments. Use a development split to tune thresholds; retain at least 20 held-out examples grouped by scenario/entity to reduce leakage. Small samples are a smoke evaluation, not broad reliability evidence.
 
 Track intent/candidate accuracy, candidate retrieval recall, precision among accepted selections, abstention/coverage, ordering sensitivity, label sensitivity, context truncation, Brier score/calibration where meaningful, and end-to-end p50/p95 latency. Track score error/ranking agreement separately from classification. Preserve provider, model revision, prompts, option lists, token counts, hardware, cold/warm timings and cost.
 
-Proposed sprint gate: every structural branch regression passes; held-out accepted selections have no observed wrong-entity selections, with at least 70% acceptance coverage; missing-candidate and out-of-scope examples abstain; routine held-out intent accuracy reaches 90%. These small-sample thresholds permit a supervised demo, not autonomous actions. Compare accepted precision/coverage with rules and show sample counts. If the adapter fails, disable it and explain the measured limits.
+Proposed demo gate: every structural branch regression passes; held-out accepted selections have no observed wrong-entity selections, with at least 70% acceptance coverage; missing-candidate and out-of-scope examples abstain; routine held-out intent accuracy reaches 90%. These small-sample thresholds permit a supervised demo, not autonomous actions. Compare accepted precision/coverage with rules and show sample counts. If the adapter fails, disable it and explain the measured limits.
 
 Thresholds are configuration chosen on the development split, not inherent probability guarantees. Candidate validity, permissions, source freshness and delivery coverage always take precedence over model output. Provider timeout, malformed output or exceeded input budget yields rules fallback or clarification. [Phase 4](phase_04_decision_model_integration.md) specifies implementation work.
 

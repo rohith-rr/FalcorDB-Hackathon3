@@ -2,11 +2,13 @@
 
 Date: 2026-10-09. Scope: architectural reasoning for a controlled demonstration. Status: design review; runtime behavior has not been tested.
 
+Follow-up design corrections: [graph publication](../design/graph_publication.md) now specifies per-projection recovery, fixed event windows, complete scoped answer checks and generation-independent clarification. [Sandbox execution](../design/contracts.md#poc-sandbox-execution-protocol) returns durable 202 receipts with background execution/probes and authorized status polling. Original review decisions below remain context; these canonical specifications own the revised behavior. No runtime results are claimed.
+
 **Verdict: the core design is sound enough to implement as a hackathon POC.** A curated graph, explicit mappings, bounded model choices, deterministic checks and a cited explanation form a coherent product. The schema can represent the facts required by the worked scenarios. Automated maintenance of those facts is future product work and is not a reason to block the POC.
 
-This review applies the user's clarified POC goal to the [earlier feasibility review](D:/FalcorDB-Hackathon/docs/reviews/feasibility_review_2026-10-09.md). In particular, the earlier mapping-maintenance concern is not a core blocker when a participant supplies a checked manifest. Deferred questions and probable solutions are recorded separately in [open questions and probable solutions](D:/FalcorDB-Hackathon/docs/design/open_questions_and_probable_solutions.md).
+This review applies the user's clarified POC goal to the [earlier feasibility review](feasibility_review_2026-10-09.md). In particular, the earlier mapping-maintenance concern is not a core blocker when a participant supplies a checked manifest. Deferred questions and probable solutions are recorded separately in [open questions and probable solutions](../design/open_questions_and_probable_solutions.md).
 
-The review assumes one configured organization/project/repository, small declared source scopes, curated operational fixtures and a disposable sandbox if actions are demonstrated. Live Plane/Google Docs/GitHub reads, real provider demonstrations and the existing recovery gates keep their stated completion criteria. POC scope does not turn an unimplemented integration into a passing result. The user subsequently approved the seven fixes below for embedding into the design. They now appear in the canonical contracts and phase plans; see the [core decision index](D:/FalcorDB-Hackathon/docs/design/README.md#poc-core-decisions). No runtime implementation is claimed.
+The review assumes one configured organization/project/repository, small declared source scopes, curated operational fixtures and a disposable sandbox if actions are demonstrated. Live Plane/Google Docs/GitHub reads, real provider demonstrations and the existing recovery gates keep their stated completion criteria. POC scope does not turn an unimplemented integration into a passing result. The user subsequently approved the seven fixes below for embedding into the design. They now appear in the canonical contracts and phase plans; see the [core decision index](../design/README.md#poc-core-decisions). No runtime implementation is claimed.
 
 **The central reasoning chain is coherent.**
 
@@ -36,7 +38,7 @@ The graph provides relationships that the answer needs. The decision model has a
 | Explanation and fallback | Sound with a bounded claim surface | Critical values come from typed fields; invalid model output has a deterministic fallback. |
 | Sandbox execution | Feasible, concrete recipe still needed | The approval and version-bound plan model is appropriate; one runtime/operation must be selected. |
 
-**Branch reasoning checked against the design.** The [branch algorithm](D:/FalcorDB-Hackathon/docs/design/phase_03_traversal_and_branch_decisions.md) has the right decision structure: resolve the task/repository; obtain complete prerequisite scope; verify each required delivery group against exact candidate heads and recorded effects; apply policy; prefer stable when eligible; otherwise choose a verified feature or ask for clarification. Lack of a single covering branch produces an integration proposal, not an invented base.
+**Branch reasoning checked against the design.** The [branch algorithm](../design/phase_03_traversal_and_branch_decisions.md) has the right decision structure: resolve the task/repository; obtain complete prerequisite scope; verify each required delivery group against exact candidate heads and recorded effects; apply policy; prefer stable when eligible; otherwise choose a verified feature or ask for clarification. Lack of a single covering branch produces an integration proposal, not an invented base.
 
 | Evidence change | Expected result |
 | --- | --- |
@@ -46,7 +48,7 @@ The graph provides relationships that the answer needs. The decision model has a
 | Stable reverts the delivery while feature history is unchanged | Stable is REVERTED; the feature can remain INCLUDED. |
 | A dependency/delivery mapping is missing or only inferred | INSUFFICIENT_EVIDENCE; a model score cannot supply the missing proof. |
 | No code dependencies, and dependency scope is confirmed complete | Verified stable is a valid default for new work. |
-| Head or graph generation changes while an answer is generated | Retry within budget or withhold the current recommendation, including its prose. |
+| Relevant head/read-set inputs change while an answer is generated | Retry within budget or withhold the recommendation/prose; equivalent unrelated publications preserve it. |
 
 These are design walkthroughs, not executed tests. They show that the policy handles the main counterexamples coherently. Commit inclusion remains historical evidence; the POC should not describe it as a guarantee that every required behavior still works.
 
@@ -68,7 +70,7 @@ This gives the graph a substantive role in the POC. The answer should change whe
 
 C-01 is relevant when discovery is enabled; C-06 is relevant when action execution is shown. They are not reasons to block an unrelated read-only workflow. C-03, C-04 and C-07 largely make existing requirements concrete rather than introduce new architecture. Full production versions of these mechanisms are unnecessary for the POC.
 
-**Adopted sandbox recipe.** Use a disposable local payments service with two identifiable artifact versions: one healthy and one with a controlled failure. Record the current and proposed artifact, configuration version and schema compatibility in the fixture manifest. Only the sandbox adapter may change the target during the demonstration. Bind the approved plan to the observed target version and refuse unknown compatibility. The demo recovery criterion sends one synthetic request per second for 30 seconds and requires all 30 to succeed with the expected served artifact identity. This is a demo criterion, not a production SLO. A schema-incompatible fixture must block the same restore proposal. Unknown execution outcomes retain the target reservation until actual state and retained receipts can be reconciled; matching artifact state alone cannot manufacture a success receipt. The [SRE recipe](D:/FalcorDB-Hackathon/docs/design/sre_integration_plan.md#poc-sandbox-recipe) and [canonical protocol](D:/FalcorDB-Hackathon/docs/design/contracts.md#poc-sandbox-execution-protocol) own the implementation details.
+**Adopted sandbox recipe.** Use a disposable local payments service with two identifiable artifact versions: one healthy and one with a controlled failure. Record the current and proposed artifact, configuration version and schema compatibility in the fixture manifest. Only the sandbox adapter may change the target during the demonstration. Bind the approved plan to the observed target version and refuse unknown compatibility. The demo recovery criterion sends one synthetic request per second for 30 seconds and requires all 30 to succeed with the expected served artifact identity. This is a demo criterion, not a production SLO. A schema-incompatible fixture must block the same restore proposal. Unknown execution outcomes retain the target reservation until actual state and retained receipts can be reconciled; matching artifact state alone cannot manufacture a success receipt. The [SRE recipe](../design/sre_integration_plan.md#poc-sandbox-recipe) and [canonical protocol](../design/contracts.md#poc-sandbox-execution-protocol) own the implementation details.
 
 **Minimum POC rehearsal evidence.** The following establishes the main claims; it is not a declaration that the full phase suites have passed or a replacement for their completion gates.
 
@@ -80,6 +82,6 @@ C-01 is relevant when discovery is enabled; C-06 is relevant when action executi
 6. Customer A's measured failure and Customer B's possible exposure stay distinct.
 7. Source mode is visible per source; curated mappings remain manifest evidence even when linked records are live.
 8. If discovery is shown, suggestions remain inferred; if execution is shown, approval, freshness, duplicate handling and measured sandbox outcome are demonstrated.
-9. An interrupted import and a response crossing a graph generation do not yield a current answer from invalid evidence.
+9. Required-projection recovery or changed semantic inputs cannot yield a current answer from invalid evidence; unrelated publication preserves equivalent complete inputs.
 
 The next step is implementing the selected workflows with these boundaries. No core redesign is indicated by this review. Automated mapping maintenance, continuous ingestion at scale, broad model reliability and production operations can stay in the separate open-question backlog.

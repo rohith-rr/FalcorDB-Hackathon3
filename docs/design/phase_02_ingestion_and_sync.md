@@ -1,6 +1,6 @@
 # Phase 2: structured ingestion and source synchronization
 
-Status: planned. Depends on Phase 1. Original sprint timebox: 6 hours, provisional because live Plane/Google Docs adapters and recovery validation are now required.
+Status: planned. Depends on Phase 1.
 
 ## Outcome
 
@@ -10,6 +10,7 @@ Live Plane task data, Google Docs content, GitHub change/review metadata and sup
 
 ```text
 backend/app/ingestion/{normalize,reconcile,manifest,snapshots}.py
+backend/app/ingestion/{event_log,event_batches,incident_projection}.py
 backend/app/associations/{periods,candidates}.py
 backend/app/connectors/{github,plane,google_docs,jira_export,markdown}.py
 scripts/import_sources.py
@@ -20,7 +21,7 @@ tests/connectors/test_github_reads.py
 tests/connectors/{test_plane_reads,test_google_docs_reads}.py
 ```
 
-The sprint connector scope requires live read-only Plane, Google Docs and GitHub adapters; Jira JSON/CSV import and Markdown/document manifests remain supported. The [source-adapter specification](source_adapters.md) defines authentication, mappings, interfaces, failure behavior and the live gate. Live Jira OAuth, arbitrary PDF extraction, comment NER, native Plane dependency enumeration and inferred dependencies are deferred. A labeled export fallback does not satisfy the live integration gate.
+The demo connector scope requires live read-only Plane, Google Docs and GitHub adapters; Jira JSON/CSV import and Markdown/document manifests remain supported. The [source-adapter specification](source_adapters.md) defines authentication, mappings, interfaces, failure behavior and the live gate. Live Jira OAuth, arbitrary PDF extraction, comment NER, native Plane dependency enumeration and inferred dependencies are deferred. A labeled export fallback does not satisfy the live integration gate.
 
 ## Mapping contract
 
@@ -59,14 +60,16 @@ When identifiers/explicit associations are absent, [task-branch discovery](task_
    For discovery, retain mapped author IDs, separate authored/committed times, per-head commit membership, shared/inherited activity and bounded changed-file summaries. Never use an activity actor, pusher or committer as a substitute for author identity. Respect the discovery scope/history limits and report incomplete candidate retrieval.
 4. Import Google Docs or Markdown metadata/content with source URL, version, hash, type and explicit task links. Preserve all tabs, section anchors, lists and table structure; detect metadata/content version races. Reject missing bytes for a document marked retrievable. A superseded runbook is retained for history but excluded from default procedural guidance.
 5. Resolve/validate manifests against normalized source nodes before graph mutation. Surface duplicate task keys, dangling links/effect references, conflicting ownership, unknown dependency kinds and incomplete deliveries in an import report.
-6. Persist the full reconciled bundle and immutable content, then publish using the Phase 1 durable dirty-state protocol. Preserve tombstones and source audit records; protect newer source state from stale reimports. A post-mutation failure blocks reads until full recovery.
+6. Persist full reconciled per-projection bundles and immutable content, then publish through Phase 1 owner-specific gates/fences. Preserve tombstones/audits and referenced cross-projection identities; protect newer source state from stale reimports. A post-mutation failure blocks reads needing that projection until full owned-projection recovery.
 7. Add targeted refresh for refs, PRs and reviews involved in a branch query. Reconcile persisted changes into a full rebuild bundle through the same import gate; transient live verification remains request evidence and cannot directly mutate graph records. Maintain a small local read-only Git mirror or provider-backed ancestry adapter in Phase 3.
 
 GitHub documents authoritative PR fields in its [pull request API](https://docs.github.com/en/rest/pulls/pulls) and review records in its [review API](https://docs.github.com/en/rest/pulls/reviews). Implement read operations only in this phase. Current provider access/version settings are recorded at implementation time.
 
 ## Prototype sync policy
 
-Manual full import plus targeted refresh is sufficient for the sprint. Default live branch evidence TTL is 60 seconds, configurable; a recommendation also refreshes/revalidates heads before being issued. A source unavailable during required refresh cannot borrow fixture evidence and call it live. Imports retain their observation age and cannot masquerade as a refreshed source.
+Manual full import plus targeted refresh is sufficient for the demo. Default live branch evidence TTL is 60 seconds, configurable; a recommendation also refreshes/revalidates heads before being issued. A source unavailable during required refresh cannot borrow fixture evidence and call it live. Imports retain their observation age and cannot masquerade as a refreshed source.
+
+Incident inputs use the [durable event batching policy](graph_publication.md#durable-incident-batching): fixed 30-second windows (configurable 15-30), bounded caps/backpressure and at least 15 seconds of READY time between normal publications. Persist receipts/jobs before acknowledgment, coalesce only projection updates, and retain distinct audit events. Apply idempotent INCIDENT deltas with retained full recovery bundles; never rebuild STRUCTURAL for an alert or lifecycle receipt. Persist/reconcile consumed log positions and reconstruct timers after restart.
 
 Coverage flags distinguish `COMPLETE`, `PARTIAL`, `UNKNOWN` for task dependencies, deliveries, repository refs and review retrieval. Complete means complete within the declared source/scope, not complete company knowledge. If a source cannot enumerate dependencies completely, commands require an explicit verified manifest for the relevant scope.
 
@@ -83,3 +86,5 @@ Completion requires valid Payments/TLS imported snapshots with confirmed deliver
 ## SRE extension
 
 Add a durably accepted event receiver and background investigation job, with separate duplicate-delivery and related-alert grouping rules. Normalize deployment/artifact, catalog, on-call, customer-use and measurement records from explicit synthetic/exported sources first. Preserve event/receipt/effective times, scope and partial coverage. Live receivers require their actual provider authentication/payload contract. Refresh deployment and effective on-call state before an action or notification; a previously valid schedule or artifact record is not automatically current. The [integration plan](sre_integration_plan.md) defines replay/restart checks and later live sources.
+
+Gate: continuous/trickling arrivals cannot extend a fixed window or create back-to-back publications outside cadence; caps retain previously accepted events, duplicate deliveries add no work, and restart after publication/before position acknowledgment causes no duplicate projection. Measure pending age, batch size, read-blocked fraction and freshness. INCIDENT DIRTY blocks incident-backed investigation while structural-only queries continue. An accepted but unprojected event is shown as pending coverage, never silently incorporated into a current brief.

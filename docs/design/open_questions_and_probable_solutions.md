@@ -4,7 +4,7 @@ Date: 2026-10-09. Scope: unresolved details outside the core hackathon POC. Stat
 
 The user clarified that the immediate goal is a hackathon proof of concept. A curated, explicitly linked dataset is sufficient to demonstrate the graph reasoning. Automated company-wide knowledge maintenance, enterprise access management and production operations are not prerequisites for that demonstration.
 
-The [POC core logic review](D:/FalcorDB-Hackathon/docs/reviews/poc_core_logic_review.md) records the core verdict and implementation details that still matter to the demo. This document contains the deferred questions. Several topics are already named in [Phase 7](D:/FalcorDB-Hackathon/docs/design/phase_07_production_and_actions.md); the gaps here are the unresolved mechanisms, policies and ownership beneath those requirements, not an assertion that the design ignores them entirely.
+The [POC core logic review](../reviews/poc_core_logic_review.md) records the core verdict and implementation details that still matter to the demo. This document contains the deferred questions. Several topics are already named in [Phase 7](phase_07_production_and_actions.md); the gaps here are the unresolved mechanisms, policies and ownership beneath those requirements, not an assertion that the design ignores them entirely.
 
 The probable solutions below are design proposals. Each entry states a workable POC assumption and the condition that would make a fuller solution necessary. Existing source labels, evidence rules, live-adapter completion gates and sandbox approval requirements remain applicable to the features being demonstrated.
 
@@ -12,7 +12,7 @@ The seven POC core fixes have since been approved and embedded into their owning
 
 **OQ-01 — Who maintains confirmed cross-system mappings as the company changes?**
 
-Existing coverage: the [adapter design](D:/FalcorDB-Hackathon/docs/design/source_adapters.md) uses a verified manifest; Phase 7 proposes operator review of inferred relationships. Missing detail: responsibility, confirmation procedure and revalidation triggers.
+Existing coverage: the [adapter design](source_adapters.md) uses a verified manifest; Phase 7 proposes operator review of inferred relationships. Missing detail: responsibility, confirmation procedure and revalidation triggers.
 
 Open question: who owns task dependencies, complete delivery mappings, document applicability, service ownership and customer routing, and when must those confirmations be reviewed?
 
@@ -22,13 +22,13 @@ POC assumption: a participant authors and checks a small manifest against the de
 
 **OQ-02 — How should continuous updates be published without repeatedly interrupting answers?**
 
-Existing coverage: durable read blocking and rebuild recovery in [Phase 1](D:/FalcorDB-Hackathon/docs/design/phase_01_graph_and_fixtures.md). Missing detail: event batching, publication cadence and acceptable read unavailability under sustained ingestion.
+Existing coverage now includes [Phase 1 projection recovery](phase_01_graph_and_fixtures.md) and [fixed incident batching/scoped validation](graph_publication.md): retained events, separate ownership, bounded 15-30 second windows, a READY read interval, durable positions and backpressure. The remaining question is the measured production volume/freshness/availability envelope.
 
 Open question: what event volume, freshness delay and blocked-read rate must a live service support?
 
-Probable solution: retain source events durably, deduplicate them and coalesce related updates into bounded batches. Track accepted-event and published-event positions separately so freshness is measurable. Give investigations a bounded opportunity to complete between publications. If measured rebuild downtime becomes unacceptable, evaluate versioned graph publication or transactional incremental updates with explicit cross-worker consistency tests.
+Probable production extension: measure backlog age, delta/recovery duration, blocked reads and relevant answer retries under realistic arrival rates. Tune the specified cadence/caps within freshness requirements; if downtime remains unacceptable, validate immutable publication or transactional updates across workers without weakening recovery or complete read-set checks.
 
-POC assumption: replay one incident or scenario batch, finish its import, then investigate. Preserve dirty-state recovery; avoid a continuously running high-frequency import loop. Revisit before real monitoring streams are enabled.
+POC requirement: complete initial scenario publication, then use the specified fixed incident windows and single writer. Demonstrate continuous/trickling synthetic events and restart without per-alert structural rebuilds. Production SLOs and distributed operation remain deferred; missing runtime measurements cannot be reported as passing.
 
 **OQ-03 — How will per-user access and revocation propagate across stored evidence?**
 
@@ -42,7 +42,7 @@ POC assumption: one configured demo identity and allowlisted data. Full enterpri
 
 **OQ-04 — How should late or conflicting source records change incident history?**
 
-Existing coverage: effective times, recorded times, partial rollouts and override sources in the [SRE schema](D:/FalcorDB-Hackathon/docs/design/sre_graph_schema.md). Missing detail: reconciliation precedence and the meaning of a historical query after corrections.
+Existing coverage: effective times, recorded times, partial rollouts and override sources in the [SRE schema](sre_graph_schema.md). Missing detail: reconciliation precedence and the meaning of a historical query after corrections.
 
 Open question: should a historical brief show the best reconstruction available now, or the information available when the original brief was written?
 
@@ -72,7 +72,7 @@ POC assumption: one application writer, a durable local journal and retained reb
 
 **OQ-07 — How can recovery actions be validated across real deployment platforms?**
 
-Existing coverage: approvals, exact targets, idempotency, expiry and UNKNOWN_OUTCOME in [contracts](D:/FalcorDB-Hackathon/docs/design/contracts.md). Missing detail: platform adapters and the source of compatibility evidence.
+Existing coverage: approvals, exact targets, idempotency, expiry and UNKNOWN_OUTCOME in [contracts](contracts.md). Missing detail: platform adapters and the source of compatibility evidence.
 
 Open question: who defines compatible artifact/configuration/schema combinations, and how does an executor prevent a concurrent deployment from invalidating its checks?
 
@@ -82,7 +82,7 @@ POC assumption: one disposable single-writer workload and one vetted restore ope
 
 **OQ-08 — How will real incident notifications be delivered and reconciled?**
 
-Existing coverage: message drafts, separate sending authorization and receipt checks in the [SRE requirements](D:/FalcorDB-Hackathon/SRE%20event%20handling.md). Missing detail: channel ownership, escalation behavior and ambiguous delivery recovery.
+Existing coverage: message drafts, separate sending authorization and receipt checks in the [SRE requirements](../../SRE%20event%20handling.md). Missing detail: channel ownership, escalation behavior and ambiguous delivery recovery.
 
 Open question: which system controls recipients, escalation, retries and acknowledgment when the assistant participates in incident communication?
 
@@ -92,7 +92,7 @@ POC assumption: render message drafts only. No live paging or messaging integrat
 
 **OQ-09 — What evidence is sufficient to enable models for wider use?**
 
-Existing coverage: rules baselines, held-out examples and supervised demo gates in [decision models](D:/FalcorDB-Hackathon/docs/design/decision_models.md). Missing detail: real-data evaluation ownership, release thresholds and drift monitoring.
+Existing coverage: rules baselines, held-out examples and supervised demo gates in [decision models](decision_models.md). Missing detail: real-data evaluation ownership, release thresholds and drift monitoring.
 
 Open question: what improvement over deterministic retrieval justifies enabling each model-assisted feature outside the controlled examples?
 
@@ -110,4 +110,4 @@ Probable solution: retrieve by service, symptom, operating scope and change type
 
 POC assumption: explicitly link one reviewed synthetic prior incident and show its history. General historical matching and continuous learning can wait until multiple real incidents are available.
 
-**Items that belong in the core implementation review.** Suggestion writes invalidating their own query, basic handling of ambiguous service identity, omitted mandatory investigation checks, incorrect customer-impact claims, invalidated answer prose and duplicate/stale sandbox actions can break a small demo. They are addressed in the [core review](D:/FalcorDB-Hackathon/docs/reviews/poc_core_logic_review.md), rather than deferred here as production work.
+**Items that belong in the core implementation review.** Suggestion writes invalidating their own query, basic handling of ambiguous service identity, omitted mandatory investigation checks, incorrect customer-impact claims, invalidated answer prose and duplicate/stale sandbox actions can break a small demo. They are addressed in the [core review](../reviews/poc_core_logic_review.md), rather than deferred here as production work.

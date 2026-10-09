@@ -1,6 +1,6 @@
 # Phase 4: decision-model adapters and measured graph exploration
 
-Status: planned. Depends on Phase 3. Original sprint timebox: 5 hours, provisional under the revised recovery/live-adapter scope. Follow the [model decision record](decision_models.md); inference improves language handling, while the branch engine remains authoritative.
+Status: planned. Depends on Phase 3. Follow the [model decision record](decision_models.md); inference improves language handling, while the branch engine remains authoritative.
 
 ## Outcome
 
@@ -42,9 +42,9 @@ Batch questions using the same state where the verified provider supports it. If
 
 Implement the [association specification](task_branch_association.md) using Phase 2's work periods, identity bindings and per-head commit/content evidence. Trigger for assigned in-progress tasks without resolving explicit references. Keep explicit associations ahead of inference; overlapping tasks remain competing evidence rather than forcing unique branch ownership.
 
-Call Clef through the verified `state`/`questions` interface with branch `choice` plus `NONE`/`AMBIGUOUS`/`MULTIPLE` and independent per-pair `noul` judgments. Validate the configurable suggestion gates and evidence completeness, preserve probabilities/model hashes, and return typed `BranchAssociationResult`. Recheck task/heads/graph after the call. Suggested `IMPLEMENTED_IN` edges use `INFERRED`/`CANDIDATE`; the model cannot promote links, infer dependencies or fill `DELIVERED_BY`.
+Call Clef through verified `state`/`questions` with branch choice and abstention/multiple options plus independent pair judgments. Validate suggestion gates/completeness and preserve model/input hashes in `BranchAssociationResult`. After inference, recheck complete discovery read-set equivalence, current task/identity/access inputs and candidate/stable heads under [publication policy](graph_publication.md#final-response-publication). Unrelated generations do not discard equivalent inference. Suggested edges remain INFERRED/CANDIDATE; no promotion, dependency invention or delivery proof.
 
-Clef is the requested provider for this feature even if another provider handles intent/incident routing. Missing access, failed evaluation or malformed/timeout responses yields explicit discovery abstention; do not silently relabel rules output as Clef inference. Return request-local suggestions and persist `AssociationAuditRecord` outside the graph. Candidate edges can be projected only by an explicit later ingestion batch through Phase 1, preserving original inference time/generation/expiry and revalidating access and inputs. Never trigger an import from the producing query or automatically rebuild after every answer. Test unchanged generation on successful discovery, audit-write failure, and expired/denied suggestions during later projection.
+Clef remains the requested discovery provider even if another handles routing. Missing/failed/malformed inference yields explicit abstention; never relabel rules as Clef. Return request-local suggestions and retain audits outside the graph. Project candidate edges only in a later explicit STRUCTURAL import, retaining original inference tokens/time/expiry and revalidating access/inputs. Producing queries never mutate the graph or trigger rebuilds. Test no self-mutation, equivalent unrelated publication during inference, relevant candidate/input changes, audit failure and expired/denied later projection.
 
 ## Evaluation and completion gate
 

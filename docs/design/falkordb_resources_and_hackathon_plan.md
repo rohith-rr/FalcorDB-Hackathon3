@@ -12,7 +12,7 @@ The memorable result should be a recovery decision that changes when evidence ch
 
 ## 2. Verified event guidance
 
-The published pages list October 15-18, 2026, with submissions closing October 18 at 11:59 PM IST. The user reports direct organizer permission to start coding before the event; use that confirmation for this project and retain it with submission records. The existing 48-hour estimate is an internal engineering budget, not the event's calendar duration. [Schedule](https://www.wemakedevs.org/hackathons/falkordb/schedule).
+The published pages list October 15-18, 2026, with submissions closing October 18 at 11:59 PM IST. The user reports direct organizer permission to start coding before the event; use that confirmation for this project and retain it with submission records. [Schedule](https://www.wemakedevs.org/hackathons/falkordb/schedule).
 
 FalkorDB must be the primary graph database and essential to product behavior. Submission materials include public code, setup/data-model documentation, dependent queries or algorithms, a working video, deployment or complete local instructions, and named tracks. Disclose AI assistance and be able to explain and verify the work. The published timing rule differs from the organizer permission reported above. Recheck updated rules before submission. [Rules](https://www.wemakedevs.org/hackathons/falkordb/rules).
 
@@ -31,7 +31,7 @@ The organizer's [resource page](https://www.wemakedevs.org/hackathons/falkordb/r
 | [Browser](https://docs.falkordb.com/browser/) | Inspect the same graph that produced the answer | Required developer/demo aid. Open a small relevant subgraph. |
 | [Canvas](https://docs.falkordb.com/browser/canvas) | Embed the retrieved paths in the incident UI | Optional polish after core behavior. |
 | [Algorithms](https://docs.falkordb.com/algorithms/) | Explore dependencies or explain a path where the algorithm's semantics fit | Optional; bounded Cypher queries already perform graph work. |
-| [GraphRAG SDK](https://github.com/FalkorDB/GraphRAG-SDK) | Retrieve passages from runbooks and reviewed incident reports | Timeboxed evaluation; require identity/provenance compatibility first. |
+| [GraphRAG SDK](https://github.com/FalkorDB/GraphRAG-SDK) | Retrieve passages from runbooks and reviewed incident reports | Bounded evaluation; require identity/provenance compatibility first. |
 | [Integration catalog](https://docs.falkordb.com/integration/) | Later larger imports or streaming connectors | Defer Kafka, bulk loading, extra ORMs and graph ML unless measured needs justify them. |
 
 Use Python on the server, consistent with the existing design; the [official client catalog](https://docs.falkordb.com/getting-started/clients) also supports other languages. The browser application calls our API rather than connecting directly to the database.
@@ -131,7 +131,7 @@ Its default retrieval combines semantic/text searches, entity discovery and grap
 
 The documented storage uses document chunks, `MENTIONED_IN` provenance and generic `RELATES` edges; it is not automatically compatible with our typed operational edges. Deduplication/finalization can alter entity identities. Do not run the default pipeline against the authoritative operational graph without verifying those effects. [Storage](https://docs.falkordb.com/graphrag/storage).
 
-Timebox a two-hour compatibility experiment after the basic incident works:
+Run a bounded compatibility experiment after the basic incident works:
 
 1. Use three synthetic runbooks and two reviewed incident reports in an isolated scratch graph. Declare document versions and canonical service IDs explicitly.
 2. Try context retrieval for a procedural question. Verify returned passages, document version, section/source reference and any extra LLM calls. Measure ingestion cost as well as retrieval cost.
@@ -150,7 +150,7 @@ For the product UI, evaluate `@falkordb/canvas`, the standalone Web Component us
 
 Start locally with a pinned Docker image, health checks, local-only access and persistent storage. Verify the actual data directory in the selected image and prove persistence by restarting the container. The setup docs and MCP repository examples contain differing volume-path guidance; copying a sample volume mapping is insufficient. [Docker guide](https://docs.falkordb.com/operations/docker), [MCP repository](https://github.com/FalkorDB/FalkorDB-MCPServer).
 
-Apply the [Phase 1 dirty-state protocol](phase_01_graph_and_fixtures.md#snapshot-consistency) to all graph projections, including direct/MCP investigation reads. Record actual write-durability settings and inject an interrupted import across application/database restart. A persistent old snapshot marker cannot authorize reads of overwritten records; recovery requires a complete rebuild and a new generation. GraphRAG SDK retrieval and deterministic fallback must obey the same admission gate.
+Apply [Phase 1 per-projection durability](phase_01_graph_and_fixtures.md#snapshot-consistency) and [graph publication](graph_publication.md) to direct/MCP/SDK reads and fallback. Record write durability and test interrupted owner-specific rebuilds across restart. Old markers cannot authorize dirty records. Declare template projections and complete read-set fingerprints; unrelated incident batches must not invalidate structural-only or equivalent answer inputs. Record fixed event cadence, delta time, backlog/freshness and blocked-read fraction with actual query receipts.
 
 Index the properties used for exact lookup and add document text/vector indexes only if needed. Use execution plans and measurements on fixtures before making latency claims. Check supported Cypher syntax; do not assume Neo4j procedures or an unrestricted traversal protected by `LIMIT`. [Indexes](https://docs.falkordb.com/cypher/indexing), [limitations](https://docs.falkordb.com/cypher/known-limitations).
 
@@ -189,7 +189,7 @@ Reuse the [existing phases](README.md), not a second full implementation schedul
 | 6 | Recovery sandbox, focused UI/Canvas if feasible, demo and packaging | Actual restoration/blocked-plan variants and reproducible recording. |
 | 7 | Additional live operational sources, production permissions/actions, larger pipelines | Separate operational release checks. |
 
-If setup costs grow, cut GraphRAG SDK experimentation, native algorithm projections, Canvas polish and extra live connectors beyond the required Plane/Google Docs/GitHub scope in that order. Preserve durable recovery, real graph investigation, model-guided choices, evidence, one answer API call and approved sandbox action. Both [live adapter gates](source_adapters.md#acceptance-and-completion-record) remain required; export fallback is a partial deliverable. The original sprint estimates are provisional under this revised scope. Optional Public API branching shares identities and can remain a short second example, not another complete product.
+If setup costs grow, cut GraphRAG SDK experimentation, native algorithm projections, Canvas polish and extra live connectors beyond the required Plane/Google Docs/GitHub scope in that order. Preserve durable recovery, real graph investigation, model-guided choices, evidence, one answer API call and approved sandbox action. Both [live adapter gates](source_adapters.md#acceptance-and-completion-record) remain required; export fallback is a partial deliverable. Optional Public API branching shares identities and can remain a short second example, not another complete product.
 
 Prepare a root README, public repository, query/template inventory, seed/replay/reset instructions, environment example, tested versions, demo video, deployment/local path and named track claims. Explain participant contributions and AI assistance. Include evaluation results, labeled synthetic data, remaining limits and a small architecture diagram. Recheck submission requirements in the [official rules](https://www.wemakedevs.org/hackathons/falkordb/rules).
 
