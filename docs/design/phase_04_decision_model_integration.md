@@ -1,0 +1,47 @@
+# Phase 4: decision-model adapters and measured graph exploration
+
+Status: planned. Depends on Phase 3. Original sprint timebox: 5 hours, provisional under the revised recovery/live-adapter scope. Follow the [model decision record](decision_models.md); inference improves language handling, while the branch engine remains authoritative.
+
+## Outcome
+
+The system handles evaluated paraphrases and document/task ambiguity through a typed adapter. It can switch between rules and an accessible model without changing graph or branch contracts.
+
+## Proposed files
+
+```text
+backend/app/models/{decision_adapter,rules,laya,jev,clef}.py
+backend/app/routing/{questions,candidates,gates}.py
+evals/decision_routing/{development,held_out}.jsonl
+scripts/evaluate_decision_routing.py
+reports/decision_model_evaluation.md
+tests/models/test_adapter_contracts.py
+```
+
+## Internal adapter contract
+
+`decide(state, questions, budget) -> DecisionBatch`: each result has question ID/type, selected value, provider distribution, optional confidence, provider/model revision, input-budget metadata and duration. `choice` and `score` may have confidence; `noul` retains its probability without inventing a provider confidence field. Validation rejects nonfinite/out-of-range values, unexpected option IDs and malformed shapes. Provider action signals do not grant tool execution.
+
+Keep provider differences in adapters. Pin/check actual SDK and checkpoint versions. Make an integration smoke request before relying on a provider's presumed compatibility. Local Laya startup stays outside request handling; prewarm the selected model if hardware permits, and record cold start separately. Use configured server-side credentials/timeouts for Jev.
+
+## Coding sequence
+
+1. Wrap the Phase 3 rules router in the common interface and retain its output as a comparison baseline.
+2. Implement Jev, Clef and/or Laya adapter according to available access. Verify endpoint/SDK request and response fields with a small smoke request. Record missing access as unevaluated.
+3. Create intent `choice`: `BRANCH_BASE`, `TASK_CONTEXT`, `BLOCKERS`, `EPIC_PROGRESS`, `INCIDENT_BRIEF`, `INCIDENT_HISTORY`, `OTHER`. Exact identifiers bypass semantic entity selection but not intent resolution when needed.
+4. Retrieve authorized candidates before semantic selection. Initial cap is 10 entities/documents per call, with a configured token budget for the chosen provider. Include descriptive option text, types, task purpose and short versioned excerpts. Map selected labels back to known logical IDs.
+5. Add `NONE`/`AMBIGUOUS` options and request clarification when choices are incomplete or tied. Selection can narrow narrative context but cannot drop required delivery/verification evidence. If candidate retrieval exceeds budgets, refine scope or perform a measured hierarchical shortlist; do not silently omit the correct candidate.
+6. Add optional `noul` judgments for narrative blockers and `score` over `routine`, `blocking current work`, `urgent production impact`. Use multiple independent questions for multiple comments/documents rather than pretending `choice` is multi-select. Ticket priority and policy remain primary.
+7. Implement calibrated acceptance gates using the development split. Validate option membership, access and required evidence regardless of confidence. Ordering/label/truncation sensitivity is a measured failure mode.
+8. Add provider timeout, exception and malformed-response fallbacks. Exact/rule-resolved requests continue; ambiguous requests return clarification. Log selection method and any fallback.
+
+Batch questions using the same state where the verified provider supports it. If a first selection changes what data is fetched, use a second request with that new state. Known graph edges do not trigger individual model calls.
+
+## Evaluation and completion gate
+
+Use the sample counts and gate in the decision record: at least 60 total examples and at least 20 held-out, grouped by scenario. Compare rules and each accessible model on identical inputs. Report intent/candidate accuracy, accepted precision/coverage, missing-option abstentions, p50/p95 latency, cold/warm behavior, token truncation, hardware and costs. Exercise option order changes, neutral/renamed labels, misleading document titles and unrelated questions.
+
+Every branch regression from Phase 3 must pass with each adapter enabled and disabled. An adapter meeting the demo gate can be enabled for supervised semantic routing. A failed/unavailable adapter remains disabled; the completion report explains that outcome and the rules mode. This phase is complete when there is an honest evaluation and a working fallback, not when a model has merely returned valid JSON.
+
+## SRE extension
+
+Add next-node/evidence selection with actual permitted neighbors plus `ASK_FOR_HELP`/`STOP`. Repeated choices use newly retrieved context, while full records remain in the evidence store. Test multiple pending paths, premature stop, absent candidates, source/model disagreement and several operating locations. A failed adapter uses a labeled deterministic/partial investigation. Compare rules, general-LLM navigation and specialized decision models with the same tools, snapshots, budgets and final answer provider. Measure cost per correctly grounded incident brief and missed evidence, not only decision-call price. See the [SRE integration plan](sre_integration_plan.md).
