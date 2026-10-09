@@ -4,11 +4,25 @@ Status: proposed. Implement these as Pydantic models in `backend/app/contracts/`
 
 ## Request and resolution
 
-`QueryRequest`: `question`, optional `project_id`, `repository_id`, `task_id`, `incident_id`, `service_id`, `service_instance_id`, and `requested_intent`. Intent values are `BRANCH_BASE`, `TASK_CONTEXT`, `BLOCKERS`, `EPIC_PROGRESS`, `INCIDENT_BRIEF`, `INCIDENT_HISTORY`, `OTHER`. Incident requests also carry an optional event-time window and operating scope; the server validates all scope against the principal.
+`QueryRequest`: `question`, optional `project_id`, `repository_id`, `task_id`, `incident_id`, `service_id`, `service_instance_id`, `requested_intent`, and optional `clarification_answer` (`token` plus exactly one typed selection — `selected_task_id`, `selected_repository_id`, or `selected_ref`) valid only when resubmitting a prior `NEEDS_CLARIFICATION` question; see [Clarification and continuation](#clarification-and-continuation). Intent values are `BRANCH_BASE`, `TASK_CONTEXT`, `BLOCKERS`, `EPIC_PROGRESS`, `INCIDENT_BRIEF`, `INCIDENT_HISTORY`, `OTHER`. Incident requests also carry an optional event-time window and operating scope; the server validates all scope against the principal.
 
-The server derives `tenant_id` and `principal_id` from authentication/configured demo identity. A client cannot select an arbitrary tenant. Resolve a fully scoped exact task key first; otherwise retrieve accessible candidates. Resolution is `RESOLVED`, `NEEDS_CLARIFICATION`, `NOT_FOUND` or `UNSUPPORTED`. A clarification includes only accessible candidate labels/IDs and a continuation token; subsequent requests retain original scope.
+The server derives `tenant_id` and `principal_id` from authentication/configured demo identity. A client cannot select an arbitrary tenant. Resolve a fully scoped exact task key first; otherwise retrieve accessible candidates. Resolution is `RESOLVED`, `NEEDS_CLARIFICATION`, `NOT_FOUND` or `UNSUPPORTED`. A clarification is the typed `clarification` object described below and includes only accessible candidates and a continuation token; subsequent requests retain original scope.
 
 Clarification may be needed after task resolution when repository bindings or verified branch candidates remain ambiguous. In that case the response retains the resolved task and relevant accessible evidence, sets resolution to `NEEDS_CLARIFICATION`, and leaves the branch decision null until selection is settled.
+
+### Clarification and continuation
+
+`NEEDS_CLARIFICATION` has three variants, distinguished by a `kind` discriminator on the response's `clarification` object — exposed as the nullable `clarification` field of `QueryResponse`:
+
+- `TASK`: the requested task key matched several accessible tasks; candidates are task labels/IDs.
+- `REPOSITORY`: a resolved task has multiple repository bindings; candidates are repository IDs/labels, and the response retains the resolved task.
+- `BRANCH`: several verified branch candidates qualify and the manifest names no preferred branch; candidates are the exact candidate refs/SHAs from `candidate_results`.
+
+The `clarification` object carries `kind`, `candidates` typed per `kind`, `token`, and `expires_at`. The `token` is an opaque, tenant/principal-scoped value bound to a hash of the original question, resolved scope, `kind`, candidate set, graph generation and mapping/effect/policy versions, with a short expiry. It is never replayable across tenants, across kinds, or after a graph generation change. `expires_at` bounds token validity consistent with evidence freshness windows.
+
+A client answers by resubmitting `POST /query` with the original `question` and scope plus an optional `clarification_answer` on `QueryRequest`: `token` and exactly one typed selection field matching the token's `kind` — `selected_task_id`, `selected_repository_id`, or `selected_ref`. A missing, duplicated or kind-mismatched selection is invalid. No separate continuation endpoint is defined; the same read-only `POST /query` contract applies. An unknown, out-of-scope, or multiply/unselected candidate, a token from another principal, or one whose binding hash no longer matches returns 422 or a fresh `NEEDS_CLARIFICATION`; it never resolves against the guessed candidate set. Task and repository selections narrow the request scope for the resumed resolution — the server revalidates accessibility of the selected task/repository under the original principal scope, and a selection that is no longer accessible or resolvable yields a fresh `NEEDS_CLARIFICATION` or `NOT_FOUND`, never an assumed scope.
+
+Selection is a preference, not verification. For `BRANCH`, on receipt the server revalidates the token binding, refreshes live heads for the selected candidate and stable, and recomputes the full decision — ancestry, revision effects, policy — before recording a recommendation. An expired token yields a new `NEEDS_CLARIFICATION`; a changed, missing or newly ineligible head yields `STALE_EVIDENCE` or refreshed candidates with a new token. Commands are never derived from token-time state alone; the selected branch must pass the same pre-recommendation checks as any other candidate.
 
 ## Snapshot and evidence
 
@@ -23,6 +37,20 @@ Clarification may be needed after task resolution when repository bindings or ve
 `TraversalStep`: `step_id`, `template_id`, sanitized `parameters`, `node_ids`, `edge_ids`, `evidence_ids`, `selection_method`, `duration_ms`, `stop_reason`. Record model metadata separately: provider, model/checkpoint revision, question version, option-set hash, probabilities, selected value and abstention reason. Do not log credentials or inaccessible content.
 
 Snapshot completeness, freshness and inference uncertainty are independent. A high model confidence cannot make an incomplete source snapshot complete.
+
+## Task-branch association
+
+These types support the [time-window/Clef fallback](task_branch_association.md), preserving the existing `TASK`, `REPOSITORY` and verified-base `BRANCH` clarification variants.
+
+`IdentityBinding`: `binding_id`, `tenant_id`, `tracker_source`, `tracker_user_id`, native GitHub user ID and/or verified author-email alias references, `mapping_version`, confirming actor/source, and provenance. Match exact configured identities; no display-name inference. Reuse `Employee` identity/edges when the SRE extension is enabled.
+
+`TaskWorkPeriod`: `id`, `task_id`, `assignee_id`, nullable `identity_binding_id`, UTC `valid_from`, nullable `valid_to`, `observed_at`, `time_accuracy` (`EVENT`, `OBSERVED_BOUND`), `coverage` (`COMPLETE`, `PARTIAL`, `UNKNOWN`), and activity/evidence references. Intersect one person's assignment and task `IN_PROGRESS` intervals; observation time bounds open periods. Generic update times cannot supply unknown starts. Missing identity mapping preserves tracker history but prevents author matching.
+
+`BranchAssociationCandidate`: `association_id`, `task_id`, `repository_id`, `ref`, exact observed `head_sha` and `stable_head_sha`, `assignee_ids`, `work_period_ids`, `matching_commit_shas`, bounded changed-path summaries, `evidence_ids`, `link_method=INFERRED`, `authority=CANDIDATE`, nullable `pair_probability`, nullable `choice_probability`, model/question/identity/mapping versions, option/input hashes, `observed_at`, `valid_until`, and `limitations`. Scores concern associations, not delivery coverage or complete implementation.
+
+`BranchAssociationResult`: `task_id`, `repository_id`, `status` (`SUGGESTED`, `AMBIGUOUS`, `NO_MATCH`, `INSUFFICIENT_EVIDENCE`, `PROVIDER_UNAVAILABLE`, `NOT_APPLICABLE`), `candidates`, nullable `preferred_association_id`, `search_window`, `coverage`, snapshot/generation, `evidence_ids`, and `limitations`. Multiple associations remain representable. `NO_MATCH` is limited to the searched window; changed/unverifiable task/head after inference yields `INSUFFICIENT_EVIDENCE` with a stale-evidence limitation and no preferred association. Operator/source manifests may promote associations through ingestion; query selection cannot promote them or create delivery evidence.
+
+`TASK_CONTEXT` and `BRANCH_BASE` responses may include discovery through `branch_associations`; branch-base commands still require confirmed complete delivery evidence. Clef failure is isolated to discovery and does not block explicit mappings or the answer provider.
 
 ## Branch decision
 
@@ -47,9 +75,9 @@ Each candidate result carries `repository_id`, `ref`, `head_sha`, `exists`, poli
 
 ## Context and answer response
 
-`ContextBundle`: `request_id`, resolved intent/entities, snapshots, typed facts, nullable branch decision, nullable incident context, task/dependency summaries, selected document sections, review summaries, epic counts, evidence items, traversal steps and limitations. Enforce provider token budgets while retaining all decision evidence and coverage counts; omitted narrative content is reported.
+`ContextBundle`: `request_id`, resolved intent/entities, snapshots, typed facts, nullable branch decision, nullable incident context, `branch_associations` (array of `BranchAssociationResult`, empty when discovery is unused), task/dependency summaries, selected document sections, review summaries, epic counts, evidence items, traversal steps and limitations. Enforce provider token budgets while retaining all decision evidence and coverage counts; omitted narrative content is reported.
 
-`QueryResponse`: `request_id`, `resolution`, `decision`, `answer`, `citations`, `trace`, `limitations`, and `timings`. `decision` is nullable and explicitly tagged as `BRANCH` or `INCIDENT`; an incident context never masquerades as a branch recommendation. `answer` contains `mode` (`LLM`, `DETERMINISTIC`), a short summary and explainable statements paired with valid evidence IDs. Branch/ref/SHA, task statuses, progress counts, commands, incident impact states/targets/responders and source URLs are rendered from engine fields. LLM text may explain these facts but is validated against them; rejected output falls back to an engine template.
+`QueryResponse`: `request_id`, `resolution`, nullable `clarification`, `decision`, `branch_associations` (array of `BranchAssociationResult`, empty when unused), `answer`, `citations`, `trace`, `limitations`, and `timings`. `decision` is nullable and explicitly tagged as `BRANCH` or `INCIDENT`; an incident context never masquerades as a branch recommendation. `clarification` is a nullable typed field (`kind` discriminator `TASK`, `REPOSITORY` or `BRANCH`, `candidates` typed per `kind`, `token`, `expires_at`); it is present only when `resolution` is `NEEDS_CLARIFICATION` — see [Clarification and continuation](#clarification-and-continuation) — and then `decision` is null and the answer may not recommend or prefer any candidate. `branch_associations` exposes inferred implementation suggestions separately from verified base decisions and never supplies commands. `answer` contains `mode` (`LLM`, `DETERMINISTIC`), a short summary and explainable statements paired with valid evidence IDs. Branch/ref/SHA, task statuses, progress counts, commands, incident impact states/targets/responders and source URLs are rendered from engine fields. LLM text may explain these facts but is validated against them; rejected output falls back to an engine template.
 
 ## HTTP surface
 

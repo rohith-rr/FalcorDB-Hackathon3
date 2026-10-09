@@ -1,6 +1,6 @@
 # Design revision record
 
-Date: 2026-10-09. Scope: approved design corrections and live adapter planning. Application implementation has not started; this workspace is not a Git repository.
+Date: 2026-10-09. Scope: approved design corrections, live adapter planning and requested Clef task-branch discovery. Application implementation has not started; this workspace is not a Git repository.
 
 ## Review findings resolved in the specifications
 
@@ -14,8 +14,14 @@ The [contracts](contracts.md), master design, implementation index, all phase ga
 
 ## Documentation validation
 
-Local documentation checks passed: 20 Markdown documents, 110 relative links, 12 heading anchors and one JSON example; fenced blocks are balanced. An obsolete-guidance scan found no active global delivery-reversion flag, marker-only recovery or optional-live adapter completion policy. Required import/effect/adapter contract and acceptance coverage was also checked. A final semantic pass confirmed partial reapplication records remain representable as uncertainty rather than being rejected or treated as complete restoration.
+Initial revision documentation checks passed: 20 Markdown documents, 110 relative links, 12 heading anchors and one JSON example; fenced blocks were balanced. An obsolete-guidance scan found no active global delivery-reversion flag, marker-only recovery or optional-live adapter completion policy. Required import/effect/adapter contract and acceptance coverage was also checked. A final semantic pass confirmed partial reapplication records remain representable as uncertainty rather than being rejected or treated as complete restoration.
 
 Archived original SHA-256: `5152b97014014fcbd28a1527a60dd078266e483ccaed9dc95ed149551a04b0a6`.
 
 Runtime database/Git tests and live adapter calls are not part of this documentation revision and have not passed or run. No provider accounts, source records, notifications or deployed services were changed. There is no Git diff/commit to report because the workspace has no Git repository; review the updated documents directly.
+
+## Requested task-branch discovery addition
+
+Added [temporal Clef association](task_branch_association.md) for assigned in-progress tasks with missing task identifiers. The design reconstructs assignment/status work periods, resolves author identity, retrieves per-head commit/content evidence and asks Clef to distinguish likely, multiple, ambiguous or absent associations. It preserves explicit mappings and stores inference as candidate evidence with expiry, provenance and a separate response field. Missing history, shared commits, concurrent tasks, stale inputs and provider failure cause visible uncertainty rather than delivery claims.
+
+Aligned source adapters, schema/contracts, ingestion, Phase 4 evaluation, task context, final answer freshness, foundation scenarios, demo cases, master design and index. Existing task/repository/verified-base clarification and stale-narrative requirements remain in force. Addition documentation checks passed across 21 Markdown documents, 128 local links, 16 heading anchors and one JSON example. Checked canonical response fields, retained clarification selections, temporal association requirements, post-answer freshness and archive preservation. Runtime implementation, tests and actual Clef calls remain future phase work; documentation checks are not runtime regression results.

@@ -23,6 +23,7 @@ Canonical authority: the configured task provider (Plane or Jira/export) owns ta
 | `PullRequest` | base `repository_id`, number, title, `state` (`OPEN`, `CLOSED`), `draft`, nullable `merged_at`, nullable `merge_commit_sha`, `head_repository_id`, head/base refs and SHAs |
 | `Review` | provider ID, reviewer ID, state, `submitted_at`, reviewed `commit_sha`, bounded body/content reference, dismissal metadata when available |
 | `Commit` | `repository_id`, full SHA, nullable committed time/message, `history_complete` |
+| `TaskWorkPeriod` | `task_id`, `assignee_id`, nullable `identity_binding_id`, `valid_from`, nullable `valid_to`, `time_accuracy` (`EVENT`, `OBSERVED_BOUND`), `coverage`, activity/evidence references; normalized state is `IN_PROGRESS` |
 | `RevisionEffect` | `repository_id`, `delivery_id`, `effect_kind` (`REVERT`, `REAPPLICATION`), `effect_commit_sha`, nonempty `affected_revision_shas`, `coverage` (`COMPLETE`, `PARTIAL`, `UNKNOWN`), `authority`, `mapping_version`; common provenance fields |
 | `Document` plus `DesignDoc` or `ProcessDoc` | title, version, content hash, content path/reference, document status (`CURRENT`, `SUPERSEDED`, `DRAFT`), access scope |
 | `CheckRun` | provider ID, repository ID, SHA, name, status, nullable conclusion and completed time |
@@ -33,6 +34,10 @@ For assignees, `null` means retrieval is unknown and `[]` means known unassigned
 
 A branch query requires one resolved repository from the task's explicit bindings and request scope. Multiple bindings require clarification; a process-only task may have none. The manifest confirms task-to-repository bindings for new work before any branch exists. Fork PRs retain separate head/base repository identities; a same-named ref in the base repository cannot stand in for the fork source.
 
+For [task-branch discovery](task_branch_association.md), retain separate authored/committed timestamps and native author identity/binding references on commits when available. Tracker activity establishes assignment/in-progress windows. `TaskWorkPeriod` identity includes provider/task/assignee/transition references and interval accuracy; unknown intervals cannot be treated as complete.
+
+Inferred `IMPLEMENTED_IN` edges reference `association_id`, candidate/stable head SHAs, work-period/evidence IDs and model/identity/mapping versions, with `link_method=INFERRED` and `authority=CANDIDATE`. A scoped candidate read may retrieve them as task-context suggestions; confirmed traversal/delivery decisions still exclude them. Promotion requires source/operator evidence, and a promoted branch association alone is not complete delivery proof.
+
 ## Relationships and direction
 
 | From | Edge | To | Meaning |
@@ -41,6 +46,7 @@ A branch query requires one resolved repository from the task's explicit binding
 | `Task` | `HAS_TASK` | `Task` | Story/task hierarchy |
 | `Task` | `DEPENDS_ON` | `Task` | Source needs destination; includes dependency kind |
 | `Task` | `IMPLEMENTED_IN` | `Branch` | Planned/observed implementation branch |
+| `Task` | `HAS_WORK_PERIOD` | `TaskWorkPeriod` | Intersection of assignment and in-progress intervals for one assignee |
 | `Task` | `IMPLEMENTED_BY` | `PullRequest` | Explicitly linked implementation change |
 | `Task` | `DELIVERED_BY` | `Commit` | Confirmed required delivery revision, with fields below |
 | `Repository` | `HAS_BRANCH` | `Branch` | Repository ref |

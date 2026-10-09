@@ -7,6 +7,7 @@ Read the [master design](../../requirement_doc.md) first. This folder divides co
 - [Graph schema](graph_schema.md): identities, source properties, relationship direction and delivery evidence.
 - [Application contracts](contracts.md): typed requests, branch decisions, evidence and API responses.
 - [Source adapters](source_adapters.md): required live Plane/Google Docs reads, provider mappings, labeled export fallback and smoke gates.
+- [Task-branch association](task_branch_association.md): assignment/in-progress windows, author/commit evidence and Clef inference when explicit task references are absent.
 - [Decision model evaluation](decision_models.md): Jev/Clef/Laya evaluation, alternatives and selection policy.
 - [SRE event handling](../../SRE%20event%20handling.md): incident-assistant requirements and grounded interpretation of the supplied PDF.
 - [SRE graph extension](sre_graph_schema.md): runtime, deployment, ownership, on-call and customer evidence.

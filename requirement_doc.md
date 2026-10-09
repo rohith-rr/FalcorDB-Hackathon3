@@ -73,6 +73,10 @@ See [graph schema](docs/design/graph_schema.md) for properties, identity and pro
 
 All nodes and relationships carry tenant identity, source references, observation times and snapshot identity. Relationships distinguish explicit/confirmed links from inferred candidates. Inferred links cannot justify a branch command. Store document content/version and individual reviews, not just titles and an aggregate review string.
 
+When task IDs are missing from branch names and commit messages, use the [Clef task-branch fallback](docs/design/task_branch_association.md). Intersect assignment history with in-progress periods, map the assignee to Git author identities, and retrieve their branch activity in that window. Clef compares task purpose with messages, changed files and competing simultaneous tasks, returning likely, multiple, ambiguous or no-match associations. Preserve period/author/commit evidence and model scores as inferred candidate links; temporal correlation is not confirmed implementation or delivery. Explicit provider/manifest mappings take precedence.
+
+When task IDs are missing from branch names and commit messages, use the [Clef task-branch fallback](docs/design/task_branch_association.md). Intersect assignment history with in-progress periods, map the assignee to Git author identities, and retrieve their branch activity in that window. Clef compares task purpose with messages, changed files and competing simultaneous tasks, returning likely, multiple, ambiguous or no-match associations. Preserve period/author/commit evidence and model scores as inferred candidate links; temporal correlation is not confirmed implementation or delivery. Explicit provider/manifest mappings take precedence.
+
 The [SRE graph extension](docs/design/sre_graph_schema.md) adds incident, deployment, artifact, service-instance, ownership, on-call, customer-feature, observation and action-plan records. It reuses existing entities and preserves operating-location/time information. A task assignee is not assumed to be a code author or current responder; a deployed revision is not assumed to be the cause of a failure.
 
 ## Where decision models fit
@@ -88,6 +92,8 @@ Use model-guided exploration to select useful neighboring nodes or evidence requ
 | Does review text describe a deployment blocker? | Optional `noul`, with cited input and uncertainty handling |
 | Rank narrative urgency | Optional `score` with a defined rubric; explicit ticket priority takes precedence |
 | Is a PR merged? Does a branch contain a required revision? | Source fields and Git checks |
+| Which ID-free branch likely implements an assigned in-progress task? | Work-period/author retrieval, then Clef association judgment with ambiguity and no-match options |
+| Which ID-free branch likely implements an assigned in-progress task? | Work-period/author retrieval, then Clef association judgment with ambiguity and no-match options |
 | Which incident node or evidence should be explored next? | Model `choice` over scoped neighbors and pending checks; preserve several paths |
 | Who is on-call now? What was deployed? Are customers failing? | Current assignment, deployment and measurement records; model choices do not establish these facts |
 
@@ -140,6 +146,8 @@ The original Phases 0-6 estimate totaled 36 hours plus 12 recovery hours within 
 - Interrupted imports remain blocked across application/database restart until a validated full rebuild; no mixed-snapshot answer or command appears.
 - Stable merge/revert does not exclude an unchanged valid feature; complete confirmed reapplication restores only applicable candidate histories.
 - Live Plane tasks and Google Docs content produce actual source-backed context/citations; unavailable adapters keep the full demo gate incomplete.
+- ID-free task/branch discovery uses assignment/in-progress history and author/content evidence; Clef suggestions and ambiguities remain visible without becoming confirmed delivery coverage.
+- ID-free task/branch discovery uses assignment/in-progress history and author/content evidence; Clef suggestions and ambiguities remain visible without becoming confirmed delivery coverage.
 - Model accuracy, abstention, latency and cost are measured separately from graph/branch correctness.
 
 Incident requirements add correct historical deployments/current responders, observed versus possible customer effects, cited possible explanations, version-bound recovery proposals and approved sandbox actions. Runtime service-call cycles permit bounded investigation; they are distinct from invalid task/action execution ordering. See the SRE requirements and integration plan for acceptance cases. No production messages or changes are performed by this document update.

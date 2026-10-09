@@ -62,6 +62,11 @@ Keep runtime snapshots, credentials, local caches and provider output out of com
 | Plane pagination/status/type/assignee coverage | Preserve IDs, all assignees and gaps; no inferred dependencies |
 | Google Docs tabs/table/version change | Preserve content/anchors; retry race or reject required live import |
 | Live adapter unavailable | Labeled export fallback; live integration gate incomplete |
+| ID-free branch with assigned in-progress author activity | Clef suggests a candidate association with work-period/commit evidence |
+| Same person, simultaneous tasks/unrelated commits | Content evidence distinguishes tasks or reports ambiguity |
+| Reassigned/reopened/multi-assignee task | Separate work periods; do not attribute past work to the new assignee |
+| Missing activity history/author identity or Clef outage | Explicit discovery abstention; retain explicit mappings |
+| Inferred-only prerequisite implementation | No confirmed delivery coverage or branch-base command |
 
 Fixtures are synthetic and labeled as such. No external provider account access is required to define them. Both Plane and Google Docs credentials/access are required for Phase 2's later live smoke gate.
 

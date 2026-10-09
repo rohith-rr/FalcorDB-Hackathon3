@@ -4,17 +4,19 @@ Status: planned. Depends on Phase 3. Original sprint timebox: 5 hours, provision
 
 ## Outcome
 
-The system handles evaluated paraphrases and document/task ambiguity through a typed adapter. It can switch between rules and an accessible model without changing graph or branch contracts.
+The system handles evaluated paraphrases, document/task ambiguity and ID-free task/branch association through a typed adapter. Clef evaluates the requested time-window discovery fallback; rules/evidence abstention remain available when it is unavailable. Known graph/branch decisions keep their source-verification requirements.
 
 ## Proposed files
 
 ```text
 backend/app/models/{decision_adapter,rules,laya,jev,clef}.py
 backend/app/routing/{questions,candidates,gates}.py
+backend/app/associations/{clef,results}.py
 evals/decision_routing/{development,held_out}.jsonl
 scripts/evaluate_decision_routing.py
 reports/decision_model_evaluation.md
 tests/models/test_adapter_contracts.py
+tests/associations/test_task_branch_discovery.py
 ```
 
 ## Internal adapter contract
@@ -36,11 +38,21 @@ Keep provider differences in adapters. Pin/check actual SDK and checkpoint versi
 
 Batch questions using the same state where the verified provider supports it. If a first selection changes what data is fetched, use a second request with that new state. Known graph edges do not trigger individual model calls.
 
+## Clef task-branch discovery
+
+Implement the [association specification](task_branch_association.md) using Phase 2's work periods, identity bindings and per-head commit/content evidence. Trigger for assigned in-progress tasks without resolving explicit references. Keep explicit associations ahead of inference; overlapping tasks remain competing evidence rather than forcing unique branch ownership.
+
+Call Clef through the verified `state`/`questions` interface with branch `choice` plus `NONE`/`AMBIGUOUS`/`MULTIPLE` and independent per-pair `noul` judgments. Validate the configurable suggestion gates and evidence completeness, preserve probabilities/model hashes, and return typed `BranchAssociationResult`. Recheck task/heads/graph after the call. Suggested `IMPLEMENTED_IN` edges use `INFERRED`/`CANDIDATE`; the model cannot promote links, infer dependencies or fill `DELIVERED_BY`.
+
+Clef is the requested provider for this feature even if another provider handles intent/incident routing. Missing access, failed evaluation or malformed/timeout responses yields explicit discovery abstention; do not silently relabel rules output as Clef inference. Persist any candidate links only through authorized ingestion using the Phase 1 import protocol.
+
 ## Evaluation and completion gate
 
 Use the sample counts and gate in the decision record: at least 60 total examples and at least 20 held-out, grouped by scenario. Compare rules and each accessible model on identical inputs. Report intent/candidate accuracy, accepted precision/coverage, missing-option abstentions, p50/p95 latency, cold/warm behavior, token truncation, hardware and costs. Exercise option order changes, neutral/renamed labels, misleading document titles and unrelated questions.
 
 Every branch regression from Phase 3 must pass with each adapter enabled and disabled. An adapter meeting the demo gate can be enabled for supervised semantic routing. A failed/unavailable adapter remains disabled; the completion report explains that outcome and the rules mode. This phase is complete when there is an honest evaluation and a working fallback, not when a model has merely returned valid JSON.
+
+The discovery feature has an additional [association evaluation gate](task_branch_association.md#acceptance-and-evaluation), separate from the 60 routing examples: at least 20 association cases with 10 held-out, rules/Clef comparison, and an actual Clef smoke result before claiming live identification. Include ID-free positive cases and same-person concurrent-task negatives; verify high-scoring inferred-only prerequisite coverage never produces a branch command. Report unavailable inference as an incomplete feature, without disabling known explicit task/Git workflows.
 
 ## SRE extension
 

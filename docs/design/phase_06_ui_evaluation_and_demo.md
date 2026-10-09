@@ -25,6 +25,7 @@ Add a small graph-path view using returned node/edge IDs, or a simple ordered pa
 1. Build a question box with project/repository scope, sample Payments/TLS prompts and loading/error states. Keep credentials and raw provider configuration out of the client.
 2. Render typed decisions with selected branch and pinned SHA, prerequisite coverage, applicable revert/reapplication evidence per candidate, observed review state, warnings and verification time. Label each source's data mode (`FIXTURE`, `IMPORT`, `LIVE`) and answer mode separately; a live document must not relabel fixture relationships as live.
 3. Display exact task/design/runbook/PR/review source links and excerpts with versions. Provide accessible candidate selection when resolution requests clarification.
+   In task context, display `branch_associations` as suggested implementation branches, with assignment/work period, author commits, changed paths, model score and limitations. Keep these suggestions distinct from verified base recommendations; a clarification selection does not confirm an inferred association.
 4. Show proposed Git commands only for eligible unexpired results. Include expected repository/remote and fetched SHA. Disable command copying after expiry until refresh; the query has not created a branch.
 5. Show evidence path and verification detail on demand. Model probabilities are a routing signal, not code readiness. Distinguish stale source data, incomplete context and provider fallback using plain language. Handle HTTP 503 import/recovery and snapshot-change errors with a clear retry state, suppressing decisions/command copying from invalidated requests.
 6. Add basic browser integration or a demo path query for Payments and TLS. Keep graph access local/configured for the prototype. Never expose unrestricted database credentials in browser code.
@@ -49,6 +50,9 @@ Add a small graph-path view using returned node/edge IDs, or a simple ordered pa
 | Live source unavailable | Clearly labeled export fallback; full live demo gate remains incomplete |
 | Ambiguous/out-of-scope question | Clarification or unsupported result |
 | Task context | Current documents, PRs and individual review evidence |
+| No task ID in branch/commits | Suggested Clef association with matched person/time/content evidence |
+| Same author on concurrent tasks/branches | Ambiguous/multiple associations remain visible; no invented exclusive ownership |
+| Incomplete identity/time history or Clef failure | Explain discovery abstention; no inferred delivery or branch command |
 | TLS process | Actual cited steps, unchanged task status and justified progress counts |
 | Decision model down | Working rules/clarification and labeled routing fallback |
 | Answer LLM down or invalid | Deterministic response and labeled answer mode |

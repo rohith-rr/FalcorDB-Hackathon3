@@ -27,7 +27,7 @@ Use the [canonical schema](graph_schema.md); do not invent a separate demo ontol
 3. Create indexes supported by the pinned database on IDs, scoped task keys and relevant lookup fields. Do not assume Neo4j index/constraint syntax is compatible.
 4. Implement the durable import protocol below before exposing logical-ID upserts. Write nodes before edges; preserve source ownership and tombstone removed associations. Do not create placeholder nodes that look verified.
 5. Store document content separately with content hash, version and section anchors; store graph references. Populate real TLS runbook steps in the synthetic fixture, not just its title.
-6. Add templates for exact task lookup, epic children, one dependency frontier, task delivery groups and revision effects, implementation PR/branch links, current documents, individual reviews and candidate heads.
+6. Add templates for exact task lookup, epic children, one dependency frontier, task delivery groups and revision effects, implementation PR/branch links, work periods and scoped inferred association candidates, current documents, individual reviews and candidate heads. The candidate-evidence template keeps inferred suggestions out of confirmed delivery traversal.
 7. Load fixtures and inspect graph topology in FalkorDB Browser. Verify the direction of `DEPENDS_ON` and incoming document edges against the schema.
 
 ## Snapshot consistency

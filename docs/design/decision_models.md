@@ -6,6 +6,8 @@ Status: proposed; incident exploration and Clef documentation added 2026-10-09. 
 
 Use model-guided graph exploration within application-controlled reads and state verification. Evaluate specialized decision models for next-node/evidence selection, intent/entity/document routing and optional narrative judgments. Maintain several pending paths and required-check coverage. Use a separate LLM API after evidence retrieval to explain results. Ship labeled rules routing if a model fails evaluation; do not replace source facts with probabilistic judgments.
 
+Add the requested [Clef task-branch association](task_branch_association.md): assignment/in-progress windows and mapped author activity retrieve candidates; Clef compares task purpose, commit messages and changed paths when explicit identifiers are absent. Evaluate this separately from routing, with competing simultaneous tasks and multiple possible branches. Model output establishes a candidate association, never verified delivery or unique branch ownership. The feature requires its own actual Clef smoke/evaluation result; using Jev/Laya for other routing does not demonstrate it.
+
 ## Verified provider capabilities
 
 TypeSafe's [introduction](https://docs.typesafe.ai/introduction) describes its System One decision approach. Its [primitives documentation](https://docs.typesafe.ai/primitives) defines `choice` as selecting from supplied options, `score` as an ordered-level value, and `noul` as a yes probability. Choice/Score return distributions and confidence; Noul has no separate confidence field. Same-request questions see the same state independently; dependent questions require a subsequent request. Include an escape option when a choice set may be incomplete.
