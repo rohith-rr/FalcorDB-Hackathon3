@@ -12,6 +12,8 @@ from typing import Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from app.contracts.answer import AnswerFact
+from app.contracts.evidence import EvidenceItem
 from app.core.ids import parse_scoped_id
 
 
@@ -214,7 +216,7 @@ class ContextBundle(BaseModel):
     resolved_entity_ids: List[str] = Field(default_factory=list)
     snapshots: List[Dict[str, str]] = Field(default_factory=list)
     graph_read_set: Dict[str, str] = Field(default_factory=dict)
-    facts: List[AnswerFact] = Field(default_factory=list)  # type: ignore[name-defined]
+    facts: List[AnswerFact] = Field(default_factory=list)
     access_versions: Dict[str, int] = Field(default_factory=dict)
     branch_decision: Optional[dict] = None
     conversation_context: Optional[ConversationContext] = None
@@ -224,6 +226,6 @@ class ContextBundle(BaseModel):
     document_sections: List[dict] = Field(default_factory=list)
     review_summaries: List[dict] = Field(default_factory=list)
     epic_counts: List[dict] = Field(default_factory=list)
-    evidence_items: List[EvidenceItem] = Field(default_factory=list)  # type: ignore[name-defined]
+    evidence_items: List[EvidenceItem] = Field(default_factory=list)
     traversal_steps: List[dict] = Field(default_factory=list)
     limitations: List[str] = Field(default_factory=list)

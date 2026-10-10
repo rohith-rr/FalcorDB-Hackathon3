@@ -6,6 +6,8 @@ Status: planned. Depends on Phase 0.
 
 FalkorDB contains an inspectable Payments/TLS graph with provenance and repeatable imports. Scoped read queries recover the exact relationships needed for branch and document workflows.
 
+Use the verified local runtime and paths from [workspace setup](workspace_setup.md). No external provider token, OAuth or login is required for this phase. Graph data, retained transactional state, immutable content, recovery bundles and Git fixtures all use workspace storage; retained records remain outside projection deletion.
+
 ## Proposed files
 
 ```text
@@ -67,7 +69,7 @@ Run database integration tests against the pinned image, not only an in-memory s
 
 Inject failure halfway through node upserts, after nodes/before edges, and immediately before publication. Restart both the application and database/container: dirty state must survive and every ordinary graph read must return `GRAPH_RECOVERY_REQUIRED`. Verify successful full recovery restores exact expected records/content, retires stale associations and is idempotent; a failed recovery remains blocked. Exercise missing bundle/control state, uncertain write acknowledgments, preparation failure with the old snapshot still readable, and concurrent queries crossing a generation. No mixed-snapshot answer or command may escape. Retain actual persistence configuration and restart-test output; no Phase 1 completion without this evidence.
 
-Retain seed commands, expected counts and a browser screenshot/path export for the demo. Phase 2 starts when schema and query compatibility have been verified.
+Retain seed commands, expected counts and a browser screenshot/path export for the demo. Retain actual Docker disk/mount and application-state paths with the restart evidence; project data must remain under the workspace after recovery. Phase 2 implementation starts when schema and query compatibility have been verified, without waiting for provider credentials.
 
 Verify direct/MCP reads, the picker and stored evidence routes use the same projection admission rules. Seed/reset scripts cannot bypass them. During a provider call, unrelated publication may finish and an equivalent read set may publish; changed dependencies, aggregates, absence results, effects or permitted content must invalidate it. Include INCIDENT DIRTY with structural queries still working, cross-owner recovery preserving links, and unrelated/relevant generation changes during traversal and inference. Retained records survive rebuild/restart. Run the [publication acceptance cases](graph_publication.md#required-implementation-evidence); startup instructions declare ownership, single writer, cadence/caps and gate order.
 

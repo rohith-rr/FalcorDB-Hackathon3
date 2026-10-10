@@ -27,6 +27,7 @@ from app.fixtures.build import (  # noqa: E402
 )
 from app.graph.client import connect_default  # noqa: E402
 from app.graph.import_state import (  # noqa: E402
+    BundleConflictError,
     BundleStore,
     PublicationGateProtocol,
     read_import_state,
@@ -39,7 +40,17 @@ def merge_structural_bundles() -> dict:
     bundle (a second full-bundle publication would tombstone the first)."""
     main = build_structural_bundle()
     conv = build_conversation_bundle()
-    snapshot_id = "snap-structural-001"
+    # Versioned fixture snapshot: the corrected SUPERSEDES direction and CLI
+    # message normalization change the retained bundle's bytes, and retained
+    # bundles are immutable (a changed bundle must be allocated a new
+    # bundle/snapshot ID, phase_01: BundleConflictError). The corrected
+    # builder therefore claims the next unclaimed fixture version instead of
+    # reusing an already-retained ID, so workspaces seeded before the
+    # correction keep every predecessor's recovery bytes intact for a
+    # still-DIRTY projection (seed_graph.py --reset clears only the graph,
+    # never retained bundles; test runs are isolated to their own temporary
+    # bundle directory, so only operator publications claim IDs here).
+    snapshot_id = "snap-structural-004-cli-messages"
     for bundle in (main, conv):
         for record in bundle["nodes"] + bundle["edges"]:
             record["snapshot_id"] = snapshot_id
@@ -96,7 +107,14 @@ def main() -> int:
 
         bundle = merge_structural_bundles()
         protocol = PublicationGateProtocol(client, BundleStore(settings.bundles_root))
-        report = protocol.publish(bundle)
+        try:
+            report = protocol.publish(bundle)
+        except BundleConflictError as exc:
+            print(f"bundle preparation conflict: {exc}")
+            print("operator options:")
+            print("  - allocate a new snapshot/bundle ID for the changed bundle, or")
+            print(f"  - operator-clear stale retained bundles under {settings.bundles_root}")
+            return 1
         print(json.dumps(report, indent=1, default=str))
 
         state = read_import_state(client, "STRUCTURAL")

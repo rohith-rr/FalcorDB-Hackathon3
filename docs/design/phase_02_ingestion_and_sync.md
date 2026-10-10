@@ -4,7 +4,7 @@ Status: planned. Depends on Phase 1.
 
 ## Outcome
 
-Live Plane task data, Google Docs content, GitHub change/review metadata and supported exports become one graph with explicit mappings and declared coverage. Importing the same snapshot does not create duplicate relationships. Source mode is retained per source.
+Plane task data, Google Docs content and GitHub change/review metadata from synthetic/sanitized fixtures and supported exports become one graph with explicit mappings and declared coverage. Importing the same snapshot does not create duplicate relationships. Source mode is retained per source. Complete adapter code and offline/local validation first; external credentials and actual live reads are configured after Phase 2 implementation under [workspace setup](workspace_setup.md#credentials-after-phase-2-implementation).
 
 ## Proposed files
 
@@ -23,7 +23,9 @@ tests/connectors/{test_plane_reads,test_google_docs_reads}.py
 tests/connectors/test_codex_jsonl.py
 ```
 
-The demo connector scope requires live read-only Plane, Google Docs and GitHub adapters; Jira JSON/CSV import and Markdown/document manifests remain supported. The [source-adapter specification](source_adapters.md) defines authentication, mappings, interfaces, failure behavior and the live gate. Live Jira OAuth, arbitrary PDF extraction, comment NER, native Plane dependency enumeration and inferred dependencies are deferred. A labeled export fallback does not satisfy the live integration gate.
+The demo connector scope requires complete read-only Plane, Google Docs and GitHub adapters; Jira JSON/CSV import and Markdown/document manifests remain supported. The [source-adapter specification](source_adapters.md) defines authentication, mappings, interfaces, failure behavior and the later live gate. Implement authenticated-request and OAuth-refresh code against saved synthetic/sanitized responses and mocked HTTP transports, leaving external secrets empty and avoiding provider calls or sign-in during this phase. Live Jira OAuth, arbitrary PDF extraction, comment NER, native Plane dependency enumeration and inferred dependencies are deferred. Local checks satisfy the implementation gate; they do not establish live compatibility or satisfy the final live demo gate.
+
+All package/container downloads, import staging, Git repositories, captures, retained stores, immutable bundles/content, logs and temporary files follow the verified workspace paths. Reuse the local database and Phase 0 environment scripts; do not introduce default user-profile caches or global dependency installations.
 
 ## Mapping contract
 
@@ -65,7 +67,7 @@ When identifiers/explicit associations are absent, [task-branch discovery](task_
 6. Persist full reconciled per-projection bundles and immutable content, then publish through Phase 1 owner-specific gates/fences. Preserve tombstones/audits and referenced cross-projection identities; protect newer source state from stale reimports. A post-mutation failure blocks reads needing that projection until full owned-projection recovery.
 7. Add targeted refresh for refs, PRs and reviews involved in a branch query. Reconcile persisted changes into a full rebuild bundle through the same import gate; transient live verification remains request evidence and cannot directly mutate graph records. Maintain a small local read-only Git mirror or provider-backed ancestry adapter in Phase 3.
 
-GitHub documents authoritative PR fields in its [pull request API](https://docs.github.com/en/rest/pulls/pulls) and review records in its [review API](https://docs.github.com/en/rest/pulls/reviews). Implement read operations only in this phase. Current provider access/version settings are recorded at implementation time.
+GitHub documents authoritative PR fields in its [pull request API](https://docs.github.com/en/rest/pulls/pulls) and review records in its [review API](https://docs.github.com/en/rest/pulls/reviews). Implement read operations only in this phase. Record targeted API/client versions and offline fixture dialects now; record actual provider access/version settings during onboarding after Phase 2 implementation.
 
 ## Prototype sync policy
 
@@ -77,13 +79,19 @@ Coverage flags distinguish `COMPLETE`, `PARTIAL`, `UNKNOWN` for task dependencie
 
 Implement the [persistent source-access registry](source_adapters.md#persistent-source-access-handling) independently of graph publication. A denied/unavailable source can invalidate access to retained content even when import preparation aborts and the graph stays READY. Version source/resource access, persist restrictions across restart and restore access only after successful authorized recheck. Transport failure remains a freshness/coverage issue. Later explicit ingestion batches may project retained association audits; inference queries never publish their own candidates. Revalidate access/inputs and preserve inference observation time/generation/expiry separately from the new projection snapshot.
 
-## Validation and completion gate
+## Validation and implementation completion gate
 
 Verify repeated imports, updated refs, closed-unmerged PRs, dismissed reviews, duplicate names in different repositories, missing source pages, deleted documents and malformed manifest/effect mappings. Source failures during preparation preserve the previous snapshot at its original age; failures after dirty publication block reads until a successful full rebuild. Never interpret incomplete source enumeration as deletion. Inspect the import report and sample a normalized task/PR/review/document path against its source record. Run the source-adapter contract checks and Phase 1 interruption/restart cases.
 
 Verify work periods across reassignment, status changes/reopening, multiple assignees and time zones; a lone current snapshot or generic update timestamp must not fabricate history. Author/time candidates retain exact head/commit evidence, and unrelated inherited commits or missing identities cannot create confirmed links. Repeated imports of the same evidence are idempotent; changed periods/heads invalidate discovery caches.
 
-Completion requires valid Payments/TLS imported snapshots with confirmed delivery/dependency scope and provenance, plus actual live Plane and Google Docs smoke results and source-backed task/document citations as specified in [source adapters](source_adapters.md#acceptance-and-completion-record). Missing credentials/provider availability leave the live gate incomplete. A fixture/export-only mode remains usable but labeled as a partial deliverable.
+Implementation completion requires valid local Payments/TLS imported snapshots with confirmed delivery/dependency scope and provenance, complete Plane/Google Docs/GitHub adapter code, passing offline contract/normalization/reconciliation/access/recovery checks, and the local conversation/incident extension checks below. Validate missing credentials, authentication failures, OAuth refresh, pagination, timeout and version races using mocked transports. Prove local startup/import/readiness does not need tokens, browser login or provider calls. A placeholder adapter alone does not pass.
+
+Record implementation results separately from `LIVE_VALIDATION_DEFERRED`, with the exact remaining provider setup and smoke checklist. This planned deferral does not block the Phase 2 implementation gate or Phase 3 implementation. Data remains labeled FIXTURE/IMPORT and must not be presented as LIVE.
+
+## Live validation after Phase 2 implementation
+
+Only after implementation/local checks are complete, configure Plane, Google Docs and GitHub accounts/access, API tokens and Google OAuth through the [onboarding checklist](workspace_setup.md#credentials-after-phase-2-implementation). Run actual provider reads and refresh checks, including live Plane and Google Docs smoke results and source-backed task/document citations as specified in [source adapters](source_adapters.md#acceptance-and-completion-record). Record live compatibility and failures separately. Missing credentials/provider availability leaves these later checks deferred/unevaluated and the full live demo gate incomplete; it does not reverse local implementation completion.
 
 ## Codex conversation extension
 

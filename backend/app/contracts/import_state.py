@@ -38,6 +38,9 @@ class ImportState(BaseModel):
     last_published_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     last_failure: Optional[str] = None
+    # Declared source-scope coverage of the published bundle (READY is
+    # coherent publication; source completeness is a separate field).
+    coverage: Dict[str, str] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def validate_shape(self) -> "ImportState":

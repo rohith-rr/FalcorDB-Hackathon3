@@ -2,12 +2,15 @@
 
 Read the [master design](../../requirement_doc.md) first. This folder divides coding into independently reviewable phases. The repository currently contains design documents; paths listed as deliverables are proposed files to create during implementation.
 
+The user's 2026-10-10 setup policy applies across implementation: [workspace storage and deferred credentials](workspace_setup.md). All new project downloads/dependencies/caches/state and Docker engine data stay under `E:\FalcorDB Hackathon`, with storage verified before downloads. Complete Phases 0-2 without external tokens, OAuth, logins or provider calls; configure accounts and run live smoke checks only after Phase 2 implementation. Final live demo acceptance remains required.
+
 ## Shared specifications
 
 - [Graph schema](graph_schema.md): identities, source properties, relationship direction and delivery evidence.
 - [Application contracts](contracts.md): typed requests, branch decisions, evidence and API responses.
 - [Graph publication](graph_publication.md): projection ownership, durable incident batching, scoped read-set validation and generation-independent clarification.
-- [Source adapters](source_adapters.md): required live Plane/Google Docs reads, provider mappings, labeled export fallback and smoke gates.
+- [Workspace setup](workspace_setup.md): E:-resident dependency/container storage, pre-download checks and provider onboarding after Phase 2 implementation.
+- [Source adapters](source_adapters.md): Plane/Google Docs implementation contracts, offline validation, provider mappings and later required live smoke gates.
 - [Codex conversations](codex_conversations.md): selected JSONL imports, message provenance, scoped mentions, reviewed design decisions and conversation queries.
 - [Task-branch association](task_branch_association.md): assignment/in-progress windows, author/commit evidence and Clef inference when explicit task references are absent.
 - [Decision model evaluation](decision_models.md): Jev/Clef/Laya evaluation, alternatives and selection policy.
@@ -41,9 +44,10 @@ To use the project's own implementation work as demo data, follow the [Plane bac
 
 | Order | Design document | Depends on | Completion artifact |
 | --- | --- | --- | --- |
-| 0 | [Foundation](phase_00_foundation.md) | Shared specifications | Running API/database and deterministic scenarios |
+| 0 | [Foundation](phase_00_foundation.md) | Shared specifications | Verified workspace storage, running local API/database and deterministic scenarios |
 | 1 | [Graph and fixtures](phase_01_graph_and_fixtures.md) | 0 | Durable interrupted-import recovery and scoped query results |
-| 2 | [Ingestion and sync](phase_02_ingestion_and_sync.md) | 1 | Normalized snapshots, confirmed links, live Plane/Google Docs smoke evidence and repeatable Codex imports |
+| 2 | [Ingestion and sync](phase_02_ingestion_and_sync.md) | 1 | Complete adapters, offline/local checks, normalized snapshots, confirmed links and repeatable Codex imports |
+| After 2 implementation | [Provider onboarding and live validation](workspace_setup.md#credentials-after-phase-2-implementation) | Phase 2 implementation gate | Configure accounts/tokens/OAuth and retain real Plane/Google Docs/GitHub smoke evidence |
 | 3 | [Traversal and branch decisions](phase_03_traversal_and_branch_decisions.md) | 2 | Correct typed recommendations, scoped conversation retrieval and trace evidence |
 | 4 | [Decision model integration](phase_04_decision_model_integration.md) | 3 | Measured routing choice or documented rules fallback |
 | 5 | [Context and LLM answers](phase_05_context_and_llm_answers.md) | 3, 4 | A cited explanation from a real LLM API call |
@@ -52,7 +56,9 @@ To use the project's own implementation work as demo data, follow the [Plane bac
 
 Use each completion gate before moving on. A failing semantic adapter can be disabled without preventing graph decisions or the answer LLM. Record provider unavailability as an unevaluated result, not a passing evaluation.
 
-For the incident demo, follow the SRE integration plan's additions to these phases; it is an alternative demo path over the same phases, not an additional workload. The existing development scenarios remain part of the product requirements and regressions when implemented; completing all development and incident features together is not assumed. The shared live Plane/Google Docs gate applies to either demo path.
+The post-Phase-2 live checklist is a separate milestone and does not block Phase 3 implementation with fixture/import data. Record implementation completion and deferred live validation separately; keep the full demo gate pending until the required live checks pass.
+
+For the incident demo, follow the SRE integration plan's additions to these phases; it is an alternative demo path over the same phases, not an additional workload. The existing development scenarios remain part of the product requirements and regressions when implemented; completing all development and incident features together is not assumed. The shared credential deferral and later live Plane/Google Docs gate apply to either demo path.
 
 The recommended hackathon demonstration leads with incident investigation and approved sandbox recovery. The FalkorDB resource plan maps sponsor tools to that workflow and treats document SDK retrieval, native algorithm projections and Canvas as optional additions. Event dates and the user's reported organizer permission for early coding are recorded there.
 
@@ -60,7 +66,7 @@ The recommended hackathon demonstration leads with incident investigation and ap
 
 Phase completion is defined by each phase's completion gate, not by elapsed time. Effort is re-estimated after the recovery/persistence and live-adapter compatibility checks rather than committed to hour figures in advance.
 
-The demo covers one organization, one project and one repository. If scope must shrink, cut extra connectors beyond Plane/Google Docs/GitHub and the requested Codex import, sophisticated visuals, optional checks ingestion and model fine-tuning. Preserve durable recovery, candidate-specific revision effects, the verified branch workflow, review warnings, TLS content, conversation provenance/review gates, citations, traversal trace and a real retrieval-to-LLM explanation. Live Plane and Google Docs are required completion gates; export fallback is labeled as a partial deliverable. Keep fixtures clearly labeled. A rules-only demo does not establish the value of Jev, Clef or Laya. For the SRE-focused demo, use the alternative scope and cuts in the [SRE integration plan](sre_integration_plan.md).
+The demo covers one organization, one project and one repository. If scope must shrink, cut extra connectors beyond Plane/Google Docs/GitHub and the requested Codex import, sophisticated visuals, optional checks ingestion and model fine-tuning. Preserve durable recovery, candidate-specific revision effects, the verified branch workflow, review warnings, TLS content, conversation provenance/review gates, citations, traversal trace and a real retrieval-to-LLM explanation. Live Plane and Google Docs are required final demo gates, scheduled after Phase 2 implementation; export-only operation does not pass them. Keep fixtures clearly labeled. A rules-only demo does not establish the value of Jev, Clef or Laya. For the SRE-focused demo, use the alternative scope and cuts in the [SRE integration plan](sre_integration_plan.md).
 
 ## Questions settled by default
 
@@ -70,7 +76,7 @@ Python backend; React frontend; fixtures/exports first, then required live Plane
 
 ## Design revision gate
 
-Before application implementation, review the import state machine, candidate-effect semantics and source-adapter contract together. Confirm phase scenarios/gates have no marker-only recovery, global delivery-reversion flag or optional-live Plane/Google Docs guidance. Keep the archived original draft unchanged. Documentation validation can verify links, examples and consistency; it cannot claim database recovery, Git scenarios or live providers have passed. Retain the [design revision record](design_revision_record.md) with this distinction.
+Before application implementation, review the import state machine, candidate-effect semantics, source-adapter contract and workspace setup together. Confirm phase scenarios/gates have no marker-only recovery or global delivery-reversion flag, and distinguish Phase 2 implementation completion from later required live demo validation. Keep the archived original draft unchanged. Documentation validation can verify links, examples and consistency; it cannot claim storage relocation, database recovery, Git scenarios or live providers have passed. Retain the [design revision record](design_revision_record.md) with this distinction.
 
 ## Definition of a phase completion
 

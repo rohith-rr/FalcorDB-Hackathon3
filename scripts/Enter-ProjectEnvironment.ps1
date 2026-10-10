@@ -121,6 +121,11 @@ if ($env:VIRTUAL_ENV) {
 
 # --- Run-through mode -----------------------------------------------------
 if ($CommandArguments) {
-    & @($CommandArguments)
+    $Executable = $CommandArguments[0]
+    [string[]]$RunArguments = @()
+    if ($CommandArguments.Count -gt 1) {
+        $RunArguments = $CommandArguments[1..($CommandArguments.Count - 1)]
+    }
+    & $Executable @RunArguments
     exit $LASTEXITCODE
 }

@@ -4,6 +4,8 @@ Use this file as instructions for an agent with access to Plane and this reposit
 
 This is a creation recipe, not a record that tasks or PRs already exist. Local keys such as `T01` are seed identifiers, not Plane issue keys. Start with task creation only. PR creation belongs to later, explicitly requested implementation work, after real changes exist.
 
+The user's 2026-10-10 [workspace and credential policy](../design/workspace_setup.md) governs future implementation: complete Phases 0-2 with offline/local checks before adding tokens/OAuth or logging into providers. Existing seed receipts remain historical evidence. The live readback checks in T05/T06/T07 are separate onboarding checks after Phase 2 implementation; do not initiate provider access or rerun external seeding as a prerequisite for those phases. New dependencies, containers and local artifacts use verified workspace storage.
+
 ## Copy-paste prompt
 
 The [requested Codex conversation extension](../design/codex_conversations.md) is implemented through the existing phase tasks and their updated design gates. Keep the eighteen stable task keys/dependency catalog and existing seed payload/receipts unchanged unless a separate backlog update is requested. Import only explicitly selected project chats and reviewed rationale; this seed recipe, evaluator prompts and ground-truth associations are not discovery evidence. A chat-reported implementation or approval cannot populate delivery mappings or execution receipts. Record real conversation import evidence in the phase completion report after implementation.

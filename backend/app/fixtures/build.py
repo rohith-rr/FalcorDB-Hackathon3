@@ -417,7 +417,14 @@ def build_conversation_bundle(snapshot_id: str = "snap-conversations-001") -> Di
                 if complete_line:
                     raise ValueError(f"malformed complete JSONL line {line_no} in {source_key}")
                 break  # partial tail: deferred, cursor does not advance past it
-            if record.get("type") == "message":
+            # Local messages and CLI completed-message events carry visible
+            # conversation content. Reasoning, bookkeeping and turn echoes
+            # are separate record types/events and never become messages.
+            visible_message = record.get("type") == "message" or (
+                record.get("type") == "event"
+                and record.get("event") == "agent.message.completed"
+            )
+            if visible_message and record.get("role") in ("user", "assistant"):
                 origin = {
                     "injected": "INJECTED_CONTEXT",
                 }.get(str(record.get("origin_hint", "")), None)
@@ -437,7 +444,9 @@ def build_conversation_bundle(snapshot_id: str = "snap-conversations-001") -> Di
                 })
                 ordinal += 1
         capture_ref = store.write_capture(
-            capture_id=f"capture-{source_key}-1",
+            # Parser changes create new immutable captures while preserving
+            # earlier renditions still referenced by retained evidence.
+            capture_id=f"capture-{source_key}-1-{expected['parser_version']}",
             source_key=source_key,
             epoch=1,
             messages=messages,
@@ -525,9 +534,13 @@ def build_conversation_bundle(snapshot_id: str = "snap-conversations-001") -> Di
                                "codex-fixture", f"codex:applies:{entry['decision_key']}", link_method="MANIFEST"))
     for entry in review_manifest["reviews"]:
         if entry["status"] == "SUPERSEDED" and entry.get("replacement_decision_key"):
+            # SUPERSEDES means "reviewed replacement of an exact prior
+            # revision" (graph_schema.md): the replacement decision points AT
+            # the prior SUPERSEDED revision, so replacement traversal identifies
+            # the current decision, never the obsolete one.
             edges.append(_edge("SUPERSEDES", f"demo:codex:edge:supersedes:{entry['decision_key']}",
-                               decisions[entry["decision_key"]],
-                               decisions[entry["replacement_decision_key"]], {}, tenant, snapshot_id,
+                               decisions[entry["replacement_decision_key"]],
+                               decisions[entry["decision_key"]], {}, tenant, snapshot_id,
                                "codex-fixture", f"codex:supersedes:{entry['decision_key']}", link_method="MANIFEST"))
 
     return {

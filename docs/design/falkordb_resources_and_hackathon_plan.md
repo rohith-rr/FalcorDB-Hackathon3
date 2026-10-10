@@ -2,6 +2,8 @@
 
 Research and proposed integration, 2026-10-09. No SDK, database, MCP server or model was installed or started for this review. This plan extends the [Company Brain](../../requirement_doc.md) and [SRE requirements](../../SRE%20event%20handling.md). Recommendations below are our design judgments, not a published judging rubric or a guarantee of winning.
 
+Setup sequencing was revised by user request on 2026-10-10: apply [workspace setup](workspace_setup.md) to every new dependency/container/cache and complete Phase 2 implementation before external tokens, OAuth, logins or cloud provisioning. Earlier live-source requirements remain final demo gates, with live validation recorded separately after implementation.
+
 ## 1. Recommendation
 
 Build the SRE incident workflow as the main demonstration of the Company Brain. Use FalkorDB to find the deployment active at the incident time, related changes, current responders, customer paths and applicable runbooks. Let Jev/Clef select useful next nodes from permitted choices, then give the collected evidence to one answer LLM.
@@ -26,7 +28,7 @@ The organizer's [resource page](https://www.wemakedevs.org/hackathons/falkordb/r
 | --- | --- | --- |
 | [Python client](https://github.com/FalkorDB/falkordb-py) | Load normalized records; exact lookup; deployment and dependency queries; query diagnostics | Required. Record tested version and real query output. |
 | [Docker/Compose](https://docs.falkordb.com/operations/docker) | Reproducible local database, persistence and Browser | Required local fallback, even if a hosted demo is used. |
-| [FalkorDB Cloud](https://app.falkordb.cloud/) | Candidate hosted database for a live reviewer experience | Optional. Confirm available plan and connection details during setup; no free credits or capacity assumed. |
+| [FalkorDB Cloud](https://app.falkordb.cloud/) | Candidate hosted database for a live reviewer experience | Optional after Phase 2 implementation. Confirm available plan and connection details then; no free credits or capacity assumed. |
 | [MCP server](https://github.com/FalkorDB/FalkorDB-MCPServer) | Execute selected, approved read queries through a standard tool connection | High value for Track 01. Show actual tool receipts and transport identity. |
 | [Browser](https://docs.falkordb.com/browser/) | Inspect the same graph that produced the answer | Required developer/demo aid. Open a small relevant subgraph. |
 | [Canvas](https://docs.falkordb.com/browser/canvas) | Embed the retrieved paths in the incident UI | Optional polish after core behavior. |
@@ -148,7 +150,7 @@ Browser can execute queries and visualize returned graph records. Use it for top
 
 For the product UI, evaluate `@falkordb/canvas`, the standalone Web Component used by Browser with a documented React/TypeScript example. Feed it authorized nodes/edges returned by our backend, using stable application IDs and an explicit display mapping. Highlight retrieved paths and let a node open its evidence/timestamp panel. Avoid exposing database credentials in the frontend. [Canvas](https://docs.falkordb.com/browser/canvas).
 
-Start locally with a pinned Docker image, health checks, local-only access and persistent storage. Verify the actual data directory in the selected image and prove persistence by restarting the container. The setup docs and MCP repository examples contain differing volume-path guidance; copying a sample volume mapping is insufficient. [Docker guide](https://docs.falkordb.com/operations/docker), [MCP repository](https://github.com/FalkorDB/FalkorDB-MCPServer).
+Start locally with a pinned Docker image, health checks, local-only access and persistent storage. Before any pull/build, verify Docker Desktop's host engine disk under `E:\FalcorDB Hackathon\.local\docker`; also keep runtime/package caches/temp and application state in the workspace. Verify the actual data directory in the selected image and prove persistence by restarting the container. The setup docs and MCP repository examples contain differing volume-path guidance; copying a sample volume mapping is insufficient. [Workspace policy](workspace_setup.md), [Docker guide](https://docs.falkordb.com/operations/docker), [MCP repository](https://github.com/FalkorDB/FalkorDB-MCPServer).
 
 Apply [Phase 1 per-projection durability](phase_01_graph_and_fixtures.md#snapshot-consistency) and [graph publication](graph_publication.md) to direct/MCP/SDK reads and fallback. Record write durability and test interrupted owner-specific rebuilds across restart. Old markers cannot authorize dirty records. Declare template projections and complete read-set fingerprints; unrelated incident batches must not invalidate structural-only or equivalent answer inputs. Record fixed event cadence, delta time, backlog/freshness and blocked-read fraction with actual query receipts.
 
@@ -180,9 +182,10 @@ Reuse the [existing phases](README.md), not a second full implementation schedul
 
 | Phase | Resource work | Completion evidence |
 | --- | --- | --- |
-| 0 | Pin Python client/server; persistent local runtime; optional hosted target | Actual compatibility/configuration record and restart proof. |
+| 0 | Verify workspace storage before downloads; pin Python client/server; persistent local runtime | Actual storage/compatibility/configuration record and restart proof; no external login. |
 | 1 | Canonical graph, durable import/recovery, approved templates, ID indexes, Browser inspection | Repeatable seed, interrupted-import restart evidence and expected query results. |
-| 2 | Live Plane/Google Docs reads, supported exports, event receipt and versioned facts | Actual live adapter citations, retry/deduplication and historical-state evidence. |
+| 2 | Complete Plane/Google Docs/GitHub adapters with mocked transports; local imports, event receipt and versioned facts | Offline adapter/local import, retry/deduplication and historical-state evidence; live checks recorded deferred. |
+| After 2 implementation | Provider credential/OAuth onboarding and real read/refresh checks; optional hosted target when needed | Actual live adapter citations and compatibility results, recorded separately from implementation. |
 | 3 | Bounded neighbor reads, incident-time impact queries, constrained MCP gateway | Real MCP read trace and multi-path coverage. |
 | 4 | One accessible decision-model provider and fair navigator comparison | Measured selections, abstention and cost. |
 | 5 | Evidence bundle and real answer LLM; optional SDK experiment | Valid source citations and reported omissions. |

@@ -1,7 +1,7 @@
 {
   "tenant_id": "demo",
   "source_instance": "demo:codex:local:fixture",
-  "parser_version": "1.0.0",
+  "parser_version": "1.0.1",
   "redaction_version": "1.0.0",
   "dialect": "codex-fixture-dialect",
   "dialect_version": "1.0",

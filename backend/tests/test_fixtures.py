@@ -5,6 +5,8 @@ SHAs), scenario uniqueness."""
 from __future__ import annotations
 
 import json
+import shutil
+from pathlib import Path
 
 import pytest
 
@@ -93,6 +95,111 @@ def test_conversation_fixture_has_no_real_secrets():
         lowered = text.lower()
         for forbidden in ("api_key", "authorization:", "bearer ", "password"):
             assert forbidden not in lowered, f"{name} must not contain {forbidden!r}"
+
+
+@pytest.fixture
+def conversation_builder(tmp_path, monkeypatch, fixtures_root):
+    from app.fixtures import build
+
+    inputs = tmp_path / "fixtures"
+    shutil.copytree(fixtures_root / "conversations", inputs / "conversations")
+    monkeypatch.setattr(build, "FIXTURES_ROOT", inputs)
+    monkeypatch.setattr(build, "WORKSPACE_ROOT", tmp_path / "workspace")
+    return build
+
+
+def test_cli_event_messages_match_normalization_expectations(conversation_builder):
+    bundle = conversation_builder.build_conversation_bundle()
+    messages = [n for n in bundle["nodes"] if n["label"] == "Message"
+                and n["conversation_id"] == "demo:codex:cli_events"]
+    expected = conversation_builder.load_fixture("conversations", "expected.json")
+    assertions = [m for m in expected["expected_messages"] if m["source_key"] == "cli_events"]
+    assert len(messages) == len(assertions) == 2
+    assert [m["native_id"] for m in messages] == ["e2", "e4"]
+    capture = json.loads(Path(messages[0]["content_reference"]).read_text(encoding="utf-8"))
+    assert capture["coverage"] == "COMPLETE"
+    assert len(capture["messages"]) == 2
+    for message, captured, assertion in zip(messages, capture["messages"], assertions):
+        assert message["source_ordinal"] == assertion["ordinal"]
+        assert message["role"] == assertion["role"]
+        assert message["origin"] == assertion["origin"]
+        assert assertion["content_contains"] in captured["content"]
+        assert message["source_timestamp"] == captured["source_timestamp"]
+    source_records = [json.loads(line) for line in (
+        conversation_builder.FIXTURES_ROOT / "conversations" / "cli_events.jsonl"
+    ).read_text(encoding="utf-8").splitlines()]
+    timestamps = {r.get("id"): r.get("timestamp") for r in source_records}
+    assert all(m["source_timestamp"] == timestamps[m["native_id"]] for m in messages)
+    assert len([e for e in bundle["edges"] if e["type"] == "HAS_MESSAGE"
+                and e["start_id"] == "demo:codex:cli_events"]) == 2
+    assert any(e["type"] == "NEXT_MESSAGE" and e["start_id"] == messages[0]["id"]
+               and e["end_id"] == messages[1]["id"] for e in bundle["edges"])
+    assert conversation_builder.build_conversation_bundle() == bundle
+
+
+def test_cli_filters_nonvisible_events_and_preserves_repeated_utterances(conversation_builder):
+    path = conversation_builder.FIXTURES_ROOT / "conversations" / "cli_events.jsonl"
+    records = [
+        {"type": "event", "event": "agent.message.completed", "role": "system", "content": "private"},
+        {"type": "event", "event": "agent.message.completed", "role": "developer", "content": "private"},
+        {"type": "event", "event": "item.completed", "role": "assistant", "content": "reasoning"},
+        {"type": "event", "event": "turn.completed", "role": "assistant", "content": "echo", "echo_of": "e2"},
+        {"type": "event", "event": "agent.message.completed", "role": "user", "id": "repeat-1", "content": "Repeated"},
+        {"type": "event", "event": "agent.message.completed", "role": "user", "id": "repeat-2", "content": "Repeated"},
+    ]
+    with path.open("a", encoding="utf-8") as handle:
+        for record in records:
+            handle.write(json.dumps(record) + "\n")
+    bundle = conversation_builder.build_conversation_bundle()
+    messages = [n for n in bundle["nodes"] if n["label"] == "Message"
+                and n["conversation_id"] == "demo:codex:cli_events"]
+    assert [m["native_id"] for m in messages] == ["e2", "e4", "repeat-1", "repeat-2"]
+    first, second = messages[-2:]
+    assert first["id"] != second["id"]
+    assert first["content_hash"] == second["content_hash"]
+    assert first["source_timestamp"] is second["source_timestamp"] is None
+
+
+def test_corrected_parser_preserves_previous_immutable_capture(conversation_builder):
+    from app.storage.conversation_captures import ConversationCaptureStore
+
+    store = ConversationCaptureStore(
+        conversation_builder.WORKSPACE_ROOT / ".local/state/conversations",
+        conversation_builder.WORKSPACE_ROOT / ".local/state/retained",
+    )
+    previous = store.write_capture(
+        "capture-cli_events-1", "cli_events", 1, [], "1.0.0", "1.0.0", "COMPLETE", [""],
+    )
+    previous_path = Path(previous["content_reference"])
+    previous_bytes = previous_path.read_bytes()
+    bundle = conversation_builder.build_conversation_bundle()
+    message = next(n for n in bundle["nodes"] if n["label"] == "Message"
+                   and n["conversation_id"] == "demo:codex:cli_events")
+    assert message["capture_id"] != previous["capture_id"]
+    assert previous_path.read_bytes() == previous_bytes
+    current = json.loads(Path(message["content_reference"]).read_text(encoding="utf-8"))
+    assert current["parser_version"] == "1.0.1"
+    assert len(current["messages"]) == 2
+
+
+def test_corrected_seed_allocates_a_new_immutable_bundle(conversation_builder, tmp_path, fixtures_root):
+    from app.graph.import_state import BundleStore
+    from scripts import seed_graph
+
+    for scope in ("payments", "tls"):
+        shutil.copytree(fixtures_root / scope, conversation_builder.FIXTURES_ROOT / scope)
+    store = BundleStore(tmp_path / "bundles")
+    previous = {
+        "projection_id": "STRUCTURAL", "bundle_id": "bundle-structural-snap-structural-003",
+        "snapshot_id": "snap-structural-003", "nodes": [], "edges": [],
+    }
+    previous_hash = store.persist(previous)
+    corrected = seed_graph.merge_structural_bundles()
+    assert corrected["snapshot_id"] != previous["snapshot_id"]
+    assert corrected["bundle_id"] != previous["bundle_id"]
+    current_hash = store.persist(corrected)
+    assert store.persist(corrected) == current_hash
+    assert store.persist(previous) == previous_hash
 
 
 def test_review_manifest_supersession_is_acyclic():

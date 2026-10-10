@@ -1,5 +1,6 @@
 // Durable per-projection ImportState readback (control metadata; not domain
-// data). Missing record => UNINITIALIZED handled by the caller.
+// data). Missing record => UNINITIALIZED handled by the caller. Coverage
+// carries the declared source-scope completeness of the published bundle.
 MATCH (c:ImportControl {graph_name: $graph_name, projection_id: $projection_id})
 RETURN c.state AS state, c.generation AS generation,
        c.active_snapshot_id AS active_snapshot_id,
@@ -7,5 +8,6 @@ RETURN c.state AS state, c.generation AS generation,
        c.pending_bundle_hash AS pending_bundle_hash,
        c.last_published_at AS last_published_at,
        c.updated_at AS updated_at,
-       c.last_failure AS last_failure
+       c.last_failure AS last_failure,
+       c.coverage AS coverage
 LIMIT 2

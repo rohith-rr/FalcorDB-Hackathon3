@@ -11,7 +11,7 @@ from app.contracts.conversations import ConversationMention, DesignDecisionRecor
 from app.contracts.decision import BranchDecision, BranchDecisionStatus, ProposedCommand
 from app.contracts.import_state import EventBatchPolicy, ImportState, ImportStateCode
 from app.contracts.query import ClarificationSelection, Intent, QueryRequest
-from app.core.ids import UnscopedIdError, parse_scoped_id
+from app.core.ids import UnscopedIdError, is_scoped_id, parse_scoped_id, tenant_of
 
 
 def test_query_request_accepts_scoped_ids():
@@ -24,9 +24,14 @@ def test_query_request_accepts_scoped_ids():
     assert Intent.BRANCH_BASE.value == "BRANCH_BASE"
 
 
-def test_query_request_rejects_unscoped_ids():
+@pytest.mark.parametrize("value", ["PAY-103", "demo:PAY-103", "demo::payments", "demo:jira:"])
+@pytest.mark.parametrize("field", [
+    "project_id", "repository_id", "task_id", "incident_id", "service_id",
+    "service_instance_id", "conversation_id", "design_decision_id",
+])
+def test_query_request_rejects_unscoped_ids(value, field):
     with pytest.raises(ValidationError, match="not a scoped application ID"):
-        QueryRequest(question="q", task_id="PAY-103")
+        QueryRequest(question="q", **{field: value})
 
 
 def test_clarification_selection_requires_exactly_one_field():
@@ -164,9 +169,44 @@ def test_mention_semantic_candidates_stay_candidates():
     assert mention.resolution is MentionResolution.EXACT
 
 
+def test_context_bundle_is_fully_defined():
+    """The shared foundation contract must be instantiable: its referenced
+    model types resolve at import time, so even a minimal bundle builds and
+    its schema can be generated (no PydanticUserError for undefined types)."""
+    from app.contracts.conversations import ContextBundle
+
+    bundle = ContextBundle(request_id="req-1")
+    assert bundle.facts == []
+    assert bundle.evidence_items == []
+    schema = ContextBundle.model_json_schema()
+    assert "facts" in schema["properties"]
+    assert "evidence_items" in schema["properties"]
+
+
 def test_parse_scoped_id():
     assert parse_scoped_id("demo:github:payments:901:pr:17") == "demo:github:payments:901:pr:17"
     with pytest.raises(UnscopedIdError):
         parse_scoped_id("main")
     with pytest.raises(UnscopedIdError):
         parse_scoped_id("demo::branch")
+
+
+@pytest.mark.parametrize("value", [
+    "demo", "demo:PAY-103", "demo::payments", "demo:jira:",
+    "demo:jira:payments:", "demo:jira:payments\n", "demo:jira:payment scope", None,
+])
+def test_scoped_id_requires_three_nonempty_components(value):
+    assert not is_scoped_id(value)
+    assert tenant_of(value) is None
+    with pytest.raises(UnscopedIdError):
+        parse_scoped_id(value)
+
+
+@pytest.mark.parametrize("value", [
+    "demo:jira:payments", "demo:jira:payments:PAY-103",
+    "demo:github:123:branch:feature/backend-service",
+])
+def test_scoped_id_accepts_scope_and_optional_details(value):
+    assert is_scoped_id(value)
+    assert parse_scoped_id(value) == value
+    assert tenant_of(value) == "demo"

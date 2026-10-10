@@ -6,6 +6,7 @@ import json
 import socket
 import sys
 from pathlib import Path
+from uuid import uuid4
 
 WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
 BACKEND_ROOT = WORKSPACE_ROOT / "backend"
@@ -59,3 +60,24 @@ def db_available() -> bool:
 requires_db = pytest.mark.skipif(
     not falkordb_available(), reason="FalkorDB not reachable on 127.0.0.1:6379 (docker compose up)"
 )
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _isolated_graph_and_bundles(tmp_path_factory):
+    """Give each test session its own graph and retained recovery bundles.
+
+    Durable import controls reference bundles_root, so both settings must be
+    isolated together to preserve application recovery state. Unique graph
+    names prevent sessions from inheriting DIRTY projections whose bundles
+    belong to another temporary directory.
+    """
+    from app.config import get_settings
+
+    settings = get_settings()
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(
+            settings, "falkordb_graph_name",
+            f"{settings.falkordb_graph_name}_test_{uuid4().hex}",
+        )
+        patch.setattr(settings, "bundles_root", tmp_path_factory.mktemp("test-bundles"))
+        yield settings

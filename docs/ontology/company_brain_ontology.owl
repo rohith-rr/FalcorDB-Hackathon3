@@ -1,0 +1,2240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rdf:RDF [
+<!ENTITY cb "https://company-brain.example/ontology#">
+<!ENTITY xsd "http://www.w3.org/2001/XMLSchema#">
+]>
+<rdf:RDF xmlns="&cb;"
+     xml:base="https://company-brain.example/ontology"
+     xmlns:cb="&cb;"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+
+    <!-- ================================================================== -->
+    <!-- ONTOLOGY HEADER                                                    -->
+    <!-- ================================================================== -->
+
+    <owl:Ontology rdf:about="https://company-brain.example/ontology">
+        <rdfs:label xml:lang="en">Company Brain Knowledge Graph Ontology</rdfs:label>
+        <rdfs:comment xml:lang="en">OWL rendering of the Company Brain knowledge graph schema (FalkorDB property graph) for viewing in Protégé.
+
+Node labels are modeled as owl:Class; graph edge (relationship) types are modeled as owl:ObjectProperty with domain/range matching the allowed (source label, edge type, destination label) triples; node/edge fields are modeled as owl:DatatypeProperty.
+
+Sources (in this repository):
+- docs/design/graph_schema.md ................ canonical schema v1 (STRUCTURAL projection) - implemented
+- docs/design/sre_graph_schema.md ............ proposed SRE extension (INCIDENT projection)
+- docs/design/codex_conversations.md ......... proposed Codex conversation extension (Conversation/Message/DesignDecision; implemented as schema labels)
+- docs/design/graph_publication.md ........... projection ownership and publication protocol
+- backend/app/graph/schema.py ............... machine-validated labels, edge endpoints and required fields (SCHEMA_VERSION 1.0.0)
+- backend/app/graph/projection_ownership.py . STRUCTURAL/INCIDENT label and edge ownership (Phase 0 foundation subset)
+
+Implementation status is noted per entity. The graph keeps two logical projections in one FalkorDB graph: STRUCTURAL (catalog facts) and INCIDENT (alerts, deployments, runtime observations, actions). Every node and edge carries tenant-scoped application IDs and provenance fields (see datatype properties below). Edges are records in their own right (id, tenant_id, projection_owner, source_record_ref, snapshot_id, observed_at, link_method, authority, is_deleted) modeled here as the class GraphRelationship.
+
+A property marked (proposed) is specified in the design docs but not yet enforced by backend/app/graph/schema.py; names marked (Phase 0) are the implemented foundation-subset aliases in projection_ownership.py.</rdfs:comment>
+        <rdfs:seeAlso rdf:resource="docs/design/graph_schema.md"/>
+        <rdfs:seeAlso rdf:resource="docs/design/sre_graph_schema.md"/>
+        <rdfs:seeAlso rdf:resource="docs/design/codex_conversations.md"/>
+        <rdfs:seeAlso rdf:resource="backend/app/graph/schema.py"/>
+        <rdfs:seeAlso rdf:resource="backend/app/graph/projection_ownership.py"/>
+        <owl:versionInfo rdf:datatype="&xsd;string">1.0.0 (mirrors backend/app/graph/schema.py SCHEMA_VERSION)</owl:versionInfo>
+    </owl:Ontology>
+
+    <!-- ================================================================== -->
+    <!-- CLASSES: ROOT                                                      -->
+    <!-- ================================================================== -->
+
+    <owl:Class rdf:about="#GraphEntity">
+        <rdfs:label xml:lang="en">Graph entity</rdfs:label>
+        <rdfs:comment xml:lang="en">Root of every node label in the Company Brain knowledge graph. Every node carries the common provenance properties: id (tenant-scoped application ID, never the FalkorDB internal numeric ID), tenant_id, immutable projection_owner (STRUCTURAL or INCIDENT), source_system, source_record_ref, optional source_url, source_updated_at, observed_at, ingested_at, owning snapshot_id, schema_version and is_deleted (tombstone flag). Nodes and edges cannot cross tenants.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="#GraphRelationship">
+        <rdfs:label xml:lang="en">Graph relationship (edge record)</rdfs:label>
+        <rdfs:comment xml:lang="en">In the property graph every edge is itself a record with identity and provenance: id, tenant_id, projection_owner, source_record_ref, snapshot_id, observed_at, link_method (API, MANIFEST, PARSED_EXPLICIT_REFERENCE, INFERRED), authority (CONFIRMED, CANDIDATE) and is_deleted. Runtime relations additionally carry valid_from, nullable valid_to, recorded_at, time_accuracy, scope and completeness, kept separate from ingestion time. Active traversal excludes tombstones and CANDIDATE edges. This class holds those edge-level fields; the edge topology itself is expressed by the object properties (HAS_TASK, DEPENDS_ON, ...).</rdfs:comment>
+    </owl:Class>
+
+    <!-- ================================================================== -->
+    <!-- CLASSES: STRUCTURAL PROJECTION                                     -->
+    <!-- ================================================================== -->
+
+    <owl:Class rdf:about="#StructuralEntity">
+        <rdfs:label xml:lang="en">Structural entity</rdfs:label>
+        <rdfs:comment xml:lang="en">Nodes owned by the STRUCTURAL projection: tasks, epics, repositories, branches, commits, reviews, document references, conversations/messages/decisions and verified mappings. Structural rebuilds preserve incident-owned records.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#GraphEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Epic">
+        <rdfs:label xml:lang="en">Epic</rdfs:label>
+        <rdfs:comment xml:lang="en">Project-level grouping of work items. Required: project_id, external_key, title, status (normalized), raw_status. Epic progress uses distinct non-cancelled leaf work items under a confirmed hierarchy.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#StructuralEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Task">
+        <rdfs:label xml:lang="en">Task</rdfs:label>
+        <rdfs:comment xml:lang="en">Tracker work item. work_item_type: STORY, TASK or SUBTASK; status normalized to TODO, IN_PROGRESS, BLOCKED, DONE, CANCELLED, UNKNOWN (raw provider status preserved). assignee_ids: null means retrieval unknown, [] means known unassigned. repository_ids are explicit task-to-repository bindings; a process-only task may have none.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#StructuralEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Repository">
+        <rdfs:label xml:lang="en">Repository</rdfs:label>
+        <rdfs:comment xml:lang="en">Source code repository. Required: provider_id, owner_name, clone_url, configured stable_ref, default_ref. Identity example: demo:github:repository:123.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#StructuralEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Branch">
+        <rdfs:label xml:lang="en">Branch</rdfs:label>
+        <rdfs:comment xml:lang="en">Observed repository ref. Identity includes its repository and the exact case-sensitive ref. Required: repository_id, ref, head_sha (full 40-char SHA), exists, is_protected.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#StructuralEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#PullRequest">
+        <rdfs:label xml:lang="en">Pull request</rdfs:label>
+        <rdfs:comment xml:lang="en">Required: repository_id, number, title, state (OPEN or CLOSED), draft, merged_at, merge_commit_sha, head_repository_id, base_ref, head_sha, base_sha. GitHub CLOSED is not synonymous with merged; merged presentation derives from authoritative merge fields. Fork PRs retain separate head/base repository identities.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#StructuralEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Review">
+        <rdfs:label xml:lang="en">Review</rdfs:label>
+        <rdfs:comment xml:lang="en">Individual PR review with provider-native review ID. Required: reviewer_id, state, submitted_at, commit_sha (reviewed revision), bounded body/content reference, dismissal metadata when available. Retains state and the revision that was reviewed.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#StructuralEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Commit">
+        <rdfs:label xml:lang="en">Commit</rdfs:label>
+        <rdfs:comment xml:lang="en">Required: repository_id, sha (full 40-char), message, committed_at, history_complete. Imported ancestry is bounded; the live verification adapter is authoritative when graph history is incomplete.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#StructuralEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#TaskWorkPeriod">
+        <rdfs:label xml:lang="en">Task work period</rdfs:label>
+        <rdfs:comment xml:lang="en">Intersection of assignment and in-progress intervals for one assignee. Required: task_id, assignee_id, valid_from, time_accuracy (EVENT or OBSERVED_BOUND), coverage. Unknown intervals cannot be treated as complete.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#StructuralEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#RevisionEffect">
+        <rdfs:label xml:lang="en">Revision effect</rdfs:label>
+        <rdfs:comment xml:lang="en">A revert or reapplication event over a delivery group. Required: repository_id, delivery_id, effect_kind (REVERT or REAPPLICATION), effect_commit_sha, nonempty affected_revision_shas, coverage (COMPLETE, PARTIAL, UNKNOWN), authority, mapping_version. Carries the subtype label REVERT or REAPPLICATION matching effect_kind (modeled here as subclasses).</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#StructuralEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#REVERT">
+        <rdfs:label xml:lang="en">REVERT (RevisionEffect subtype)</rdfs:label>
+        <rdfs:comment xml:lang="en">RevisionEffect with effect_kind = REVERT. A revert vetoes every historical alternative in its delivery group until explicitly resolved by a confirmed complete reapplication.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#RevisionEffect"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#REAPPLICATION">
+        <rdfs:label xml:lang="en">REAPPLICATION (RevisionEffect subtype)</rdfs:label>
+        <rdfs:comment xml:lang="en">RevisionEffect with effect_kind = REAPPLICATION. Requires nonempty RESOLVES_REVERT references to REVERT effects of the same delivery and repository; resolution must be CONFIRMED.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#RevisionEffect"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Document">
+        <rdfs:label xml:lang="en">Document</rdfs:label>
+        <rdfs:comment xml:lang="en">Document reference (content bytes live in local content storage; the graph stores references). Required: title, version, content_hash, content_path, doc_status (CURRENT, SUPERSEDED, DRAFT), access_scope, document_role. Document identity is stable across versions; version/content hash stored separately. Subtypes: DesignDoc, ProcessDoc (runbooks use document_role = RUNBOOK), Postmortem (proposed).</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#StructuralEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#DesignDoc">
+        <rdfs:label xml:lang="en">Design document</rdfs:label>
+        <rdfs:comment xml:lang="en">Document subtype that SPECIFIES architectural requirements for tasks.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#Document"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ProcessDoc">
+        <rdfs:label xml:lang="en">Process document</rdfs:label>
+        <rdfs:comment xml:lang="en">Document subtype that GOVERNS_PROCESS operational instructions for tasks. Runbooks are ProcessDocs with document_role = RUNBOOK.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#Document"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Postmortem">
+        <rdfs:label xml:lang="en">Postmortem (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Document subtype for post-incident reports (document_role = POSTMORTEM); DESCRIBES an Incident. Retains reviewed/draft status. Proposed in docs/design/sre_graph_schema.md.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#Document"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#CheckRun">
+        <rdfs:label xml:lang="en">Check run</rdfs:label>
+        <rdfs:comment xml:lang="en">CI check result for a specific revision. Fields: provider_id, repository_id, sha, name, status, conclusion, completed_at.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#StructuralEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Conversation">
+        <rdfs:label xml:lang="en">Conversation</rdfs:label>
+        <rdfs:comment xml:lang="en">Imported Codex conversation. Required: source_key, source_epoch, parser_version, redaction_version; explicitly bound project/repository IDs (IN_REPOSITORY via import manifest; no inferred code ownership), coverage and access scope. Conversation nodes and their relationships belong to STRUCTURAL.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#StructuralEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Message">
+        <rdfs:label xml:lang="en">Message</rdfs:label>
+        <rdfs:comment xml:lang="en">Verified conversational message. Required: conversation_id, sequence, role (USER or ASSISTANT), origin (HUMAN_INPUT, ASSISTANT_VISIBLE, INJECTED_CONTEXT, UNKNOWN), content_hash, capture_id. Logical IDs stay stable across append; content/capture hashes are separate version fields. Repeated utterances are not merged or counted as independent support.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#StructuralEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#DesignDecision">
+        <rdfs:label xml:lang="en">Design decision</rdfs:label>
+        <rdfs:comment xml:lang="en">Extracted/recorded decision with exact revision. Required: revision_hash, title, status (PROPOSED, ACCEPTED, REJECTED, SUPERSEDED). A model may propose, but only an authorized operator review manifest sets ACCEPTED/REJECTED/SUPERSEDED. SUPPORTED_BY message IDs are the evidence; APPLIES_TO scopes it. SUPERSEDES is acyclic within a tenant.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#StructuralEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ImportControl">
+        <rdfs:label xml:lang="en">Import control</rdfs:label>
+        <rdfs:comment xml:lang="en">Per-projection control metadata (ImportState: DIRTY/READY publication gates, generation, active snapshot), reserved outside domain traversal/deletion. Control metadata, not domain data.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#StructuralEntity"/>
+    </owl:Class>
+
+    <!-- ================================================================== -->
+    <!-- CLASSES: INCIDENT PROJECTION                                      -->
+    <!-- ================================================================== -->
+
+    <owl:Class rdf:about="#IncidentEntity">
+        <rdfs:label xml:lang="en">Incident entity</rdfs:label>
+        <rdfs:comment xml:lang="en">Nodes owned by the INCIDENT projection: alerts, incident lifecycle, deployments, artifacts, service/instance identities, employees, on-call assignments, runtime observations and projected action records. Incident-origin links retain their owner even when their endpoint is a structural commit, employee, task or service.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#GraphEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Alert">
+        <rdfs:label xml:lang="en">Alert</rdfs:label>
+        <rdfs:comment xml:lang="en">Monitoring provider event. Fields: provider_id, event_id, deduplication_key (deduplication identity), signature, occurred_at, received_at, severity (CRITICAL, HIGH, MEDIUM, LOW), raw_state, sanitized payload_reference, service-resolution status.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Incident">
+        <rdfs:label xml:lang="en">Incident</rdfs:label>
+        <rdfs:comment xml:lang="en">Investigation episode. Fields: episode_id, lifecycle_state (OPEN, ACKNOWLEDGED, MITIGATED, MONITORING, RESOLVED), opened/acknowledged/mitigated/resolved times when known, source owner, assigned roles, severity policy version.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Service">
+        <rdfs:label xml:lang="en">Service</rdfs:label>
+        <rdfs:comment xml:lang="en">Application or dependency. Fields: catalog_id, name, service_kind (APPLICATION, DATABASE, QUEUE, EXTERNAL), repository bindings, ownership source, applicability scope. A microservice is a service, not a separate identity; do not merge services by display name across accounts/environments.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ServiceInstance">
+        <rdfs:label xml:lang="en">Service instance</rdfs:label>
+        <rdfs:comment xml:lang="en">Logical workload of a service in one operating location. Fields: workload_id, service_id, provider account/cluster/namespace, environment, region, catalog identity state. Current runtime state/version comes from incident observations/deployments, not static instance fields.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Deployment">
+        <rdfs:label xml:lang="en">Deployment</rdfs:label>
+        <rdfs:comment xml:lang="en">Rollout record. Fields: deployment_id, started_at, completed_at, outcome, target instance, change reference, rollback-history availability, validity interval and known served fraction on the DEPLOYED_TO edge. Keep both old/new deployments during partial rollouts.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Artifact">
+        <rdfs:label xml:lang="en">Artifact</rdfs:label>
+        <rdfs:comment xml:lang="en">Immutable deployed package/image. Fields: artifact_id/digest, build provenance reference, build revisions, provenance completeness. BUILT_FROM commit(s) may span several repositories.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Employee">
+        <rdfs:label xml:lang="en">Employee</rdfs:label>
+        <rdfs:comment xml:lang="en">Verified company identity. Fields: directory_id, provider identity mappings, access scope. No guessed email-to-user matching; verified authorship/assignment/reviewer edges only.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#OnCallAssignment">
+        <rdfs:label xml:lang="en">On-call assignment</rdfs:label>
+        <rdfs:comment xml:lang="en">Effective on-call record. Fields: assignment_id, service/escalation level, person, effective start/end, override source, retrieved time. Query on-call at the proposed notification time.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#CustomerObservation">
+        <rdfs:label xml:lang="en">Customer observation (Phase 0)</rdfs:label>
+        <rdfs:comment xml:lang="en">Implemented Phase 0 foundation-subset label for customer-scoped runtime observations. The proposed SRE schema (sre_graph_schema.md) models this as Customer USES ProductFeature SERVED_BY ServiceInstance plus Observation FOR_CUSTOMER Customer.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ActionRecord">
+        <rdfs:label xml:lang="en">Action record (Phase 0)</rdfs:label>
+        <rdfs:comment xml:lang="en">Implemented Phase 0 foundation-subset label for projected action records. The proposed SRE schema models this as ActionPlan (plan ID/version, exact target, expected/proposed state, prerequisites, approval status, expiry, outcome references) linked by Incident HAS_PLAN ActionPlan.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Change">
+        <rdfs:label xml:lang="en">Change (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Source change record. Fields: change_id, change_kind (CODE, CONFIG, SCHEMA, FEATURE_FLAG, INFRASTRUCTURE), effective time, bounded before/after references, affected scope. Proposed in sre_graph_schema.md.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Team">
+        <rdfs:label xml:lang="en">Team (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Directory team. Fields: directory_id, name, escalation/service ownership references. Proposed in sre_graph_schema.md.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ProductFeature">
+        <rdfs:label xml:lang="en">Product feature (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Customer-visible feature. Fields: stable feature_id, name, operation and routing/source reference. Proposed in sre_graph_schema.md.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Customer">
+        <rdfs:label xml:lang="en">Customer (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Customer organization. Fields: stable customer_id, authorized display_name, optional support_tier, usage-mapping source/coverage. An enterprise tier is a property, not a different identity. Customer counts carry permission/coverage limits. Proposed in sre_graph_schema.md.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Observation">
+        <rdfs:label xml:lang="en">Observation (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Bounded observation summary (kind, source, subject, measurement start/end, sample/coverage description, value or content reference). Bulk logs and metric series stay in their source systems; only bounded summaries and retrievable references are stored as graph nodes. Proposed in sre_graph_schema.md.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#IncidentEvent">
+        <rdfs:label xml:lang="en">Incident event (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Timeline/decision-history event. Fields: event_id, incident_id, event kind, actor/provider, occurred/recorded times, evidence references. Incident roles are versioned assignment records within IncidentEvent (employee ID, role, start/end, source) rather than permanent edges. Proposed in sre_graph_schema.md.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ActionPlan">
+        <rdfs:label xml:lang="en">Action plan (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Proposed/approved/completed action record. Fields: plan_id/version, kind, exact target, expected state, proposed state, prerequisites, approval status, expiry, outcome references. A cyclic or unknown action ordering blocks execution, not evidence retrieval. Incident decisions and approvals are explicit authored records, not generated facts. Proposed in sre_graph_schema.md.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="#IncidentEntity"/>
+    </owl:Class>
+
+    <!-- ================================================================== -->
+    <!-- DISJOINTNESS                                                       -->
+    <!-- ================================================================== -->
+
+    <owl:AllDisjointClasses>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="#StructuralEntity"/>
+            <rdf:Description rdf:about="#IncidentEntity"/>
+            <rdf:Description rdf:about="#GraphRelationship"/>
+        </owl:members>
+    </owl:AllDisjointClasses>
+
+    <owl:AllDisjointClasses>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="#Epic"/>
+            <rdf:Description rdf:about="#Task"/>
+            <rdf:Description rdf:about="#Repository"/>
+            <rdf:Description rdf:about="#Branch"/>
+            <rdf:Description rdf:about="#PullRequest"/>
+            <rdf:Description rdf:about="#Review"/>
+            <rdf:Description rdf:about="#Commit"/>
+            <rdf:Description rdf:about="#TaskWorkPeriod"/>
+            <rdf:Description rdf:about="#RevisionEffect"/>
+            <rdf:Description rdf:about="#Document"/>
+            <rdf:Description rdf:about="#CheckRun"/>
+            <rdf:Description rdf:about="#Conversation"/>
+            <rdf:Description rdf:about="#Message"/>
+            <rdf:Description rdf:about="#DesignDecision"/>
+            <rdf:Description rdf:about="#ImportControl"/>
+        </owl:members>
+    </owl:AllDisjointClasses>
+
+    <owl:AllDisjointClasses>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="#DesignDoc"/>
+            <rdf:Description rdf:about="#ProcessDoc"/>
+            <rdf:Description rdf:about="#Postmortem"/>
+            <rdf:Description rdf:about="#REVERT"/>
+            <rdf:Description rdf:about="#REAPPLICATION"/>
+        </owl:members>
+    </owl:AllDisjointClasses>
+
+    <owl:AllDisjointClasses>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="#Alert"/>
+            <rdf:Description rdf:about="#Incident"/>
+            <rdf:Description rdf:about="#Service"/>
+            <rdf:Description rdf:about="#ServiceInstance"/>
+            <rdf:Description rdf:about="#Deployment"/>
+            <rdf:Description rdf:about="#Artifact"/>
+            <rdf:Description rdf:about="#Employee"/>
+            <rdf:Description rdf:about="#OnCallAssignment"/>
+            <rdf:Description rdf:about="#CustomerObservation"/>
+            <rdf:Description rdf:about="#ActionRecord"/>
+            <rdf:Description rdf:about="#Change"/>
+            <rdf:Description rdf:about="#Team"/>
+            <rdf:Description rdf:about="#ProductFeature"/>
+            <rdf:Description rdf:about="#Customer"/>
+            <rdf:Description rdf:about="#Observation"/>
+            <rdf:Description rdf:about="#IncidentEvent"/>
+            <rdf:Description rdf:about="#ActionPlan"/>
+        </owl:members>
+    </owl:AllDisjointClasses>
+
+    <!-- ================================================================== -->
+    <!-- OBJECT PROPERTIES: GROUPERS                                        -->
+    <!-- ================================================================== -->
+
+    <owl:ObjectProperty rdf:about="#graphRelationship">
+        <rdfs:label xml:lang="en">graph relationship</rdfs:label>
+        <rdfs:comment xml:lang="en">Root grouping for all knowledge graph edge types.</rdfs:comment>
+        <rdfs:domain rdf:resource="#GraphEntity"/>
+        <rdfs:range rdf:resource="#GraphEntity"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#structuralRelationship">
+        <rdfs:label xml:lang="en">structural relationship</rdfs:label>
+        <rdfs:comment xml:lang="en">Edges owned by the STRUCTURAL projection (task/code/document catalog facts).</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#graphRelationship"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#incidentRelationship">
+        <rdfs:label xml:lang="en">incident relationship</rdfs:label>
+        <rdfs:comment xml:lang="en">Edges owned by the INCIDENT projection. Implemented Phase 0 foundation subset (backend/app/graph/projection_ownership.py INCIDENT_EDGE_TYPES): DEPLOYED_TO, DEPLOYS_ARTIFACT, DEPENDS_ON_RUNTIME, ASSIGNED_TO, OBSERVED_ON, ROUTE_TO, ALERT_FOR. The remaining edges below follow the proposed SRE schema (docs/design/sre_graph_schema.md).</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#graphRelationship"/>
+    </owl:ObjectProperty>
+
+    <!-- ================================================================== -->
+    <!-- OBJECT PROPERTIES: STRUCTURAL EDGES                                -->
+    <!-- ================================================================== -->
+
+    <owl:ObjectProperty rdf:about="#HAS_TASK">
+        <rdfs:label xml:lang="en">HAS_TASK</rdfs:label>
+        <rdfs:comment xml:lang="en">Epic child (Epic-&gt;Task) or story/task hierarchy (Task-&gt;Task).</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Epic"/>
+                    <rdf:Description rdf:about="#Task"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="#Task"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#DEPENDS_ON">
+        <rdfs:label xml:lang="en">DEPENDS_ON (task)</rdfs:label>
+        <rdfs:comment xml:lang="en">Source task needs destination task. Edge property dependency_kind: CODE (code-ready traversal) or PROCESS (visible in blockers). Unknown kinds prevent assuming a complete code plan. Runtime service dependency is a different edge (DEPENDS_ON_RUNTIME).</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#Task"/>
+        <rdfs:range rdf:resource="#Task"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#IMPLEMENTED_IN">
+        <rdfs:label xml:lang="en">IMPLEMENTED_IN</rdfs:label>
+        <rdfs:comment xml:lang="en">Planned/observed implementation branch. Descriptive association, not proof of completion. Inferred edges carry association_id, candidate/stable head SHAs, work-period/evidence IDs and model/identity/mapping versions with link_method=INFERRED and authority=CANDIDATE.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#Task"/>
+        <rdfs:range rdf:resource="#Branch"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#HAS_WORK_PERIOD">
+        <rdfs:label xml:lang="en">HAS_WORK_PERIOD</rdfs:label>
+        <rdfs:comment xml:lang="en">Task to its assignment/in-progress interval intersection for one assignee.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#Task"/>
+        <rdfs:range rdf:resource="#TaskWorkPeriod"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#IMPLEMENTED_BY">
+        <rdfs:label xml:lang="en">IMPLEMENTED_BY</rdfs:label>
+        <rdfs:comment xml:lang="en">Explicitly linked implementation change (Task-&gt;PullRequest). Canonical direction; source aliases such as PullRequest IMPLEMENTS Task normalize to this direction.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#Task"/>
+        <rdfs:range rdf:resource="#PullRequest"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#DELIVERED_BY">
+        <rdfs:label xml:lang="en">DELIVERED_BY</rdfs:label>
+        <rdfs:comment xml:lang="en">Confirmed required delivery revision (Task-&gt;Commit). Edge carries delivery_id, implementation_revision, role (IMPLEMENTATION or INTEGRATION), optional pr_id, optional equivalent_to_delivery_id and coverage (COMPLETE, PARTIAL, UNKNOWN). A task can require multiple delivery groups, all of which must be covered.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#Task"/>
+        <rdfs:range rdf:resource="#Commit"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#HAS_BRANCH">
+        <rdfs:label xml:lang="en">HAS_BRANCH</rdfs:label>
+        <rdfs:comment xml:lang="en">Repository ref.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#Repository"/>
+        <rdfs:range rdf:resource="#Branch"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#HEAD_AT">
+        <rdfs:label xml:lang="en">HEAD_AT</rdfs:label>
+        <rdfs:comment xml:lang="en">Observed current head; one active confirmed edge per branch.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#Branch"/>
+        <rdfs:range rdf:resource="#Commit"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#HAS_PR">
+        <rdfs:label xml:lang="en">HAS_PR</rdfs:label>
+        <rdfs:comment xml:lang="en">Source/head branch of a PR.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#Branch"/>
+        <rdfs:range rdf:resource="#PullRequest"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#TARGETS">
+        <rdfs:label xml:lang="en">TARGETS</rdfs:label>
+        <rdfs:comment xml:lang="en">Base ref in the base repository; one active confirmed target per PR.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#PullRequest"/>
+        <rdfs:range rdf:resource="#Branch"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#IN_REPOSITORY">
+        <rdfs:label xml:lang="en">IN_REPOSITORY</rdfs:label>
+        <rdfs:comment xml:lang="en">Repository owning the PR, or explicit import-manifest binding of a conversation (no inferred code ownership).</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#PullRequest"/>
+                    <rdf:Description rdf:about="#Conversation"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="#Repository"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#REVIEWS">
+        <rdfs:label xml:lang="en">REVIEWS</rdfs:label>
+        <rdfs:comment xml:lang="en">Individual review of a PR.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#Review"/>
+        <rdfs:range rdf:resource="#PullRequest"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#REVIEWED_COMMIT">
+        <rdfs:label xml:lang="en">REVIEWED_COMMIT</rdfs:label>
+        <rdfs:comment xml:lang="en">Version that was reviewed.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#Review"/>
+        <rdfs:range rdf:resource="#Commit"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#PARENT">
+        <rdfs:label xml:lang="en">PARENT</rdfs:label>
+        <rdfs:comment xml:lang="en">Immediate parent commit; bounded imported history.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#Commit"/>
+        <rdfs:range rdf:resource="#Commit"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#EFFECT_AT">
+        <rdfs:label xml:lang="en">EFFECT_AT</rdfs:label>
+        <rdfs:comment xml:lang="en">Commit whose effect is evaluated against each candidate head.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#RevisionEffect"/>
+        <rdfs:range rdf:resource="#Commit"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#AFFECTS_REVISION">
+        <rdfs:label xml:lang="en">AFFECTS_REVISION</rdfs:label>
+        <rdfs:comment xml:lang="en">Explicit implementation/integration revisions affected within the delivery group; must match the stored SHAs.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#RevisionEffect"/>
+        <rdfs:range rdf:resource="#Commit"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#RESOLVES_REVERT">
+        <rdfs:label xml:lang="en">RESOLVES_REVERT</rdfs:label>
+        <rdfs:comment xml:lang="en">Confirmed complete restoration of this specific revert: REAPPLICATION -&gt; REVERT, same delivery and repository, must be CONFIRMED.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#REAPPLICATION"/>
+        <rdfs:range rdf:resource="#REVERT"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#SPECIFIES">
+        <rdfs:label xml:lang="en">SPECIFIES</rdfs:label>
+        <rdfs:comment xml:lang="en">Architectural requirements for a task (DesignDoc, carrying the Document label).</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#DesignDoc"/>
+                    <rdf:Description rdf:about="#Document"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="#Task"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#GOVERNS_PROCESS">
+        <rdfs:label xml:lang="en">GOVERNS_PROCESS</rdfs:label>
+        <rdfs:comment xml:lang="en">Operational instructions for a task (ProcessDoc, carrying the Document label).</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#ProcessDoc"/>
+                    <rdf:Description rdf:about="#Document"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="#Task"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#CHECKS_COMMIT">
+        <rdfs:label xml:lang="en">CHECKS_COMMIT</rdfs:label>
+        <rdfs:comment xml:lang="en">Check result for a specific revision.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#CheckRun"/>
+        <rdfs:range rdf:resource="#Commit"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#HAS_MESSAGE">
+        <rdfs:label xml:lang="en">HAS_MESSAGE</rdfs:label>
+        <rdfs:comment xml:lang="en">Normalized eligible messages from a versioned sanitized capture.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#Conversation"/>
+        <rdfs:range rdf:resource="#Message"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#NEXT_MESSAGE">
+        <rdfs:label xml:lang="en">NEXT_MESSAGE</rdfs:label>
+        <rdfs:comment xml:lang="en">Optional verified order within one conversation; gaps retain coverage limitations.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#Message"/>
+        <rdfs:range rdf:resource="#Message"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#MENTIONS">
+        <rdfs:label xml:lang="en">MENTIONS</rdfs:label>
+        <rdfs:comment xml:lang="en">Scoped explicit reference from a message to a structural entity (task, repository, branch, PR, commit, document or design decision). CONFIRMED means the reference resolved within authorized manifest scope, never that the message claim is true. Semantic matches are INFERRED/CANDIDATE.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#Message"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Task"/>
+                    <rdf:Description rdf:about="#Repository"/>
+                    <rdf:Description rdf:about="#Branch"/>
+                    <rdf:Description rdf:about="#PullRequest"/>
+                    <rdf:Description rdf:about="#Commit"/>
+                    <rdf:Description rdf:about="#Document"/>
+                    <rdf:Description rdf:about="#DesignDecision"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#SUPPORTED_BY">
+        <rdfs:label xml:lang="en">SUPPORTED_BY</rdfs:label>
+        <rdfs:comment xml:lang="en">Exact message evidence for a decision's rationale and intent. CONFIRMED only means the cited message exists; the decision itself remains PROPOSED until reviewed.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#DesignDecision"/>
+        <rdfs:range rdf:resource="#Message"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#APPLIES_TO">
+        <rdfs:label xml:lang="en">APPLIES_TO</rdfs:label>
+        <rdfs:comment xml:lang="en">Reviewed scoped applicability to a structural entity; proposed links remain candidates. Cannot synthesize task dependencies, delivery mappings or incident facts.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#DesignDecision"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Task"/>
+                    <rdf:Description rdf:about="#Repository"/>
+                    <rdf:Description rdf:about="#Branch"/>
+                    <rdf:Description rdf:about="#PullRequest"/>
+                    <rdf:Description rdf:about="#Commit"/>
+                    <rdf:Description rdf:about="#Document"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#SUPERSEDES">
+        <rdfs:label xml:lang="en">SUPERSEDES</rdfs:label>
+        <rdfs:comment xml:lang="en">Reviewed replacement of an exact prior decision revision; acyclic, same tenant, no self-links.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#structuralRelationship"/>
+        <rdfs:domain rdf:resource="#DesignDecision"/>
+        <rdfs:range rdf:resource="#DesignDecision"/>
+    </owl:ObjectProperty>
+
+    <!-- ================================================================== -->
+    <!-- OBJECT PROPERTIES: INCIDENT EDGES                                  -->
+    <!-- ================================================================== -->
+
+    <owl:ObjectProperty rdf:about="#DEPLOYED_TO">
+        <rdfs:label xml:lang="en">DEPLOYED_TO</rdfs:label>
+        <rdfs:comment xml:lang="en">Rollout record to a service instance, including valid interval and known served fraction. Keep both old and new deployments during partial rollouts; reconstruct the workload at the alert time.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Deployment"/>
+        <rdfs:range rdf:resource="#ServiceInstance"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#DEPLOYS_ARTIFACT">
+        <rdfs:label xml:lang="en">DEPLOYS_ARTIFACT</rdfs:label>
+        <rdfs:comment xml:lang="en">Exact deployed package/image.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Deployment"/>
+        <rdfs:range rdf:resource="#Artifact"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#DEPENDS_ON_RUNTIME">
+        <rdfs:label xml:lang="en">DEPENDS_ON_RUNTIME (ServiceInstance DEPENDS_ON)</rdfs:label>
+        <rdfs:comment xml:lang="en">Caller service instance needs destination instance (includes required/optional/fallback behavior). Phase 0 foundation-subset name DEPENDS_ON_RUNTIME; the proposed SRE schema reuses the name DEPENDS_ON for this edge. Runtime call cycles are valid facts; use visited IDs and budgets for investigation. Direction is explicit: checkout depends on payments.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#ServiceInstance"/>
+        <rdfs:range rdf:resource="#ServiceInstance"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#ASSIGNED_TO">
+        <rdfs:label xml:lang="en">ASSIGNED_TO</rdfs:label>
+        <rdfs:comment xml:lang="en">Tracker assignment of a task to an employee; distinct from authorship.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Task"/>
+        <rdfs:range rdf:resource="#Employee"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#OBSERVED_ON">
+        <rdfs:label xml:lang="en">OBSERVED_ON</rdfs:label>
+        <rdfs:comment xml:lang="en">Location-specific alert signal when known, or runtime measurement/report subject (Observation) on a service instance.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Alert"/>
+                    <rdf:Description rdf:about="#Observation"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="#ServiceInstance"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#ROUTE_TO">
+        <rdfs:label xml:lang="en">ROUTE_TO (Phase 0 alias of SERVED_BY)</rdfs:label>
+        <rdfs:comment xml:lang="en">Phase 0 foundation-subset routing edge for customer feature routing to a service instance. The proposed SRE schema names this ProductFeature SERVED_BY ServiceInstance.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#ProductFeature"/>
+                    <rdf:Description rdf:about="#CustomerObservation"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="#ServiceInstance"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#ALERT_FOR">
+        <rdfs:label xml:lang="en">ALERT_FOR (Phase 0 grouping alias)</rdfs:label>
+        <rdfs:comment xml:lang="en">Phase 0 foundation-subset edge associating an alert with its resolved service, instance or incident episode. The proposed SRE schema splits this into Alert FIRED_ON Service, Alert OBSERVED_ON ServiceInstance and Alert PART_OF Incident (with grouping evidence).</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Alert"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Service"/>
+                    <rdf:Description rdf:about="#ServiceInstance"/>
+                    <rdf:Description rdf:about="#Incident"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#FIRED_ON">
+        <rdfs:label xml:lang="en">FIRED_ON (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Confirmed logical service identity for an alert.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Alert"/>
+        <rdfs:range rdf:resource="#Service"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#PART_OF">
+        <rdfs:label xml:lang="en">PART_OF (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Alert belongs to an investigation episode, with grouping evidence.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Alert"/>
+        <rdfs:range rdf:resource="#Incident"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#HAS_INSTANCE">
+        <rdfs:label xml:lang="en">HAS_INSTANCE (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Environment/region workload of a service.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Service"/>
+        <rdfs:range rdf:resource="#ServiceInstance"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#BUILT_FROM">
+        <rdfs:label xml:lang="en">BUILT_FROM (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Verified build revision of an artifact; may include several repositories.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Artifact"/>
+        <rdfs:range rdf:resource="#Commit"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#CONTAINS">
+        <rdfs:label xml:lang="en">CONTAINS (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Source-owned PR commit membership, not automatic squash equivalence.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#PullRequest"/>
+        <rdfs:range rdf:resource="#Commit"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#AUTHORED_BY">
+        <rdfs:label xml:lang="en">AUTHORED_BY (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Verified commit author mapping.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Commit"/>
+        <rdfs:range rdf:resource="#Employee"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#SUBMITTED_BY">
+        <rdfs:label xml:lang="en">SUBMITTED_BY (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Actual individual reviewer (a shorthand employee-to-PR edge cannot replace the review node).</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Review"/>
+        <rdfs:range rdf:resource="#Employee"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#OWNED_BY">
+        <rdfs:label xml:lang="en">OWNED_BY (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Catalog ownership of a service by a team.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Service"/>
+        <rdfs:range rdf:resource="#Team"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#MEMBER_OF">
+        <rdfs:label xml:lang="en">MEMBER_OF (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Directory membership of an employee in a team.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Employee"/>
+        <rdfs:range rdf:resource="#Team"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#COVERS">
+        <rdfs:label xml:lang="en">COVERS (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Service/escalation responsibility of an on-call assignment.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#OnCallAssignment"/>
+        <rdfs:range rdf:resource="#Service"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#ASSIGNS">
+        <rdfs:label xml:lang="en">ASSIGNS (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Effective responder assignment by an on-call record.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#OnCallAssignment"/>
+        <rdfs:range rdf:resource="#Employee"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#USES">
+        <rdfs:label xml:lang="en">USES (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Current usage/entitlement mapping from a customer to a product feature, with scope and coverage.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Customer"/>
+        <rdfs:range rdf:resource="#ProductFeature"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#SERVED_BY">
+        <rdfs:label xml:lang="en">SERVED_BY (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Feature routing to a service instance in the relevant environment/region.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#ProductFeature"/>
+        <rdfs:range rdf:resource="#ServiceInstance"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#FOR_CUSTOMER">
+        <rdfs:label xml:lang="en">FOR_CUSTOMER (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Known customer scope of an observation, only when the source records it.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Observation"/>
+        <rdfs:range rdf:resource="#Customer"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#AFFECTS">
+        <rdfs:label xml:lang="en">AFFECTS (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Effective runtime change scope of a change.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Change"/>
+        <rdfs:range rdf:resource="#ServiceInstance"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#LINKED_PR">
+        <rdfs:label xml:lang="en">LINKED_PR (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Optional explicit code/config change provenance.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Change"/>
+        <rdfs:range rdf:resource="#PullRequest"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#RUNBOOK_FOR">
+        <rdfs:label xml:lang="en">RUNBOOK_FOR (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Operating instructions (ProcessDoc with document_role = RUNBOOK) applicable to a service, with applicability/version.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#ProcessDoc"/>
+        <rdfs:range rdf:resource="#Service"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#HAS_EVENT">
+        <rdfs:label xml:lang="en">HAS_EVENT (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Incident timeline and decision history.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Incident"/>
+        <rdfs:range rdf:resource="#IncidentEvent"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#HAS_PLAN">
+        <rdfs:label xml:lang="en">HAS_PLAN (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Proposed/approved/completed action record of an incident.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Incident"/>
+        <rdfs:range rdf:resource="#ActionPlan"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#HAS_OBSERVATION">
+        <rdfs:label xml:lang="en">HAS_OBSERVATION (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Evidence collected during an investigation.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Incident"/>
+        <rdfs:range rdf:resource="#Observation"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#DESCRIBES">
+        <rdfs:label xml:lang="en">DESCRIBES (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Reviewed/draft post-incident analysis (Document with document_role = POSTMORTEM) of an incident.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Document"/>
+        <rdfs:range rdf:resource="#Incident"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#FOLLOWED_UP_BY">
+        <rdfs:label xml:lang="en">FOLLOWED_UP_BY (proposed)</rdfs:label>
+        <rdfs:comment xml:lang="en">Owned reliability work in the existing tracker.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="#incidentRelationship"/>
+        <rdfs:domain rdf:resource="#Incident"/>
+        <rdfs:range rdf:resource="#Task"/>
+    </owl:ObjectProperty>
+
+    <!-- ================================================================== -->
+    <!-- DATATYPE PROPERTIES: COMMON NODE PROVENANCE                        -->
+    <!-- ================================================================== -->
+
+    <owl:DatatypeProperty rdf:about="#id">
+        <rdfs:label xml:lang="en">id</rdfs:label>
+        <rdfs:comment xml:lang="en">Tenant-scoped application ID (namespaced by tenant, provider and native scope), never the FalkorDB internal numeric node ID. Examples: demo:jira:PAY:PAY-API, demo:github:123:pr:17, demo:git:123:commit:&lt;full-sha&gt;. Also present on every edge record.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#GraphEntity"/>
+                    <rdf:Description rdf:about="#GraphRelationship"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#tenant_id">
+        <rdfs:label xml:lang="en">tenant_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Tenant scope; nodes and edges cannot cross tenants.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#GraphEntity"/>
+                    <rdf:Description rdf:about="#GraphRelationship"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#projection_owner">
+        <rdfs:label xml:lang="en">projection_owner</rdfs:label>
+        <rdfs:comment xml:lang="en">Immutable ownership: STRUCTURAL or INCIDENT. Derived canonically from label/edge type; a STRUCTURAL bundle cannot carry an INCIDENT-owned record. Determines which projection rebuild may touch the record.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#GraphEntity"/>
+                    <rdf:Description rdf:about="#GraphRelationship"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#source_system">
+        <rdfs:label xml:lang="en">source_system</rdfs:label>
+        <rdfs:comment xml:lang="en">Originating system of the record (Plane, GitHub, Git, Google Docs, monitoring, ...).</rdfs:comment>
+        <rdfs:domain rdf:resource="#GraphEntity"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#source_record_ref">
+        <rdfs:label xml:lang="en">source_record_ref</rdfs:label>
+        <rdfs:comment xml:lang="en">Reference to the owning source record; also on edges.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#GraphEntity"/>
+                    <rdf:Description rdf:about="#GraphRelationship"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#source_url">
+        <rdfs:label xml:lang="en">source_url</rdfs:label>
+        <rdfs:comment xml:lang="en">Optional source URL, separate from any local content path.</rdfs:comment>
+        <rdfs:domain rdf:resource="#GraphEntity"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#source_updated_at">
+        <rdfs:label xml:lang="en">source_updated_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Optional source update time; a source without update times explicitly marks that time unavailable rather than fabricating observation time.</rdfs:comment>
+        <rdfs:domain rdf:resource="#GraphEntity"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#observed_at">
+        <rdfs:label xml:lang="en">observed_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Observation time (the repo fixtures use a fixed observation clock); also on edges.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#GraphEntity"/>
+                    <rdf:Description rdf:about="#GraphRelationship"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#ingested_at">
+        <rdfs:label xml:lang="en">ingested_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Ingestion time; separate from source update and observation times.</rdfs:comment>
+        <rdfs:domain rdf:resource="#GraphEntity"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#snapshot_id">
+        <rdfs:label xml:lang="en">snapshot_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Owning publication snapshot; also on edges.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#GraphEntity"/>
+                    <rdf:Description rdf:about="#GraphRelationship"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#schema_version">
+        <rdfs:label xml:lang="en">schema_version</rdfs:label>
+        <rdfs:comment xml:lang="en">Schema version of the record; must equal the validator's SCHEMA_VERSION (1.0.0).</rdfs:comment>
+        <rdfs:domain rdf:resource="#GraphEntity"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#is_deleted">
+        <rdfs:label xml:lang="en">is_deleted</rdfs:label>
+        <rdfs:comment xml:lang="en">Boolean tombstone flag on every node and edge; active traversal excludes tombstones (and CANDIDATE edges).</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#GraphEntity"/>
+                    <rdf:Description rdf:about="#GraphRelationship"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+
+    <!-- ================================================================== -->
+    <!-- DATATYPE PROPERTIES: COMMON EDGE (GraphRelationship) PROPERTIES    -->
+    <!-- ================================================================== -->
+
+    <owl:DatatypeProperty rdf:about="#link_method">
+        <rdfs:label xml:lang="en">link_method</rdfs:label>
+        <rdfs:comment xml:lang="en">How the link was established: API, MANIFEST, PARSED_EXPLICIT_REFERENCE or INFERRED.</rdfs:comment>
+        <rdfs:domain rdf:resource="#GraphRelationship"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#authority">
+        <rdfs:label xml:lang="en">authority</rdfs:label>
+        <rdfs:comment xml:lang="en">CONFIRMED or CANDIDATE. Active traversal excludes candidates; promotion requires source/operator evidence (the confirming record or operator identity is stored). Also a field of RevisionEffect nodes.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#GraphRelationship"/>
+                    <rdf:Description rdf:about="#RevisionEffect"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#dependency_kind">
+        <rdfs:label xml:lang="en">dependency_kind</rdfs:label>
+        <rdfs:comment xml:lang="en">Task DEPENDS_ON kind: CODE (code-ready traversal) or PROCESS (visible in blockers). Unknown kinds prevent assuming a complete code plan.</rdfs:comment>
+        <rdfs:domain rdf:resource="#GraphRelationship"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#coverage">
+        <rdfs:label xml:lang="en">coverage</rdfs:label>
+        <rdfs:comment xml:lang="en">COMPLETE, PARTIAL or UNKNOWN. Used by TaskWorkPeriod, RevisionEffect, DELIVERED_BY delivery mappings, Conversation and SRE runtime relations. Partial mappings cannot stand in for the complete thing; unknown stays unknown.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#GraphRelationship"/>
+                    <rdf:Description rdf:about="#TaskWorkPeriod"/>
+                    <rdf:Description rdf:about="#RevisionEffect"/>
+                    <rdf:Description rdf:about="#Conversation"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#valid_from">
+        <rdfs:label xml:lang="en">valid_from</rdfs:label>
+        <rdfs:comment xml:lang="en">Validity start for runtime relations/assignments (reconstruct the workload at the alert time) and for task work periods.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#GraphRelationship"/>
+                    <rdf:Description rdf:about="#TaskWorkPeriod"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#valid_to">
+        <rdfs:label xml:lang="en">valid_to</rdfs:label>
+        <rdfs:comment xml:lang="en">Nullable validity end; keep both old/new deployments during partial rollouts.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#GraphRelationship"/>
+                    <rdf:Description rdf:about="#TaskWorkPeriod"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#recorded_at">
+        <rdfs:label xml:lang="en">recorded_at</rdfs:label>
+        <rdfs:comment xml:lang="en">When a runtime relation/assignment was recorded; separate from ingestion time.</rdfs:comment>
+        <rdfs:domain rdf:resource="#GraphRelationship"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#time_accuracy">
+        <rdfs:label xml:lang="en">time_accuracy</rdfs:label>
+        <rdfs:comment xml:lang="en">EVENT or OBSERVED_BOUND; unknown intervals cannot be treated as complete. Used by TaskWorkPeriod and runtime relations.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#GraphRelationship"/>
+                    <rdf:Description rdf:about="#TaskWorkPeriod"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#delivery_id">
+        <rdfs:label xml:lang="en">delivery_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Delivery identity, scoped to task/repository; carried by DELIVERED_BY edges and RevisionEffect nodes.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#GraphRelationship"/>
+                    <rdf:Description rdf:about="#RevisionEffect"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#delivery_role">
+        <rdfs:label xml:lang="en">delivery_role</rdfs:label>
+        <rdfs:comment xml:lang="en">IMPLEMENTATION or INTEGRATION on a DELIVERED_BY edge. An integration revision is an alternative representation of the same delivery after squash/rebase, not an additional prerequisite.</rdfs:comment>
+        <rdfs:domain rdf:resource="#GraphRelationship"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#implementation_revision">
+        <rdfs:label xml:lang="en">implementation_revision</rdfs:label>
+        <rdfs:comment xml:lang="en">The mapped revision of a DELIVERED_BY delivery mapping.</rdfs:comment>
+        <rdfs:domain rdf:resource="#GraphRelationship"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#equivalent_to_delivery_id">
+        <rdfs:label xml:lang="en">equivalent_to_delivery_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Optional equivalence between delivery mappings.</rdfs:comment>
+        <rdfs:domain rdf:resource="#GraphRelationship"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <!-- ================================================================== -->
+    <!-- DATATYPE PROPERTIES: STRUCTURAL FIELDS                             -->
+    <!-- ================================================================== -->
+
+    <owl:DatatypeProperty rdf:about="#project_id">
+        <rdfs:label xml:lang="en">project_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Tracker project scope of an Epic or Task.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Epic"/>
+                    <rdf:Description rdf:about="#Task"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#external_key">
+        <rdfs:label xml:lang="en">external_key</rdfs:label>
+        <rdfs:comment xml:lang="en">Provider-native work item key (e.g. PAY-API). Source-native UUIDs, not display keys, establish Plane identities.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Epic"/>
+                    <rdf:Description rdf:about="#Task"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#title">
+        <rdfs:label xml:lang="en">title</rdfs:label>
+        <rdfs:comment xml:lang="en">Display title (Epic, Task, PullRequest, Conversation, Document, DesignDecision, ProductFeature, Service, Team, CheckRun name field is separate).</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Epic"/>
+                    <rdf:Description rdf:about="#Task"/>
+                    <rdf:Description rdf:about="#PullRequest"/>
+                    <rdf:Description rdf:about="#Conversation"/>
+                    <rdf:Description rdf:about="#Document"/>
+                    <rdf:Description rdf:about="#DesignDecision"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#status">
+        <rdfs:label xml:lang="en">status (normalized)</rdfs:label>
+        <rdfs:comment xml:lang="en">Normalized status; raw provider value kept in raw_status. Task/Epic: TODO, IN_PROGRESS, BLOCKED, DONE, CANCELLED, UNKNOWN. DesignDecision: PROPOSED, ACCEPTED, REJECTED, SUPERSEDED. CheckRun: provider status. Titles alone are insufficient to explain a procedure.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Epic"/>
+                    <rdf:Description rdf:about="#Task"/>
+                    <rdf:Description rdf:about="#CheckRun"/>
+                    <rdf:Description rdf:about="#DesignDecision"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#raw_status">
+        <rdfs:label xml:lang="en">raw_status</rdfs:label>
+        <rdfs:comment xml:lang="en">Preserved provider-native status value.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Epic"/>
+                    <rdf:Description rdf:about="#Task"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#work_item_type">
+        <rdfs:label xml:lang="en">work_item_type</rdfs:label>
+        <rdfs:comment xml:lang="en">STORY, TASK or SUBTASK.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Task"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#priority">
+        <rdfs:label xml:lang="en">priority</rdfs:label>
+        <rdfs:comment xml:lang="en">Task priority.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Task"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#assignee_ids">
+        <rdfs:label xml:lang="en">assignee_ids</rdfs:label>
+        <rdfs:comment xml:lang="en">Task assignees. null = retrieval unknown; [] = known unassigned. Normalize a single legacy assignee into a one-element array; preserve all assignees without selecting an arbitrary primary person.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Task"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#repository_ids">
+        <rdfs:label xml:lang="en">repository_ids</rdfs:label>
+        <rdfs:comment xml:lang="en">Explicit task-to-repository bindings (manifest-confirmed for new work); a process-only task may have none. Multiple bindings require clarification.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Task"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#provider_id">
+        <rdfs:label xml:lang="en">provider_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Provider-native identifier (Repository, CheckRun, Alert).</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Repository"/>
+                    <rdf:Description rdf:about="#CheckRun"/>
+                    <rdf:Description rdf:about="#Alert"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#owner_name">
+        <rdfs:label xml:lang="en">owner_name</rdfs:label>
+        <rdfs:comment xml:lang="en">Repository owner/name.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Repository"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#clone_url">
+        <rdfs:label xml:lang="en">clone_url</rdfs:label>
+        <rdfs:comment xml:lang="en">Repository clone URL.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Repository"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#stable_ref">
+        <rdfs:label xml:lang="en">stable_ref</rdfs:label>
+        <rdfs:comment xml:lang="en">Configured stable ref of the repository (e.g. main).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Repository"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#default_ref">
+        <rdfs:label xml:lang="en">default_ref</rdfs:label>
+        <rdfs:comment xml:lang="en">Repository default ref.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Repository"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#repository_id">
+        <rdfs:label xml:lang="en">repository_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Repository binding of a Branch, PullRequest, Commit, RevisionEffect or CheckRun.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Branch"/>
+                    <rdf:Description rdf:about="#PullRequest"/>
+                    <rdf:Description rdf:about="#Commit"/>
+                    <rdf:Description rdf:about="#RevisionEffect"/>
+                    <rdf:Description rdf:about="#CheckRun"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#ref">
+        <rdfs:label xml:lang="en">ref</rdfs:label>
+        <rdfs:comment xml:lang="en">Full, exact case-sensitive branch ref.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Branch"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#head_sha">
+        <rdfs:label xml:lang="en">head_sha</rdfs:label>
+        <rdfs:comment xml:lang="en">Full 40-char head SHA of a branch, or the head SHA of a PR.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Branch"/>
+                    <rdf:Description rdf:about="#PullRequest"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#exists">
+        <rdfs:label xml:lang="en">exists</rdfs:label>
+        <rdfs:comment xml:lang="en">Whether the observed ref exists.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Branch"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#is_protected">
+        <rdfs:label xml:lang="en">is_protected</rdfs:label>
+        <rdfs:comment xml:lang="en">Branch protection flag.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Branch"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#number">
+        <rdfs:label xml:lang="en">number</rdfs:label>
+        <rdfs:comment xml:lang="en">PR number.</rdfs:comment>
+        <rdfs:domain rdf:resource="#PullRequest"/>
+        <rdfs:range rdf:resource="&xsd;integer"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#state">
+        <rdfs:label xml:lang="en">state</rdfs:label>
+        <rdfs:comment xml:lang="en">PullRequest state: OPEN or CLOSED (CLOSED is not synonymous with merged; merged presentation derives from authoritative merge fields). Review state uses provider review states.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#PullRequest"/>
+                    <rdf:Description rdf:about="#Review"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#draft">
+        <rdfs:label xml:lang="en">draft</rdfs:label>
+        <rdfs:comment xml:lang="en">PR draft flag.</rdfs:comment>
+        <rdfs:domain rdf:resource="#PullRequest"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#merged_at">
+        <rdfs:label xml:lang="en">merged_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Nullable authoritative merge time.</rdfs:comment>
+        <rdfs:domain rdf:resource="#PullRequest"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#merge_commit_sha">
+        <rdfs:label xml:lang="en">merge_commit_sha</rdfs:label>
+        <rdfs:comment xml:lang="en">Nullable authoritative merge commit SHA.</rdfs:comment>
+        <rdfs:domain rdf:resource="#PullRequest"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#head_repository_id">
+        <rdfs:label xml:lang="en">head_repository_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Head repository of a (possibly forked) PR; fork PRs retain separate head/base repository identities.</rdfs:comment>
+        <rdfs:domain rdf:resource="#PullRequest"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#base_ref">
+        <rdfs:label xml:lang="en">base_ref</rdfs:label>
+        <rdfs:comment xml:lang="en">PR base ref.</rdfs:comment>
+        <rdfs:domain rdf:resource="#PullRequest"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#base_sha">
+        <rdfs:label xml:lang="en">base_sha</rdfs:label>
+        <rdfs:comment xml:lang="en">PR base SHA.</rdfs:comment>
+        <rdfs:domain rdf:resource="#PullRequest"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#reviewer_id">
+        <rdfs:label xml:lang="en">reviewer_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Individual reviewer identity of a review.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Review"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#submitted_at">
+        <rdfs:label xml:lang="en">submitted_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Review submission time.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Review"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#commit_sha">
+        <rdfs:label xml:lang="en">commit_sha</rdfs:label>
+        <rdfs:comment xml:lang="en">Reviewed revision of a review.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Review"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#sha">
+        <rdfs:label xml:lang="en">sha</rdfs:label>
+        <rdfs:comment xml:lang="en">Full 40-char commit SHA (or checked SHA of a CheckRun).</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Commit"/>
+                    <rdf:Description rdf:about="#CheckRun"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#message">
+        <rdfs:label xml:lang="en">message</rdfs:label>
+        <rdfs:comment xml:lang="en">Commit message.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Commit"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#committed_at">
+        <rdfs:label xml:lang="en">committed_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Nullable commit time (kept separate from authored time when available).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Commit"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#history_complete">
+        <rdfs:label xml:lang="en">history_complete</rdfs:label>
+        <rdfs:comment xml:lang="en">Whether imported ancestry for this commit is complete; the live verification adapter is authoritative when it is not.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Commit"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#task_id">
+        <rdfs:label xml:lang="en">task_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Task binding of a work period.</rdfs:comment>
+        <rdfs:domain rdf:resource="#TaskWorkPeriod"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#assignee_id">
+        <rdfs:label xml:lang="en">assignee_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Assignee of a work period.</rdfs:comment>
+        <rdfs:domain rdf:resource="#TaskWorkPeriod"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#identity_binding_id">
+        <rdfs:label xml:lang="en">identity_binding_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Optional verified provider identity binding of a work period.</rdfs:comment>
+        <rdfs:domain rdf:resource="#TaskWorkPeriod"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#effect_kind">
+        <rdfs:label xml:lang="en">effect_kind</rdfs:label>
+        <rdfs:comment xml:lang="en">REVERT or REAPPLICATION (matches the subtype label).</rdfs:comment>
+        <rdfs:domain rdf:resource="#RevisionEffect"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#effect_commit_sha">
+        <rdfs:label xml:lang="en">effect_commit_sha</rdfs:label>
+        <rdfs:comment xml:lang="en">Commit whose effect is evaluated; must match the EFFECT_AT endpoint SHA.</rdfs:comment>
+        <rdfs:domain rdf:resource="#RevisionEffect"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#affected_revision_shas">
+        <rdfs:label xml:lang="en">affected_revision_shas</rdfs:label>
+        <rdfs:comment xml:lang="en">Nonempty list of implementation/integration revisions affected within the delivery group; must match the AFFECTS_REVISION endpoint SHAs.</rdfs:comment>
+        <rdfs:domain rdf:resource="#RevisionEffect"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#mapping_version">
+        <rdfs:label xml:lang="en">mapping_version</rdfs:label>
+        <rdfs:comment xml:lang="en">Version of the mapping that produced this effect record.</rdfs:comment>
+        <rdfs:domain rdf:resource="#RevisionEffect"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#version">
+        <rdfs:label xml:lang="en">version</rdfs:label>
+        <rdfs:comment xml:lang="en">Document version (identity is stable across versions; version/content hash stored separately).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Document"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#content_hash">
+        <rdfs:label xml:lang="en">content_hash</rdfs:label>
+        <rdfs:comment xml:lang="en">Hash of document content or of a message's sanitized content (message revision hash is separate from logical identity).</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Document"/>
+                    <rdf:Description rdf:about="#Message"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#content_path">
+        <rdfs:label xml:lang="en">content_path</rdfs:label>
+        <rdfs:comment xml:lang="en">Local content storage path/reference for document bytes and section anchors.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Document"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#doc_status">
+        <rdfs:label xml:lang="en">doc_status</rdfs:label>
+        <rdfs:comment xml:lang="en">CURRENT, SUPERSEDED or DRAFT.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Document"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#access_scope">
+        <rdfs:label xml:lang="en">access_scope</rdfs:label>
+        <rdfs:comment xml:lang="en">Configured access scope (documents, conversations, employees). Demo uses a configured single demo identity with explicitly allowed project/repository/document scopes.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Document"/>
+                    <rdf:Description rdf:about="#Conversation"/>
+                    <rdf:Description rdf:about="#Employee"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#document_role">
+        <rdfs:label xml:lang="en">document_role</rdfs:label>
+        <rdfs:comment xml:lang="en">Role of the document, e.g. RUNBOOK (ProcessDoc) or POSTMORTEM (post-incident report).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Document"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#name">
+        <rdfs:label xml:lang="en">name</rdfs:label>
+        <rdfs:comment xml:lang="en">Name of a CheckRun, Service, Team or ProductFeature.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#CheckRun"/>
+                    <rdf:Description rdf:about="#Service"/>
+                    <rdf:Description rdf:about="#Team"/>
+                    <rdf:Description rdf:about="#ProductFeature"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#conclusion">
+        <rdfs:label xml:lang="en">conclusion</rdfs:label>
+        <rdfs:comment xml:lang="en">Nullable check run conclusion.</rdfs:comment>
+        <rdfs:domain rdf:resource="#CheckRun"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#completed_at">
+        <rdfs:label xml:lang="en">completed_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Check run or deployment completion time.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#CheckRun"/>
+                    <rdf:Description rdf:about="#Deployment"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#source_key">
+        <rdfs:label xml:lang="en">source_key</rdfs:label>
+        <rdfs:comment xml:lang="en">Registered conversation source key; renaming an allowlisted file can retain it.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Conversation"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#source_epoch">
+        <rdfs:label xml:lang="en">source_epoch</rdfs:label>
+        <rdfs:comment xml:lang="en">Epoch of the conversation source file/capture generation.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Conversation"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#parser_version">
+        <rdfs:label xml:lang="en">parser_version</rdfs:label>
+        <rdfs:comment xml:lang="en">Version of the JSONL parser/dialect used for the conversation import.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Conversation"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#redaction_version">
+        <rdfs:label xml:lang="en">redaction_version</rdfs:label>
+        <rdfs:comment xml:lang="en">Version of the sanitization/redaction policy applied to the capture.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Conversation"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#conversation_id">
+        <rdfs:label xml:lang="en">conversation_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Owning conversation of a message.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Message"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#sequence">
+        <rdfs:label xml:lang="en">sequence</rdfs:label>
+        <rdfs:comment xml:lang="en">Source sequence of a message within its conversation.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Message"/>
+        <rdfs:range rdf:resource="&xsd;integer"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#role">
+        <rdfs:label xml:lang="en">role</rdfs:label>
+        <rdfs:comment xml:lang="en">Message role: USER or ASSISTANT. A role=user record can contain injected context or a relayed agent message; it does not automatically identify a human speaker.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Message"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#origin">
+        <rdfs:label xml:lang="en">origin</rdfs:label>
+        <rdfs:comment xml:lang="en">Message origin: HUMAN_INPUT, ASSISTANT_VISIBLE, INJECTED_CONTEXT or UNKNOWN. Unknown origin is skipped with a coverage limitation.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Message"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#capture_id">
+        <rdfs:label xml:lang="en">capture_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Immutable sanitized content rendition identifier (with parser/redaction versions and captured-prefix hash), separate from the changing whole-file hash.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Message"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#revision_hash">
+        <rdfs:label xml:lang="en">revision_hash</rdfs:label>
+        <rdfs:comment xml:lang="en">Exact decision revision hash of a DesignDecision; an old ACCEPTED record cannot silently inherit revised rationale.</rdfs:comment>
+        <rdfs:domain rdf:resource="#DesignDecision"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#rationale">
+        <rdfs:label xml:lang="en">rationale</rdfs:label>
+        <rdfs:comment xml:lang="en">Bounded recorded rationale of a design decision (with alternatives).</rdfs:comment>
+        <rdfs:domain rdf:resource="#DesignDecision"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#alternatives">
+        <rdfs:label xml:lang="en">alternatives</rdfs:label>
+        <rdfs:comment xml:lang="en">Alternatives considered in a design decision.</rdfs:comment>
+        <rdfs:domain rdf:resource="#DesignDecision"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <!-- ================================================================== -->
+    <!-- DATATYPE PROPERTIES: INCIDENT FIELDS                               -->
+    <!-- ================================================================== -->
+
+    <owl:DatatypeProperty rdf:about="#event_id">
+        <rdfs:label xml:lang="en">event_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Provider event ID of an alert, or incident timeline event ID.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Alert"/>
+                    <rdf:Description rdf:about="#IncidentEvent"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#deduplication_key">
+        <rdfs:label xml:lang="en">deduplication_key</rdfs:label>
+        <rdfs:comment xml:lang="en">Deduplication identity of an alert; duplicates produce receipts, not new alerts.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Alert"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#signature">
+        <rdfs:label xml:lang="en">signature</rdfs:label>
+        <rdfs:comment xml:lang="en">Alert signature.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Alert"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#occurred_at">
+        <rdfs:label xml:lang="en">occurred_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Time the alert/incident event occurred at the provider.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Alert"/>
+                    <rdf:Description rdf:about="#IncidentEvent"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#received_at">
+        <rdfs:label xml:lang="en">received_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Time the alert was received.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Alert"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#severity">
+        <rdfs:label xml:lang="en">severity</rdfs:label>
+        <rdfs:comment xml:lang="en">Raw alert severity: CRITICAL, HIGH, MEDIUM or LOW.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Alert"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#raw_state">
+        <rdfs:label xml:lang="en">raw_state</rdfs:label>
+        <rdfs:comment xml:lang="en">Raw provider state of an alert.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Alert"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#payload_reference">
+        <rdfs:label xml:lang="en">payload_reference</rdfs:label>
+        <rdfs:comment xml:lang="en">Reference to the sanitized alert payload.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Alert"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#service_resolution_status">
+        <rdfs:label xml:lang="en">service_resolution_status</rdfs:label>
+        <rdfs:comment xml:lang="en">Status of resolving the alert to a logical service/instance.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Alert"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#episode_id">
+        <rdfs:label xml:lang="en">episode_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Incident investigation episode ID.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Incident"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#lifecycle_state">
+        <rdfs:label xml:lang="en">lifecycle_state</rdfs:label>
+        <rdfs:comment xml:lang="en">OPEN, ACKNOWLEDGED, MITIGATED, MONITORING or RESOLVED.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Incident"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#opened_at">
+        <rdfs:label xml:lang="en">opened_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Incident opening time (acknowledged/mitigated/resolved times are separate nullable fields).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Incident"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#acknowledged_at">
+        <rdfs:label xml:lang="en">acknowledged_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Incident acknowledgement time, when known.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Incident"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#mitigated_at">
+        <rdfs:label xml:lang="en">mitigated_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Incident mitigation time, when known.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Incident"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#resolved_at">
+        <rdfs:label xml:lang="en">resolved_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Incident resolution time, when known.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Incident"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#severity_policy_version">
+        <rdfs:label xml:lang="en">severity_policy_version</rdfs:label>
+        <rdfs:comment xml:lang="en">Version of the severity policy applied to the incident.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Incident"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#catalog_id">
+        <rdfs:label xml:lang="en">catalog_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Service catalog ID (do not merge services by display name across accounts/environments).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Service"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#service_kind">
+        <rdfs:label xml:lang="en">service_kind</rdfs:label>
+        <rdfs:comment xml:lang="en">APPLICATION, DATABASE, QUEUE or EXTERNAL. A microservice is a service, not a separate identity.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Service"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#workload_id">
+        <rdfs:label xml:lang="en">workload_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Logical workload ID of a service instance; an instance represents a workload in one operating location, not every temporary process.</rdfs:comment>
+        <rdfs:domain rdf:resource="#ServiceInstance"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#service_id">
+        <rdfs:label xml:lang="en">service_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Service of a service instance.</rdfs:comment>
+        <rdfs:domain rdf:resource="#ServiceInstance"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#provider_account">
+        <rdfs:label xml:lang="en">provider_account</rdfs:label>
+        <rdfs:comment xml:lang="en">Provider account of a service instance.</rdfs:comment>
+        <rdfs:domain rdf:resource="#ServiceInstance"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#cluster">
+        <rdfs:label xml:lang="en">cluster</rdfs:label>
+        <rdfs:comment xml:lang="en">Provider cluster of a service instance.</rdfs:comment>
+        <rdfs:domain rdf:resource="#ServiceInstance"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#namespace">
+        <rdfs:label xml:lang="en">namespace</rdfs:label>
+        <rdfs:comment xml:lang="en">Provider namespace of a service instance.</rdfs:comment>
+        <rdfs:domain rdf:resource="#ServiceInstance"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#environment">
+        <rdfs:label xml:lang="en">environment</rdfs:label>
+        <rdfs:comment xml:lang="en">Environment of a service instance.</rdfs:comment>
+        <rdfs:domain rdf:resource="#ServiceInstance"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#region">
+        <rdfs:label xml:lang="en">region</rdfs:label>
+        <rdfs:comment xml:lang="en">Region of a service instance.</rdfs:comment>
+        <rdfs:domain rdf:resource="#ServiceInstance"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#deployment_id">
+        <rdfs:label xml:lang="en">deployment_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Provider deployment/revision ID.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Deployment"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#started_at">
+        <rdfs:label xml:lang="en">started_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Deployment start time.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Deployment"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#outcome">
+        <rdfs:label xml:lang="en">outcome</rdfs:label>
+        <rdfs:comment xml:lang="en">Observed deployment outcome.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Deployment"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#rollback_history_available">
+        <rdfs:label xml:lang="en">rollback_history_available</rdfs:label>
+        <rdfs:comment xml:lang="en">Whether rollback history is available for the deployment.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Deployment"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#artifact_id">
+        <rdfs:label xml:lang="en">artifact_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Immutable deployed package/image identifier or digest.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Artifact"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#digest">
+        <rdfs:label xml:lang="en">digest</rdfs:label>
+        <rdfs:comment xml:lang="en">Artifact digest.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Artifact"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#build_provenance_ref">
+        <rdfs:label xml:lang="en">build_provenance_ref</rdfs:label>
+        <rdfs:comment xml:lang="en">Build provenance reference of an artifact.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Artifact"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#build_revisions">
+        <rdfs:label xml:lang="en">build_revisions</rdfs:label>
+        <rdfs:comment xml:lang="en">Verified build revisions of an artifact; may span several repositories.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Artifact"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#provenance_completeness">
+        <rdfs:label xml:lang="en">provenance_completeness</rdfs:label>
+        <rdfs:comment xml:lang="en">Completeness of artifact build provenance.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Artifact"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#directory_id">
+        <rdfs:label xml:lang="en">directory_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Verified directory ID of an Employee or Team.</rdfs:comment>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Employee"/>
+                    <rdf:Description rdf:about="#Team"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#provider_identity_mappings">
+        <rdfs:label xml:lang="en">provider_identity_mappings</rdfs:label>
+        <rdfs:comment xml:lang="en">Provider identity mappings of an employee; no guessed email-to-user match.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Employee"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#assignment_id">
+        <rdfs:label xml:lang="en">assignment_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Provider on-call assignment ID.</rdfs:comment>
+        <rdfs:domain rdf:resource="#OnCallAssignment"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#escalation_level">
+        <rdfs:label xml:lang="en">escalation_level</rdfs:label>
+        <rdfs:comment xml:lang="en">Service/escalation level of an on-call assignment.</rdfs:comment>
+        <rdfs:domain rdf:resource="#OnCallAssignment"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#effective_start">
+        <rdfs:label xml:lang="en">effective_start</rdfs:label>
+        <rdfs:comment xml:lang="en">Effective start of an on-call assignment; query on-call at the proposed notification time.</rdfs:comment>
+        <rdfs:domain rdf:resource="#OnCallAssignment"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#effective_end">
+        <rdfs:label xml:lang="en">effective_end</rdfs:label>
+        <rdfs:comment xml:lang="en">Effective end of an on-call assignment.</rdfs:comment>
+        <rdfs:domain rdf:resource="#OnCallAssignment"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#override_source">
+        <rdfs:label xml:lang="en">override_source</rdfs:label>
+        <rdfs:comment xml:lang="en">Override source of an on-call assignment (e.g. a current override beats the default rotation).</rdfs:comment>
+        <rdfs:domain rdf:resource="#OnCallAssignment"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#retrieved_at">
+        <rdfs:label xml:lang="en">retrieved_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Retrieval time of the on-call record from its provider.</rdfs:comment>
+        <rdfs:domain rdf:resource="#OnCallAssignment"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#change_id">
+        <rdfs:label xml:lang="en">change_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Source change ID (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Change"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#change_kind">
+        <rdfs:label xml:lang="en">change_kind</rdfs:label>
+        <rdfs:comment xml:lang="en">CODE, CONFIG, SCHEMA, FEATURE_FLAG or INFRASTRUCTURE (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Change"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#effective_at">
+        <rdfs:label xml:lang="en">effective_at</rdfs:label>
+        <rdfs:comment xml:lang="en">Effective time of a change (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Change"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#before_ref">
+        <rdfs:label xml:lang="en">before_ref</rdfs:label>
+        <rdfs:comment xml:lang="en">Bounded before-state reference of a change (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Change"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#after_ref">
+        <rdfs:label xml:lang="en">after_ref</rdfs:label>
+        <rdfs:comment xml:lang="en">Bounded after-state reference of a change (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Change"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#affected_scope">
+        <rdfs:label xml:lang="en">affected_scope</rdfs:label>
+        <rdfs:comment xml:lang="en">Affected runtime scope of a change (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Change"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#feature_id">
+        <rdfs:label xml:lang="en">feature_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Stable product feature ID (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#ProductFeature"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#customer_id">
+        <rdfs:label xml:lang="en">customer_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Stable customer ID (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Customer"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#display_name">
+        <rdfs:label xml:lang="en">display_name</rdfs:label>
+        <rdfs:comment xml:lang="en">Authorized customer display name; restricted names or total counts cannot leak through a path or aggregate (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Customer"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#support_tier">
+        <rdfs:label xml:lang="en">support_tier</rdfs:label>
+        <rdfs:comment xml:lang="en">Optional customer support tier; an enterprise tier is a property, not a different identity (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Customer"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#observation_kind">
+        <rdfs:label xml:lang="en">observation_kind</rdfs:label>
+        <rdfs:comment xml:lang="en">Kind of bounded observation summary (proposed); bulk logs and metric series stay in their source systems.</rdfs:comment>
+        <rdfs:domain rdf:resource="#Observation"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#measurement_start">
+        <rdfs:label xml:lang="en">measurement_start</rdfs:label>
+        <rdfs:comment xml:lang="en">Measurement window start of an observation (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Observation"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#measurement_end">
+        <rdfs:label xml:lang="en">measurement_end</rdfs:label>
+        <rdfs:comment xml:lang="en">Measurement window end of an observation (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Observation"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#sample_description">
+        <rdfs:label xml:lang="en">sample_description</rdfs:label>
+        <rdfs:comment xml:lang="en">Sample/coverage description of an observation (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Observation"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#value_ref">
+        <rdfs:label xml:lang="en">value_ref</rdfs:label>
+        <rdfs:comment xml:lang="en">Value or content reference of an observation (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#Observation"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#event_kind">
+        <rdfs:label xml:lang="en">event_kind</rdfs:label>
+        <rdfs:comment xml:lang="en">Kind of an incident timeline event (proposed). Incident roles are versioned assignment records within IncidentEvent (employee ID, role, start/end, source).</rdfs:comment>
+        <rdfs:domain rdf:resource="#IncidentEvent"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#actor">
+        <rdfs:label xml:lang="en">actor</rdfs:label>
+        <rdfs:comment xml:lang="en">Actor/provider of an incident event (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#IncidentEvent"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#recorded_at_event">
+        <rdfs:label xml:lang="en">recorded_at (incident event)</rdfs:label>
+        <rdfs:comment xml:lang="en">Recorded time of an incident event (proposed); kept separate from occurred_at.</rdfs:comment>
+        <rdfs:domain rdf:resource="#IncidentEvent"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#evidence_refs">
+        <rdfs:label xml:lang="en">evidence_refs</rdfs:label>
+        <rdfs:comment xml:lang="en">Evidence references of an incident event (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#IncidentEvent"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#plan_id">
+        <rdfs:label xml:lang="en">plan_id</rdfs:label>
+        <rdfs:comment xml:lang="en">Action plan ID (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#ActionPlan"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#plan_version">
+        <rdfs:label xml:lang="en">plan_version</rdfs:label>
+        <rdfs:comment xml:lang="en">Action plan version (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#ActionPlan"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#action_kind">
+        <rdfs:label xml:lang="en">action_kind</rdfs:label>
+        <rdfs:comment xml:lang="en">Kind of action in an action plan (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#ActionPlan"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#expected_state">
+        <rdfs:label xml:lang="en">expected_state</rdfs:label>
+        <rdfs:comment xml:lang="en">Expected state an action plan intends to establish (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#ActionPlan"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#proposed_state">
+        <rdfs:label xml:lang="en">proposed_state</rdfs:label>
+        <rdfs:comment xml:lang="en">Proposed state change of an action plan (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#ActionPlan"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#prerequisites">
+        <rdfs:label xml:lang="en">prerequisites</rdfs:label>
+        <rdfs:comment xml:lang="en">Prerequisites of an action plan; a cyclic or unknown ordering blocks execution, not evidence retrieval (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#ActionPlan"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#approval_status">
+        <rdfs:label xml:lang="en">approval_status</rdfs:label>
+        <rdfs:comment xml:lang="en">Approval status of an action plan; incident decisions and approvals are explicit authored records, not generated facts (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#ActionPlan"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#expiry">
+        <rdfs:label xml:lang="en">expiry</rdfs:label>
+        <rdfs:comment xml:lang="en">Expiry of an action plan (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#ActionPlan"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#outcome_refs">
+        <rdfs:label xml:lang="en">outcome_refs</rdfs:label>
+        <rdfs:comment xml:lang="en">Outcome references of an action plan (proposed).</rdfs:comment>
+        <rdfs:domain rdf:resource="#ActionPlan"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+</rdf:RDF>

@@ -249,11 +249,23 @@ def validate_bundle(bundle: Dict[str, Any]) -> None:
     node_labels: Dict[str, str] = {}
     seen: Set[str] = set()
     tenant: Optional[str] = None
+    # Ownership validation (docs/design/graph_publication.md): every record
+    # must be canonically owned (derived from label/edge type) and actually
+    # owned by the bundle's projection. Without this, a STRUCTURAL bundle can
+    # carry an INCIDENT-owned Task and later overwrite immutable ownership.
+    from app.graph.projection_ownership import validate_owner  # local import: module cycle
+
     for node in nodes:
         validate_node(node)
+        validate_owner(node)
         node_id = node["id"]
         if node_id in seen:
             raise GraphValidationError(f"duplicate logical node ID {node_id!r}")
+        if node["projection_owner"] != projection:
+            raise GraphValidationError(
+                f"node {node_id!r} owned by {node['projection_owner']!r} cannot be "
+                f"published through a {projection} bundle"
+            )
         seen.add(node_id)
         node_labels[node_id] = node["label"]
         if tenant is None:
@@ -264,8 +276,14 @@ def validate_bundle(bundle: Dict[str, Any]) -> None:
     edge_ids: Set[str] = set()
     for edge in edges:
         validate_edge(edge, node_labels)
+        validate_owner(edge, is_edge=True)
         if edge["id"] in edge_ids:
             raise GraphValidationError(f"duplicate logical edge ID {edge['id']!r}")
+        if edge["projection_owner"] != projection:
+            raise GraphValidationError(
+                f"edge {edge['id']!r} owned by {edge['projection_owner']!r} cannot be "
+                f"published through a {projection} bundle"
+            )
         edge_ids.add(edge["id"])
         if edge["tenant_id"] != tenant:
             raise GraphValidationError(f"cross-tenant edge {edge['id']!r}")
@@ -286,6 +304,10 @@ def validate_bundle(bundle: Dict[str, Any]) -> None:
             pr_id = edge["start_id"]
             if pr_id in active_targets and active_targets[pr_id] != edge["end_id"]:
                 raise GraphValidationError(f"PR {pr_id!r} targets more than one active branch")
+            # Record the first active target so a second, different target for
+            # the same PR is detected; the malformed bundle must fail during
+            # preparation, before any graph mutation (readable prior snapshot).
+            active_targets[pr_id] = edge["end_id"]
 
     # Resolve-effect consistency: REAPPLICATION edges must reference a REVERT.
     effects = {n["id"]: n for n in nodes if n["label"] == "RevisionEffect"}

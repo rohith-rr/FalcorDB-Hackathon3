@@ -33,6 +33,13 @@ try:
         report = protocol.recover(projection)
     except RecoveryRequired as exc:
         print(f"retained-bundle recovery unavailable ({exc}); rebuilding a full validated bundle")
+        # A recovery bundle must capture exactly the projection being
+        # recovered: fixture rebuilding is only available for STRUCTURAL.
+        # For any other projection, provide a validated full bundle instead.
+        if projection != "STRUCTURAL":
+            print(f"no fixture-built bundle exists for {projection!r}; "
+                  "operator must supply a validated full bundle for it")
+            raise SystemExit(1)
         from scripts.seed_graph import merge_structural_bundles
 
         full = merge_structural_bundles()

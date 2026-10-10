@@ -1,6 +1,6 @@
 # Company Brain: architecture and implementation design
 
-Status: proposed design; application implementation has not started. Revised 2026-10-09.
+Status: proposed design; application implementation has not started. Revised 2026-10-10.
 
 ## Product intent
 
@@ -48,6 +48,8 @@ flowchart TD
 ```
 
 Recommended initial stack: Python 3.11+, FastAPI, Pydantic, FalkorDB Python client, Docker Compose, and React/TypeScript. These are defaults for a new implementation, not existing code. Pin tested versions in Phase 0 and use Docker Desktop/WSL2 where appropriate on Windows. The answer LLM and decision provider use independent adapters.
+
+Follow the user's [workspace setup policy](docs/design/workspace_setup.md): place all new project downloads, runtimes, dependencies, caches, temporary files, application state and Docker engine disks under `E:\FalcorDB Hackathon`. Verify effective locations before installs/pulls and after restart; a project-local Compose file does not relocate Docker images. Existing OS/host tools may remain on C:, but new large project artifacts must use workspace storage. External tokens, OAuth, account logins and cloud provisioning wait until after Phase 2 implementation. Build full connector/authentication code and run local/offline checks first; actual live compatibility is validated separately afterward.
 
 The development scope covers one organization, one project and one repository. Start with fixtures and structured exports, then require read-only live Plane, Google Docs and GitHub adapters for demo completion. Jira exports and Markdown remain supported and visibly labeled alternatives. The [source-adapter specification](docs/design/source_adapters.md) defines identity, authentication, normalization, coverage and live smoke checks. The SRE-focused demo adds a small synthetic service/deployment/on-call/customer dataset; its scope and alternative demo path are defined in the SRE plan. Additional live operational sources and enterprise permissions follow after the demo.
 
@@ -137,17 +139,19 @@ Start at the [implementation index](docs/design/README.md). Each document define
 | --- | --- |
 | [0: Foundation](docs/design/phase_00_foundation.md) | Runtime, contracts and scenario fixtures |
 | [1: Graph](docs/design/phase_01_graph_and_fixtures.md) | Schema, durable import/recovery and query templates |
-| [2: Ingestion](docs/design/phase_02_ingestion_and_sync.md) | Plane/Google Docs/GitHub reads, Codex JSONL imports, exports and explicit links |
+| [2: Ingestion](docs/design/phase_02_ingestion_and_sync.md) | Complete Plane/Google Docs/GitHub adapter code, offline/local checks, Codex JSONL imports, exports and explicit links |
+| [After Phase 2 implementation](docs/design/workspace_setup.md#credentials-after-phase-2-implementation) | Provider accounts/tokens/OAuth and actual live read/refresh/citation checks |
 | [3: Traversal](docs/design/phase_03_traversal_and_branch_decisions.md) | Verified branch/blocker decisions and scoped conversation context |
 | [4: Decision models](docs/design/phase_04_decision_model_integration.md) | Adapters, evaluation and routing gate |
 | [5: Answers](docs/design/phase_05_context_and_llm_answers.md) | Evidence bundle, real LLM API call and fallback |
 | [6: Demo](docs/design/phase_06_ui_evaluation_and_demo.md) | Query UI, graph explanation and regression checks |
 | [7: Production](docs/design/phase_07_production_and_actions.md) | Permissions, reliable sync, actions and broader context |
 
-Phase completion is defined by each phase's completion gate, not by elapsed time. Re-estimate effort after the actual recovery/persistence and live-adapter compatibility checks rather than committing to hour figures in advance. Export ingestion and rules routing remain labeled fallbacks if integrations/model setup cannot be completed, but export-only results do not complete the live Plane/Google Docs gate. At least one real LLM API call is required to demonstrate the requested retrieval-to-explanation workflow; fallback-only operation is a partial deliverable.
+Phase completion is defined by each phase's completion gate, not by elapsed time. Re-estimate effort after the actual recovery/persistence and live-adapter compatibility checks rather than committing to hour figures in advance. Phase 2 implementation can complete without credentials using full adapter code and passing offline/local checks; record the later live checklist as deferred and continue Phase 3 implementation. Export ingestion and rules routing remain labeled fallbacks if integrations/model setup cannot be completed, but export-only results do not complete the final live Plane/Google Docs demo gate. At least one real LLM API call is required to demonstrate the requested retrieval-to-explanation workflow; fallback-only operation is a partial demo deliverable.
 
 ## Success criteria
 
+- Project dependency/cache/temp and container storage is verified under the workspace before downloads and after restart; Phases 0-2 local implementation checks require no provider tokens, OAuth or login.
 - Payments returns the verified backend base with review warnings and source citations; complete stable delivery selects stable instead.
 - Independent dependency branches, stale data, missing mappings, cycles and inaccessible prerequisites withhold a single-base command and explain the limitation.
 - Task context includes available design/process documents, implementation and individual reviews with source versions.

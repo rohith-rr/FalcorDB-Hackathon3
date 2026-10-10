@@ -6,6 +6,8 @@ Status: planned. Depends on Phase 5.
 
 The Company Brain can be demonstrated from a natural-language question to a cited recommendation and its graph path. An engineer can see which data supported the answer, whether it is fresh, and why a command was withheld.
 
+Frontend runtimes/dependencies, package caches, build/test output, optional browser binaries and any additional containers follow [workspace setup](workspace_setup.md). Provider accounts and live smoke checks are onboarded after Phase 2 implementation; this phase retains the final live demo acceptance requirement.
+
 ## Proposed files
 
 ```text

@@ -44,6 +44,15 @@ class GraphRecoveryRequiredError(RecoveryRequired):
     """Domain-read analogue: HTTP 503 GRAPH_RECOVERY_REQUIRED."""
 
 
+class BundleConflictError(ValueError):
+    """A retained immutable bundle already exists with different bytes.
+
+    Retained recovery bytes are never overwritten (phase_01: immutable
+    bundle requirement); a changed bundle must be allocated a new
+    bundle/snapshot ID by the importer.
+    """
+
+
 # ---------------------------------------------------------------------------
 # Gates: process-local shared/exclusive per projection (Phase 7 replaces this
 # with a multiworker-safe mechanism; single-writer durability is required now).
@@ -59,6 +68,14 @@ class _RWLock:
             while self._writer:
                 self._condition.wait()
             self._readers += 1
+
+    def try_acquire_shared(self) -> bool:
+        """Nonblocking shared admission: False while a writer holds the gate."""
+        with self._condition:
+            if self._writer:
+                return False
+            self._readers += 1
+            return True
 
     def release_shared(self) -> None:
         with self._condition:
@@ -96,6 +113,13 @@ class _Shared:
     def __init__(self, lock: _RWLock) -> None:
         self._lock = lock
         self.acquired = False
+
+    def try_enter(self) -> bool:
+        """Enter without waiting; False while a writer holds the gate."""
+        if self._lock.try_acquire_shared():
+            self.acquired = True
+            return True
+        return False
 
     def __enter__(self) -> "_Shared":
         self._lock.acquire_shared()
@@ -139,22 +163,53 @@ def admit_ordered(required: List[str]) -> "OrderedSharedAdmission":
     return OrderedSharedAdmission([name for name in _PROJECTIONS if name in required])
 
 
+def try_admit_ordered(required: List[str]) -> Optional["OrderedSharedAdmission"]:
+    """Acquire the shared gates nonblocking in STRUCTURAL, INCIDENT order.
+
+    Returns an already-acquired admission, or None when a publication holds
+    any required exclusive gate: domain readers must reject admission with
+    GRAPH_RECOVERY_REQUIRED, even if the durable state is still READY.
+    """
+    admission = OrderedSharedAdmission([name for name in _PROJECTIONS if name in required])
+    return admission if admission.try_enter() else None
+
+
 class OrderedSharedAdmission:
     def __init__(self, ordered: List[str]) -> None:
         self._ordered = ordered
         self._shared: List[_Shared] = []
+        self._entered = False
 
-    def __enter__(self) -> "OrderedSharedAdmission":
+    def try_enter(self) -> bool:
+        """Acquire every shared gate without waiting; partially acquired gates
+        are released when any required gate is held exclusively."""
+        if self._entered:
+            return True
         for name in self._ordered:
             shared = _GATES[name].admit()
-            shared.__enter__()
+            if not shared.try_enter():
+                for acquired in reversed(self._shared):
+                    acquired.__exit__(None, None, None)
+                self._shared = []
+                return False
             self._shared.append(shared)
+        self._entered = True
+        return True
+
+    def __enter__(self) -> "OrderedSharedAdmission":
+        if not self._entered:
+            for name in self._ordered:
+                shared = _GATES[name].admit()
+                shared.__enter__()
+                self._shared.append(shared)
+            self._entered = True
         return self
 
     def __exit__(self, *exc: Any) -> None:
         for shared in reversed(self._shared):
             shared.__exit__(None, None, None)
         self._shared = []
+        self._entered = False
 
 
 def publish_gates(affected: List[str]) -> "ExclusiveGateSet":
@@ -197,7 +252,8 @@ SET c.state = $state,
     c.published_log_position = $published_log_position,
     c.last_published_at = $last_published_at,
     c.updated_at = $updated_at,
-    c.last_failure = $last_failure
+    c.last_failure = $last_failure,
+    c.coverage = $coverage
 RETURN c.generation AS generation, c.state AS state
 """
 
@@ -209,7 +265,8 @@ RETURN c.state AS state, c.generation AS generation,
        c.pending_bundle_hash AS pending_bundle_hash,
        c.last_published_at AS last_published_at,
        c.updated_at AS updated_at,
-       c.last_failure AS last_failure
+       c.last_failure AS last_failure,
+       c.coverage AS coverage
 """
 
 
@@ -235,6 +292,7 @@ def read_import_state(
             "last_published_at": None,
             "updated_at": None,
             "last_failure": None,
+            "coverage": {},
         }
     row = rows[0]
     return {
@@ -247,7 +305,29 @@ def read_import_state(
         "last_published_at": row[5],
         "updated_at": row[6],
         "last_failure": row[7],
+        # Declared source-scope coverage travels with the durable state so
+        # domain reads can fingerprint it (READY != source completeness).
+        "coverage": _parse_coverage(row[8]),
     }
+
+
+def _parse_coverage(raw: Any) -> Dict[str, Any]:
+    """Decode the durable coverage JSON string; unknown/missing = UNKNOWN."""
+    if raw is None or raw == "":
+        return {}
+    if isinstance(raw, dict):
+        return dict(raw)
+    try:
+        parsed = json.loads(raw)
+    except (TypeError, ValueError):
+        return {"__unknown__": True}
+    return dict(parsed) if isinstance(parsed, dict) else {"__unknown__": True}
+
+
+def _dump_coverage(coverage: Any) -> Optional[str]:
+    if coverage is None:
+        return None
+    return json.dumps(coverage, sort_keys=True, separators=(",", ":"))
 
 
 def _now() -> datetime:
@@ -269,20 +349,46 @@ class BundleStore:
 
     def persist(self, bundle: Dict[str, Any]) -> str:
         import hashlib
+        import os
+        import uuid
 
         bundle_id = bundle["bundle_id"]
         projection = bundle["projection_id"]
         path = self._path(projection, bundle_id)
         path.parent.mkdir(parents=True, exist_ok=True)
-        payload = json.dumps(bundle, sort_keys=True, separators=(",", ":"))
-        # Write then fsync the manifest file for durable flush.
-        with open(path, "w", encoding="utf-8", newline="\n") as fh:
-            fh.write(payload)
-            fh.flush()
-            import os
-
-            os.fsync(fh.fileno())
-        digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+        payload = json.dumps(bundle, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        digest = hashlib.sha256(payload).hexdigest()
+        if path.is_file():
+            # Retained bundles are immutable (phase_01_graph_and_fixtures.md:
+            # "Durably flush manifest/content ... never overwrite versioned
+            # content"). If an interrupted import already references this ID,
+            # its recovery bytes must stay intact: identical bytes are an
+            # idempotent re-preparation; differing bytes are a conflict.
+            existing = path.read_bytes()
+            if hashlib.sha256(existing).hexdigest() != digest:
+                raise BundleConflictError(
+                    f"retained bundle {bundle_id!r} for {projection} already exists "
+                    "with different content; immutable recovery bytes are preserved. "
+                    "Allocate a new bundle/snapshot ID for the changed bundle."
+                )
+            return digest
+        # Write + fsync a temporary file first, then atomically commit the
+        # final pathname: an interrupted preparation can never leave a partial
+        # file that a later immutable re-preparation would misread as a
+        # conflicting bundle.
+        tmp = path.with_name(f"{path.name}.{uuid.uuid4().hex}.tmp")
+        try:
+            with open(tmp, "wb") as fh:
+                fh.write(payload)
+                fh.flush()
+                os.fsync(fh.fileno())
+            os.replace(tmp, path)
+        finally:
+            if tmp.is_file():
+                try:
+                    tmp.unlink()
+                except OSError:  # pragma: no cover - cleanup best effort
+                    pass
         return digest
 
     def load(self, projection_id: str, bundle_id: str) -> Optional[Dict[str, Any]]:
@@ -344,6 +450,11 @@ class PublicationGateProtocol:
             previous_generation = int(state["generation"])
             previous_snapshot = state["active_snapshot_id"]
 
+            # Ownership is immutable: every record being written must be
+            # canonically owned by this projection in the graph too
+            # (docs/design/graph_publication.md - cross-owner writes rejected).
+            self._validate_existing_owners(bundle, projection)
+
             # 3. DIRTY before the first domain write; generation is a fence.
             generation = previous_generation + 1
             self._write_control(
@@ -353,6 +464,7 @@ class PublicationGateProtocol:
                 active_snapshot_id=state["active_snapshot_id"],
                 pending_bundle_id=bundle["bundle_id"],
                 pending_bundle_hash=bundle_hash,
+                coverage=bundle.get("coverage"),
             )
             if self.fail_after == "after_dirty":
                 raise RuntimeError("injected failure after DIRTY publication")
@@ -383,6 +495,7 @@ class PublicationGateProtocol:
                 pending_bundle_id=None,
                 pending_bundle_hash=None,
                 last_published_at=published_at,
+                coverage=bundle.get("coverage"),
             )
 
             # 7. Durable readback acknowledgment before releasing the gate.
@@ -429,27 +542,36 @@ class PublicationGateProtocol:
             raise RecoveryRequired(
                 f"retained bundle {bundle_id!r} hash mismatch for {projection}"
             )
-        return self._gated_rebuild(projection, bundle, state, operator=operator)
+        return self._gated_rebuild(projection, bundle, operator=operator)
 
     def recover_with_bundle(
         self, projection: str, bundle: Dict[str, Any], operator: str = "operator"
     ) -> Dict[str, Any]:
         """Recovery from a NEW validated full bundle when the retained bundle
-        is missing/invalid (operator path)."""
+        is missing/invalid, or when durable control state is missing/unreadable
+        entirely (operator fallback documented in scripts/recover_projection.py:
+        graph empty or ImportControl gone => UNINITIALIZED => rebuild from the
+        supplied validated bundle through the same gated protocol)."""
+        # A bundle captures one specific projection's owned records. Writing a
+        # STRUCTURAL bundle during INCIDENT recovery (or vice versa) would
+        # mark the wrong projection READY with foreign records, so reject the
+        # mixed request before persistence or any mutation.
+        if bundle.get("projection_id") != projection:
+            raise RecoveryRequired(
+                f"recovery bundle is for projection {bundle.get('projection_id')!r}, "
+                f"not the requested projection {projection!r}; provide a validated "
+                f"full {projection} bundle"
+            )
         validate_bundle(bundle)
         bundle_hash = self.bundles.persist(bundle)
-        state = read_import_state(self.client, projection)
-        if state["state"] == "READY":
-            return {"projection_id": projection, "outcome": "NO_RECOVERY_REQUIRED"}
         return self._gated_rebuild(
-            projection, bundle, state, bundle_hash=bundle_hash, operator=operator
+            projection, bundle, bundle_hash=bundle_hash, operator=operator
         )
 
     def _gated_rebuild(
         self,
         projection: str,
         bundle: Dict[str, Any],
-        state: Dict[str, Any],
         bundle_hash: Optional[str] = None,
         operator: str = "operator",
     ) -> Dict[str, Any]:
@@ -459,6 +581,31 @@ class PublicationGateProtocol:
         logger.info("recovering projection %s from retained bundle %s (%s)", projection, bundle_id, operator)
 
         with publish_gates([projection]):
+            # Reconcile the durable state under the exclusive gate: another
+            # recovery or publication may have completed while this one waited
+            # for the gate. If the projection recovered meanwhile, do not
+            # rebuild stale bytes over a newer snapshot; generations must be
+            # monotonic, so derive the new generation from the current state.
+            state = read_import_state(self.client, projection)
+            if state["state"] == "READY":
+                logger.info(
+                    "recovery for %s no longer required after gate acquisition", projection
+                )
+                return {
+                    "projection_id": projection,
+                    "outcome": "NO_RECOVERY_REQUIRED",
+                    "bundle_id": bundle_id,
+                }
+            if state["state"] == "UNINITIALIZED":
+                # Missing/empty durable control state: the operator-supplied
+                # validated full bundle restores the projection from scratch
+                # ("missing ... state requires recovery", phase_01; the
+                # retained-bundle path recover() still refuses UNINITIALIZED
+                # because it has no bundle to rebuild from).
+                logger.warning(
+                    "%s control state is UNINITIALIZED; rebuilding from the "
+                    "validated full bundle provided by the operator", projection
+                )
             generation = int(state["generation"]) + 1
             self._write_control(
                 projection,
@@ -467,6 +614,7 @@ class PublicationGateProtocol:
                 active_snapshot_id=None,
                 pending_bundle_id=bundle_id,
                 pending_bundle_hash=bundle_hash,
+                coverage=bundle.get("coverage"),
             )
             # Full affected-projection rebuild: clear owned records, re-upsert.
             self._clear_owned(projection)
@@ -484,6 +632,7 @@ class PublicationGateProtocol:
                 pending_bundle_id=None,
                 pending_bundle_hash=None,
                 last_published_at=published_at,
+                coverage=bundle.get("coverage"),
             )
             ack = read_import_state(self.client, projection)
             if ack["state"] != "READY":
@@ -507,6 +656,7 @@ class PublicationGateProtocol:
         pending_bundle_id: Optional[str],
         pending_bundle_hash: Optional[str],
         last_published_at: Optional[str] = None,
+        coverage: Any = None,
     ) -> None:
         settings = get_settings()
         self.client.query(
@@ -523,8 +673,57 @@ class PublicationGateProtocol:
                 "last_published_at": last_published_at,
                 "updated_at": _now().isoformat(),
                 "last_failure": None,
+                "coverage": _dump_coverage(coverage),
             },
         )
+
+    def _validate_existing_owners(self, bundle: Dict[str, Any], projection: str) -> None:
+        """Ownership is immutable: an upsert must never overwrite the
+        projection_owner of an existing graph record (graph_publication.md —
+        reject cross-owner writes before mutation)."""
+        from app.graph.schema import GraphValidationError
+
+        node_ids = [n["id"] for n in bundle["nodes"]]
+        if node_ids:
+            rows = self.client.ro_query(
+                """
+                UNWIND $ids AS nid
+                MATCH (n {id: nid})
+                WHERE n.graph_name IS NULL
+                  AND n.projection_owner IS NOT NULL
+                  AND n.projection_owner <> $projection
+                RETURN n.id AS node_id
+                LIMIT 100
+                """,
+                {"ids": node_ids, "projection": projection},
+            )
+            conflicts = [str(r[0]) for r in rows]
+            if conflicts:
+                raise GraphValidationError(
+                    f"existing records are owned by another projection; refusing to "
+                    f"overwrite their ownership via a {projection} bundle: {conflicts[:10]}"
+                )
+        edge_ids = [e["id"] for e in bundle["edges"]]
+        if edge_ids:
+            rows = self.client.ro_query(
+                """
+                UNWIND $ids AS eid
+                MATCH ()-[r]->()
+                WHERE r.id = eid
+                  AND r.graph_name IS NULL
+                  AND r.projection_owner IS NOT NULL
+                  AND r.projection_owner <> $projection
+                RETURN r.id AS edge_id
+                LIMIT 100
+                """,
+                {"ids": edge_ids, "projection": projection},
+            )
+            conflicts = [str(r[0]) for r in rows]
+            if conflicts:
+                raise GraphValidationError(
+                    f"existing edges are owned by another projection; refusing to "
+                    f"mutate them via a {projection} bundle: {conflicts[:10]}"
+                )
 
     def _write_nodes(self, bundle: Dict[str, Any]) -> None:
         for node in bundle["nodes"]:
@@ -548,14 +747,23 @@ class PublicationGateProtocol:
     def _write_edges(self, bundle: Dict[str, Any]) -> None:
         """Upsert edges by application-owned ID. DELETE-then-CREATE handles
         endpoint changes under a stable ID (relationship endpoints cannot be
-        updated in place)."""
+        updated in place). Stale edges are removed BY EDGE ID regardless of
+        their endpoints, so a legacy edge with the same ID but different
+        endpoints (e.g. reversed direction) cannot double up after an
+        idempotent reimport."""
         for edge in bundle["edges"]:
             props = {k: v for k, v in edge.items() if k not in ("type", "start_id", "end_id")}
+            # 1. Retire EVERY existing edge carrying this application ID (all
+            #    directions/endpoints), then 2. recreate the authoritative one.
+            # A single DELETE-then-CREATE query keeps only one matched old row
+            # and leaves duplicate-id edges behind.
+            self.client.query(
+                f"MATCH ()-[old:{edge['type']} {{id: $id}}]->() DELETE old",
+                {"id": edge["id"]},
+            )
             self.client.query(
                 f"""
                 MATCH (a {{id: $start_id}}), (b {{id: $end_id}})
-                OPTIONAL MATCH (a)-[old:{edge['type']} {{id: $id}}]->()
-                DELETE old
                 CREATE (a)-[r:{edge['type']} {{id: $id}}]->(b)
                 SET r = $props
                 """,

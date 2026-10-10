@@ -16,7 +16,9 @@ TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
 
 #: template id -> (filename, row budget, projections required READY)
 TEMPLATE_INDEX: Dict[str, dict] = {
-    "exact_task_lookup": {"budget": 2, "projections": ["STRUCTURAL"]},
+    "exact_task_lookup": {
+        "budget": 2, "projections": ["STRUCTURAL"], "coverage_scope_param": "project_id",
+    },
     "dependency_frontier": {"budget": 200, "projections": ["STRUCTURAL"]},
     "epic_children": {"budget": 200, "projections": ["STRUCTURAL"]},
     "task_delivery_groups": {"budget": 50, "projections": ["STRUCTURAL"]},
